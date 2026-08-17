@@ -1,0 +1,14 @@
+body {
+	background: #eee;
+	color: #111;
+}
+.byMDdocument {
+  --by-md-bg: #fff;
+  --by-md-text: #111;
+  --by-md-muted: #666;
+  --by-md-border: #ddd;
+  --by-md-link: #56f;
+  --by-md-code-bg: #ddd;
+  --by-md-quote: #566;
+  --by-md-table-alt: #eef;
+}

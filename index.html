@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>easy MD viewer</title>
+  <link href="md.css" rel="stylesheet" />
+  <link id="theme" href="md.dark.css" rel="stylesheet" />
+  <script src="md.js" defer></script>
+</head>
+
+<body>
+  <p>easy MD viewer</p>
+  <p>This is a demo of <a href="https://github.com/byuwur/easy-md-viewer">https://github.com/byuwur/easy-md-viewer</a></p>
+  <a href="javascript:document.querySelector('#theme').setAttribute('href','md.light.css');">Light/Claro</a> |
+  <a href="javascript:document.querySelector('#theme').setAttribute('href','md.dark.css');">Dark/Oscuro</a>
+  <br /><br />
+  <div id="byMDrenderer"></div>
+  <script>
+    const markdown = `
+# easy MD viewer
+
+A **lightweight**, dependency-free Markdown viewer that renders directly to the DOM.
+
+## Inline syntax
+
+Text can be *italic*, **bold**, ***both***, ~~struck out~~, or contain \`inline code\`.
+
+Links work too: [easy JSON viewer](https://github.com/byuwur/easy-json-viewer).
+
+> ### Blockquotes
+>
+> Blockquotes recursively support **Markdown**.
+>
+> - [x] Nested task
+> - [ ] Another task
+
+## Lists
+
+1. Ordered item
+2. Another item
+   - Nested unordered item
+   - Another nested item
+
+5. Ordered lists can start at another number
+6. And continue
+
+## Table
+
+| Feature | Support | Alignment |
+| :--- | :---: | ---: |
+| Tables | **Yes** | Right |
+| Escaped pipes | A \\| B | \`x|y\` |
+
+## Code
+
+~~~js
+byMDviewer(
+    document.getElementById("byMDrenderer"),
+    "# Hello **world**"
+);
+~~~
+
+Raw HTML is intentionally not executed:
+
+\`<script>alert("nope")<\/script>\`
+
+---
+
+No npm. No CDN. No dependencies.
+`;
+    document.addEventListener("DOMContentLoaded", () => {
+      byMDviewer(document.getElementById("byMDrenderer"), markdown);
+    });
+  </script>
+</body>
+
+</html>
