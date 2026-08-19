@@ -6,10 +6,12 @@
  * Copyright (c) 2026 Andrés Trujillo [Mateus] byUwUr
  * https://github.com/byuwur/easy-md-viewer
  */
+
 (function (global) {
   const ESCAPABLE = /[\\`*{}\[\]()#+\-.!_>~|]/;
   const SAFE_LINK_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:", "ftp:", "ftps:"]);
   const SAFE_IMAGE_PROTOCOLS = new Set(["http:", "https:"]);
+  const HEADING_IDS = Symbol("headingIds");
 
   /**
    * Appends a text node to an element.
@@ -295,6 +297,41 @@
    * for image alt text.
    */
   const plainText = (text) => text.replace(/\\([\\`*{}\[\]()#+\-.!_>~|])/g, "$1").replace(/[`*_~]/g, "");
+
+  /**
+   * Converts rendered heading text into a GitHub-style anchor slug.
+   *
+   * @param {string} value
+   * @return {string}
+   */
+  const headingSlug = (value) =>
+    value
+      .toLowerCase()
+      .trim()
+      .replace(/\s/g, " ")
+      .replace(/[^\p{L}\p{M}\p{N}\p{Pc} -]/gu, "")
+      .replace(/ /g, "-");
+
+  /**
+   * Generates a document-wide unique heading ID.
+   *
+   * @param {string} value
+   * @param {Object} options
+   * @return {string}
+   */
+  const headingId = (value, options) => {
+    const occurrences = options[HEADING_IDS];
+    const original = headingSlug(value);
+    let result = original;
+
+    while (Object.prototype.hasOwnProperty.call(occurrences, result)) {
+      occurrences[original] += 1;
+      result = `${original}-${occurrences[original]}`;
+    }
+
+    occurrences[result] = 0;
+    return result;
+  };
 
   /**
    * Adds target/rel behavior to links.
@@ -1123,6 +1160,8 @@
         element.className = "byMDheading";
         const content = heading[2].replace(/\s+#+\s*$/, "");
         appendInline(element, content, options);
+        element.id = headingId(element.textContent, options);
+
         parent.appendChild(element);
         index += 1;
         continue;
