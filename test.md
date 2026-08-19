@@ -16,7 +16,7 @@ This block should NEVER appear in the rendered output.
 [//]: # (HIDDEN:MARKER)
 [//]: # (OPTIONAL:TEST BEGIN)
 
-# easy MD Viewer Test
+# easy MD Viewer BenchMarkDown
 
 A coverage and regression document for **easy-md-viewer**.
 
@@ -26,6 +26,44 @@ escaping, comments, and repeated content.
 **Expected behavior:** supported Markdown should render consistently, hidden comments
 should remain hidden, raw HTML should remain text, and unsafe URLs should not become
 clickable links.
+
+---
+
+## Test Index
+
+1. [Headings](#1-headings)
+2. [Paragraphs](#2-paragraphs)
+3. [Emphasis](#3-emphasis)
+4. [Inline Code](#4-inline-code)
+5. [Fenced Code](#5-fenced-code)
+6. [Escapes](#6-escapes)
+7. [HTML-Looking Text](#7-html-looking-text)
+8. [Hidden Comments](#8-hidden-comments)
+9. [Links](#9-links)
+10. [Autolinks](#10-autolinks)
+11. [Bare URLs and Emails](#11-bare-urls-and-emails)
+12. [Images](#12-images)
+13. [Unordered Lists](#13-unordered-lists)
+14. [Ordered Lists](#14-ordered-lists)
+15. [Nested Lists](#15-nested-lists)
+16. [Multiline List Items](#16-multiline-list-items)
+17. [Task Lists](#17-task-lists)
+18. [Blockquotes](#18-blockquotes)
+19. [Horizontal Rules](#19-horizontal-rules)
+20. [Tables](#20-tables)
+21. [Unicode](#21-unicode)
+22. [Whitespace and Empty Content](#22-whitespace-and-empty-content)
+23. [Special Characters](#23-special-characters)
+24. [Regression: List Termination](#24-regression-list-termination)
+25. [Regression: Comments Around Blocks](#25-regression-comments-around-blocks)
+26. [Regression: Markdown Inside Code](#26-regression-markdown-inside-code)
+27. [Regression: Pipes](#27-regression-pipes)
+28. [Regression: URL Punctuation](#28-regression-url-punctuation)
+29. [Regression: Nested Formatting](#29-regression-nested-formatting)
+30. [Malformed Markdown](#30-malformed-markdown)
+31. [Ordering / Volume Test](#31-ordering--volume-test)
+32. [Mixed Stress Test](#32-mixed-stress-test)
+33. [End Marker](#33-end-marker)
 
 ---
 
