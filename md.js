@@ -319,13 +319,13 @@
   };
 
   /**
-   * Adds target/rel behavior to links.
+   * Adds target/rel behavior to external links. Same-document anchor links remain in the current tab.
    *
    * @param {HTMLAnchorElement} anchor
    * @param {Object} options
    */
   const configureAnchor = (anchor, options) => {
-    if (!options.linkTarget) return;
+    if (!options.linkTarget || anchor.getAttribute("href")?.startsWith("#")) return;
     anchor.target = options.linkTarget;
     if (options.linkTarget === "_blank") anchor.rel = "noopener noreferrer";
   };
