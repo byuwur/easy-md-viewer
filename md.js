@@ -74,9 +74,8 @@
     if (typeof value !== "string") return false;
     const url = value.trim();
     if (!url) return false;
-    /*
-     * Remove ASCII controls/whitespace only for protocol inspection so strings such as "java\nscript:" cannot bypass the protocol check.
-     */
+    // Remove ASCII controls and whitespace only for protocol inspection.
+    // This prevents strings such as "java\nscript:" from bypassing the protocol check.
     const protocolProbe = url.replace(/[\u0000-\u0020\u007f]+/g, "");
     const protocolMatch = protocolProbe.match(/^([a-zA-Z][a-zA-Z\d+.-]*):/);
     if (!protocolMatch) return true;
@@ -93,9 +92,7 @@
    */
   const markerRun = (text, start) => {
     let end = start + 1;
-    while (end < text.length && text[end] === text[start]) {
-      end += 1;
-    }
+    while (end < text.length && text[end] === text[start]) end += 1;
     return end - start;
   };
 
@@ -152,9 +149,8 @@
           continue;
         }
       }
-      if (text[i] === "[") {
-        depth += 1;
-      } else if (text[i] === "]") {
+      if (text[i] === "[") depth += 1;
+      else if (text[i] === "]") {
         depth -= 1;
         if (depth === 0) return i;
       }
@@ -187,9 +183,8 @@
         quote = char;
         continue;
       }
-      if (char === "(") {
-        depth += 1;
-      } else if (char === ")") {
+      if (char === "(") depth += 1;
+      else if (char === ")") {
         depth -= 1;
         if (depth === 0) return i;
       }
@@ -232,13 +227,9 @@
           i += 1;
           continue;
         }
-        if (char === "(") {
-          depth += 1;
-        } else if (char === ")" && depth > 0) {
-          depth -= 1;
-        } else if (/\s/.test(char) && depth === 0) {
-          break;
-        }
+        if (char === "(") depth += 1;
+        else if (char === ")" && depth > 0) depth -= 1;
+        else if (/\s/.test(char) && depth === 0) break;
       }
       url = source.slice(0, i);
       rest = source.slice(i).trim();
@@ -278,16 +269,12 @@
     let match = entity.match(/^&#(\d+);$/);
     if (match) {
       const code = Number(match[1]);
-      if (Number.isInteger(code) && code >= 0 && code <= 0x10ffff) {
-        return String.fromCodePoint(code);
-      }
+      if (Number.isInteger(code) && code >= 0 && code <= 0x10ffff) return String.fromCodePoint(code);
     }
     match = entity.match(/^&#x([\da-fA-F]+);$/);
     if (match) {
       const code = Number.parseInt(match[1], 16);
-      if (Number.isInteger(code) && code >= 0 && code <= 0x10ffff) {
-        return String.fromCodePoint(code);
-      }
+      if (Number.isInteger(code) && code >= 0 && code <= 0x10ffff) return String.fromCodePoint(code);
     }
     return null;
   };
@@ -323,28 +310,24 @@
     const occurrences = options[HEADING_IDS];
     const original = headingSlug(value);
     let result = original;
-
     while (Object.prototype.hasOwnProperty.call(occurrences, result)) {
       occurrences[original] += 1;
       result = `${original}-${occurrences[original]}`;
     }
-
     occurrences[result] = 0;
     return result;
   };
 
   /**
    * Adds target/rel behavior to links.
-   * 
+   *
    * @param {HTMLAnchorElement} anchor
    * @param {Object} options
    */
   const configureAnchor = (anchor, options) => {
     if (!options.linkTarget) return;
     anchor.target = options.linkTarget;
-    if (options.linkTarget === "_blank") {
-      anchor.rel = "noopener noreferrer";
-    }
+    if (options.linkTarget === "_blank") anchor.rel = "noopener noreferrer";
   };
 
   /**
@@ -381,18 +364,13 @@
     };
     for (let i = 0; i < text.length; ) {
       const char = text[i];
-      /*
-       * Backslash escapes.
-       */
+      // Handle backslash escapes.
       if (char === "\\" && i + 1 < text.length && ESCAPABLE.test(text[i + 1])) {
         buffer += text[i + 1];
         i += 2;
         continue;
       }
-      /*
-       * Inline code supports arbitrary
-       * backtick-run delimiters.
-       */
+      // Support arbitrary backtick-run delimiters for inline code.
       if (char === "`") {
         const run = markerRun(text, i);
         const ticks = "`".repeat(run);
@@ -400,9 +378,7 @@
         if (close !== -1) {
           flush();
           let codeText = text.slice(i + run, close).replace(/\n/g, " ");
-          if (/^\s.*\s$/.test(codeText) && /\S/.test(codeText)) {
-            codeText = codeText.slice(1, -1);
-          }
+          if (/^\s.*\s$/.test(codeText) && /\S/.test(codeText)) codeText = codeText.slice(1, -1);
           const code = document.createElement("code");
           code.className = "byMDinlineCode";
           code.textContent = codeText;
@@ -411,9 +387,7 @@
           continue;
         }
       }
-      /*
-       * Images and inline links.
-       */
+      // Handle images and inline links.
       const isImage = options.withImages && text.startsWith("![", i);
       const isLink = options.withLinks && char === "[";
       if (isImage || isLink) {
@@ -431,18 +405,14 @@
                 img.className = "byMDimage";
                 img.src = destination.url;
                 img.alt = plainText(label);
-                if (destination.title) {
-                  img.title = destination.title;
-                }
+                if (destination.title) img.title = destination.title;
                 img.loading = "lazy";
                 parent.appendChild(img);
               } else {
                 const a = document.createElement("a");
                 a.className = "byMDlink";
                 a.href = destination.url;
-                if (destination.title) {
-                  a.title = destination.title;
-                }
+                if (destination.title) a.title = destination.title;
                 configureAnchor(a, options);
                 appendInline(a, label, options);
                 parent.appendChild(a);
@@ -453,12 +423,7 @@
           }
         }
       }
-      /*
-       * Explicit Markdown autolinks:
-       *
-       * <https://example.com>
-       * <name@example.com>
-       */
+      // Handle explicit Markdown URL and email autolinks.
       if (options.withLinks && char === "<") {
         const close = text.indexOf(">", i + 1);
         if (close !== -1) {
@@ -478,10 +443,7 @@
           }
         }
       }
-      /*
-       * GFM-style bare URLs
-       * and email addresses.
-       */
+      // Handle GFM-style bare URLs and email addresses.
       if (options.withLinks) {
         const rest = text.slice(i);
         const urlMatch = rest.match(/^https?:\/\/[^\s<>"']+/i);
@@ -515,9 +477,7 @@
           }
         }
       }
-      /*
-       * Strong + emphasis combined.
-       */
+      // Handle combined strong emphasis.
       const triple = text.slice(i, i + 3);
       if (triple === "***" || triple === "___") {
         const close = findClosingDelimiter(text, triple, i + 3);
@@ -532,9 +492,7 @@
           continue;
         }
       }
-      /*
-       * Strong emphasis.
-       */
+      // Handle strong emphasis.
       const double = text.slice(i, i + 2);
       if (double === "**" || double === "__") {
         const close = findClosingDelimiter(text, double, i + 2);
@@ -547,9 +505,7 @@
           continue;
         }
       }
-      /*
-       * GFM strikethrough.
-       */
+      // Handle GFM strikethrough.
       if (options.withStrikethrough && double === "~~") {
         const close = findClosingDelimiter(text, "~~", i + 2);
         if (close > i + 2) {
@@ -561,12 +517,8 @@
           continue;
         }
       }
-      /*
-       * Emphasis.
-       *
-       * Underscores inside words
-       * remain literal.
-       */
+      // Handle emphasis.
+      // Keep underscores inside words literal.
       if (char === "*" || char === "_") {
         const previous = i > 0 ? text[i - 1] : "";
         const next = text[i + 1] || "";
@@ -588,10 +540,7 @@
           }
         }
       }
-      /*
-       * Decode a small entity subset
-       * without using innerHTML.
-       */
+      // Decode a small entity subset without using innerHTML.
       if (char === "&") {
         const match = text.slice(i).match(/^&(?:amp|lt|gt|quot|apos|#\d+|#x[\da-fA-F]+);/);
         if (match) {
@@ -632,9 +581,7 @@
     for (const line of lines) {
       if (fence) {
         output.push(line);
-        if (fence.close.test(line)) {
-          fence = null;
-        }
+        if (fence.close.test(line)) fence = null;
         continue;
       }
       if (!inComment) {
@@ -687,9 +634,7 @@
     for (const line of lines) {
       if (fence) {
         output.push(line);
-        if (fence.close.test(line)) {
-          fence = null;
-        }
+        if (fence.close.test(line)) fence = null;
         continue;
       }
       const opening = matchFence(line);
@@ -747,9 +692,7 @@
   const splitTableRow = (line) => {
     let source = line.trim();
     if (source.startsWith("|")) source = source.slice(1);
-    if (source.endsWith("|") && !source.endsWith("\\|")) {
-      source = source.slice(0, -1);
-    }
+    if (source.endsWith("|") && !source.endsWith("\\|")) source = source.slice(0, -1);
     const cells = [];
     let cell = "";
     for (let i = 0; i < source.length; i++) {
@@ -792,18 +735,11 @@
     const alignments = [];
     for (const cell of cells) {
       const value = cell.replace(/\s/g, "");
-      if (!/^:?-{3,}:?$/.test(value)) {
-        return null;
-      }
-      if (value.startsWith(":") && value.endsWith(":")) {
-        alignments.push("center");
-      } else if (value.endsWith(":")) {
-        alignments.push("right");
-      } else if (value.startsWith(":")) {
-        alignments.push("left");
-      } else {
-        alignments.push(null);
-      }
+      if (!/^:?-{3,}:?$/.test(value)) return null;
+      if (value.startsWith(":") && value.endsWith(":")) alignments.push("center");
+      else if (value.endsWith(":")) alignments.push("right");
+      else if (value.startsWith(":")) alignments.push("left");
+      else alignments.push(null);
     }
     return alignments;
   };
@@ -821,15 +757,11 @@
     const line = lines[index] || "";
     if (!line.trim()) return true;
     if (matchFence(line)) return true;
-    if (/^ {0,3}#{1,6}(?:\s+|$)/.test(line)) {
-      return true;
-    }
+    if (/^ {0,3}#{1,6}(?:\s+|$)/.test(line)) return true;
     if (/^ {0,3}>/.test(line)) return true;
     if (isHorizontalRule(line)) return true;
     if (matchListItem(line)) return true;
-    if (options.withTables && index + 1 < lines.length && line.includes("|") && parseTableDelimiter(lines[index + 1])) {
-      return true;
-    }
+    if (options.withTables && index + 1 < lines.length && line.includes("|") && parseTableDelimiter(lines[index + 1])) return true;
     return false;
   };
 
@@ -845,26 +777,19 @@
   const appendInlineLine = (parent, line, last, options) => {
     let source = line;
     let hardBreak = false;
-    /*
-     * Two trailing spaces.
-     */
+    // Treat two trailing spaces as a hard break.
     if (/ {2,}$/.test(source)) {
       hardBreak = true;
       source = source.replace(/ {2,}$/, "");
     } else if (/\\$/.test(source) && !/\\\\$/.test(source)) {
-      /*
-       * Backslash hard break.
-       */
+      // Treat a trailing backslash as a hard break.
       hardBreak = true;
       source = source.slice(0, -1);
     }
     appendInline(parent, source, options);
     if (!last) {
-      if (hardBreak || options.breaks) {
-        parent.appendChild(document.createElement("br"));
-      } else {
-        appendText(parent, "\n");
-      }
+      if (hardBreak || options.breaks) parent.appendChild(document.createElement("br"));
+      else appendText(parent, "\n");
     }
   };
 
@@ -887,9 +812,7 @@
     const headRow = document.createElement("tr");
     for (let column = 0; column < headers.length; column++) {
       const th = document.createElement("th");
-      if (alignments[column]) {
-        th.classList.add(`byMDalign-${alignments[column]}`);
-      }
+      if (alignments[column]) th.classList.add(`byMDalign-${alignments[column]}`);
       appendInline(th, headers[column], options);
       headRow.appendChild(th);
     }
@@ -898,31 +821,20 @@
     const tbody = document.createElement("tbody");
     let index = start + 2;
     while (index < lines.length && lines[index].trim() && lines[index].includes("|")) {
-      if (
-        startsBlock(lines, index, {
-          ...options,
-          withTables: false
-        })
-      ) {
-        break;
-      }
+      if (startsBlock(lines, index, { ...options, withTables: false })) break;
       const cells = splitTableRow(lines[index]);
       const row = document.createElement("tr");
       const width = Math.max(headers.length, cells.length);
       for (let column = 0; column < width; column++) {
         const td = document.createElement("td");
-        if (alignments[column]) {
-          td.classList.add(`byMDalign-${alignments[column]}`);
-        }
+        if (alignments[column]) td.classList.add(`byMDalign-${alignments[column]}`);
         appendInline(td, cells[column] || "", options);
         row.appendChild(td);
       }
       tbody.appendChild(row);
       index += 1;
     }
-    if (tbody.childNodes.length) {
-      table.appendChild(tbody);
-    }
+    if (tbody.childNodes.length) table.appendChild(tbody);
     parent.appendChild(table);
     return index;
   };
@@ -1012,43 +924,28 @@
     const ordered = first.ordered;
     const list = document.createElement(ordered ? "ol" : "ul");
     list.className = "byMDlist";
-    if (ordered && first.start !== 1) {
-      list.start = first.start;
-    }
+    if (ordered && first.start !== 1) list.start = first.start;
     let index = start;
     while (index < lines.length) {
       const item = matchListItem(lines[index]);
-      if (!item || item.indent !== baseIndent || item.ordered !== ordered) {
-        break;
-      }
+      if (!item || item.indent !== baseIndent || item.ordered !== ordered) break;
       const itemLines = [item.content];
       let next = index + 1;
       while (next < lines.length) {
         const line = lines[next];
         const candidate = matchListItem(line);
-        /*
-         * A sibling starts the next item.
-         * Another list at the same/lower
-         * indentation ends this list.
-         */
+        // A sibling starts the next item.
+        // Another list at the same or lower indentation ends this list.
         if (candidate) {
-          if (candidate.indent <= baseIndent) {
-            break;
-          }
+          if (candidate.indent <= baseIndent) break;
           itemLines.push(removeIndent(line, item.contentIndent));
           next += 1;
           continue;
         }
-        /*
-         * Blank line handling is important:
-         * legal documents often contain
-         * lists followed by normal headings.
-         */
+        // Keep blank-line handling strict so normal content after lists does not get swallowed.
         if (!line.trim()) {
           let lookahead = next + 1;
-          while (lookahead < lines.length && !lines[lookahead].trim()) {
-            lookahead += 1;
-          }
+          while (lookahead < lines.length && !lines[lookahead].trim()) lookahead += 1;
           if (lookahead >= lines.length) {
             next = lookahead;
             break;
@@ -1063,31 +960,18 @@
             next += 1;
             continue;
           }
-          /*
-           * Blank followed by normal
-           * unindented content ends
-           * the list.
-           */
+          // A blank line followed by normal unindented content ends the list.
           next = lookahead;
           break;
         }
-        /*
-         * Indented continuation or
-         * nested block.
-         */
+        // Handle indented continuations and nested blocks.
         if (getIndent(line) > baseIndent) {
           itemLines.push(removeIndent(line, item.contentIndent));
           next += 1;
           continue;
         }
-        /*
-         * Lazy continuation:
-         *
-         * - Item starts here
-         *   text can continue
-         *
-         * But a new block terminates it.
-         */
+        // Allow lazy continuation text inside a list item.
+        // A new block terminates the lazy continuation.
         if (!startsBlock(lines, next, options)) {
           itemLines.push(line);
           next += 1;
@@ -1112,9 +996,7 @@
         itemLines[0] = taskMatch[2];
         renderBlocks(content, itemLines, options);
         li.appendChild(content);
-      } else {
-        renderBlocks(li, itemLines, options);
-      }
+      } else renderBlocks(li, itemLines, options);
       list.appendChild(li);
       index = next;
     }
@@ -1132,28 +1014,17 @@
   function renderBlocks(parent, lines, options) {
     for (let index = 0; index < lines.length; ) {
       const line = lines[index];
-      /*
-       * Blank line.
-       */
+      // Skip blank lines.
       if (!line.trim()) {
         index += 1;
         continue;
       }
-      /*
-       * Fenced code.
-       */
+      // Render fenced code.
       if (matchFence(line)) {
         index = appendFencedCode(parent, lines, index);
         continue;
       }
-      /*
-       * ATX headings:
-       *
-       * # H1
-       * ## H2
-       * ...
-       * ###### H6
-       */
+      // Render ATX headings from H1 through H6.
       const heading = line.match(/^ {0,3}(#{1,6})(?:\s+|$)(.*)$/);
       if (heading) {
         const element = document.createElement(`h${heading[1].length}`);
@@ -1161,49 +1032,32 @@
         const content = heading[2].replace(/\s+#+\s*$/, "");
         appendInline(element, content, options);
         element.id = headingId(element.textContent, options);
-
         parent.appendChild(element);
         index += 1;
         continue;
       }
-      /*
-       * Horizontal rule.
-       *
-       * Must be checked before lists
-       * because --- is ambiguous.
-       */
+      // Render horizontal rules before lists because --- is ambiguous.
       if (isHorizontalRule(line)) {
         parent.appendChild(document.createElement("hr"));
         index += 1;
         continue;
       }
-      /*
-       * Blockquote.
-       */
+      // Render blockquotes.
       if (/^ {0,3}>/.test(line)) {
         index = appendBlockquote(parent, lines, index, options);
         continue;
       }
-      /*
-       * GFM table.
-       */
+      // Render GFM tables.
       if (options.withTables && index + 1 < lines.length && line.includes("|") && parseTableDelimiter(lines[index + 1])) {
         index = appendTable(parent, lines, index, options);
         continue;
       }
-      /*
-       * Ordered/unordered list.
-       */
+      // Render ordered and unordered lists.
       if (matchListItem(line)) {
         index = appendList(parent, lines, index, options);
         continue;
       }
-      /*
-       * Paragraph.
-       *
-       * Consume until blank line or
-       * another recognized block.
-       */
+      // Render paragraphs until a blank line or another recognized block begins.
       const paragraphLines = [line];
       let next = index + 1;
       while (next < lines.length && lines[next].trim() && !startsBlock(lines, next, options)) {
@@ -1243,26 +1097,12 @@
    * @param {string|false} [options.linkTarget="_blank"]
    */
   global.byMDviewer = function byMDviewer(element, markdown, options = {}) {
-    if (!(element instanceof HTMLElement)) {
-      throw new TypeError("byMDviewer: element must be an HTMLElement.");
-    }
+    if (!(element instanceof HTMLElement)) throw new TypeError("byMDviewer: element must be an HTMLElement.");
     let source = markdown;
-    /*
-     * Pull Markdown from another
-     * element.
-     */
-    if (source instanceof HTMLElement) {
-      source = source.textContent;
-    } else if (source === undefined || source === null) {
-      /*
-       * Or render the target's own
-       * textual content.
-       */
-      source = element.textContent;
-    }
-    if (typeof source !== "string") {
-      throw new TypeError("byMDviewer: markdown must be a string or HTMLElement.");
-    }
+    // Pull Markdown from another element when supplied, otherwise use the target element's own text content.
+    if (source instanceof HTMLElement) source = source.textContent;
+    else if (source === undefined || source === null) source = element.textContent;
+    if (typeof source !== "string") throw new TypeError("byMDviewer: markdown must be a string or HTMLElement.");
     options = {
       withLinks: true,
       withImages: true,
@@ -1271,31 +1111,16 @@
       withStrikethrough: true,
       breaks: false,
       linkTarget: "_blank",
-      ...options
+      ...options,
+      [HEADING_IDS]: Object.create(null)
     };
-    /*
-     * Clear target safely.
-     */
+    // Clear the target safely.
     element.textContent = "";
     element.classList.add("byMDdocument");
-    /*
-     * Normalize line endings/BOM.
-     */
+    // Normalize line endings and remove the BOM.
     const normalized = source.replace(/\r\n?/g, "\n").replace(/^\uFEFF/, "");
-    /*
-     * Remove invisible Markdown/
-     * HTML comments before block
-     * parsing.
-     *
-     * This is important for the
-     * policy documents:
-     *
-     * <!-- hidden config -->
-     *
-     * and
-     *
-     * [//]&#58; # (OPTIONAL:...)
-     */
+    // Remove invisible Markdown and HTML comments before block parsing.
+    // This keeps document-control metadata out of rendered policy documents.
     const lines = stripHiddenCommentMarkers(stripHtmlComments(normalized).split("\n"));
     renderBlocks(element, lines, options);
   };
