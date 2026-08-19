@@ -13,131 +13,92 @@
 
   /**
    * Appends a text node to an element.
-   *
-   * @param {Node} parent
-   * @param {string} text
+   * @param {Node} parent - Parent DOM node.
+   * @param {string} text - Text to append.
    */
   const appendText = (parent, text) => {
-    if (text) {
-      parent.appendChild(document.createTextNode(text));
-    }
+    if (text) parent.appendChild(document.createTextNode(text));
   };
 
   /**
-   * Returns the amount of leading indentation,
-   * treating tabs as four spaces.
-   *
-   * @param {string} line
-   * @return {number}
+   * Returns the amount of leading indentation, treating tabs as four spaces.
+   * @param {string} line - Source line.
+   * @return {number} Indentation width.
    */
   const getIndent = (line) => {
     let width = 0;
-
     for (const char of line) {
-      if (char === " ") {
-        width += 1;
-      } else if (char === "\t") {
-        width += 4 - (width % 4);
-      } else {
-        break;
-      }
+      if (char === " ") width += 1;
+      else if (char === "\t") width += 4 - (width % 4);
+      else break;
     }
-
     return width;
   };
 
   /**
-   * Removes up to the requested indentation
-   * width from a line.
-   *
-   * @param {string} line
-   * @param {number} width
-   * @return {string}
+   * Removes up to the requested indentation width from a line.
+   * @param {string} line - Source line.
+   * @param {number} width - Width to remove.
+   * @return {string} De-indented line.
    */
   const removeIndent = (line, width) => {
     let removed = 0;
     let i = 0;
-
     while (i < line.length && removed < width) {
       if (line[i] === " ") {
         removed += 1;
         i += 1;
         continue;
       }
-
       if (line[i] === "\t") {
         removed += 4 - (removed % 4);
         i += 1;
         continue;
       }
-
       break;
     }
-
     return line.slice(i);
   };
 
   /**
-   * Checks whether a URL is safe to assign
-   * to href/src.
-   *
+   * Checks whether a URL is safe to assign to href/src.
    * Relative URLs and anchors are allowed.
    *
-   * @param {string} value
-   * @param {boolean} image
-   * @return {boolean}
+   * @param {string} value - URL candidate.
+   * @param {boolean} image - Whether this URL will be used as an image source.
+   * @return {boolean} True when the URL is allowed.
    */
   const isSafeUrl = (value, image = false) => {
-    if (typeof value !== "string") {
-      return false;
-    }
-
+    if (typeof value !== "string") return false;
     const url = value.trim();
-
-    if (!url) {
-      return false;
-    }
-
+    if (!url) return false;
     /*
-     * Remove ASCII controls/whitespace only
-     * for protocol inspection so strings such
-     * as "java\nscript:" cannot bypass the
-     * protocol check.
+     * Remove ASCII controls/whitespace only for protocol inspection so strings such as "java\nscript:" cannot bypass the protocol check.
      */
     const protocolProbe = url.replace(/[\u0000-\u0020\u007f]+/g, "");
     const protocolMatch = protocolProbe.match(/^([a-zA-Z][a-zA-Z\d+.-]*):/);
-
-    if (!protocolMatch) {
-      return true;
-    }
-
+    if (!protocolMatch) return true;
     const protocol = `${protocolMatch[1].toLowerCase()}:`;
-
     return (image ? SAFE_IMAGE_PROTOCOLS : SAFE_LINK_PROTOCOLS).has(protocol);
   };
 
   /**
-   * Finds the length of a run
-   * of the same character.
+   * Finds the length of a run of the same character.
    *
-   * @param {string} text
-   * @param {number} start
-   * @return {number}
+   * @param {string} text - Source text.
+   * @param {number} start - Run start.
+   * @return {number} Run length.
    */
   const markerRun = (text, start) => {
     let end = start + 1;
-
     while (end < text.length && text[end] === text[start]) {
       end += 1;
     }
-
     return end - start;
   };
 
   /**
-   * Finds the next unescaped occurrence
-   * of a delimiter.
-   *
+   * Finds the next unescaped occurrence of a delimiter.
    * Code spans are skipped while searching.
    *
    * @param {string} text
@@ -151,23 +112,17 @@
         i += 1;
         continue;
       }
-
       if (text[i] === "`") {
         const run = markerRun(text, i);
         const ticks = "`".repeat(run);
         const close = text.indexOf(ticks, i + run);
-
         if (close !== -1) {
           i = close + run - 1;
           continue;
         }
       }
-
-      if (text.startsWith(delimiter, i)) {
-        return i;
-      }
+      if (text.startsWith(delimiter, i)) return i;
     }
-
     return -1;
   };
 
@@ -181,44 +136,33 @@
    */
   const findClosingBracket = (text, open) => {
     let depth = 0;
-
     for (let i = open; i < text.length; i++) {
       if (text[i] === "\\") {
         i += 1;
         continue;
       }
-
       if (text[i] === "`") {
         const run = markerRun(text, i);
         const ticks = "`".repeat(run);
         const close = text.indexOf(ticks, i + run);
-
         if (close !== -1) {
           i = close + run - 1;
           continue;
         }
       }
-
       if (text[i] === "[") {
         depth += 1;
       } else if (text[i] === "]") {
         depth -= 1;
-
-        if (depth === 0) {
-          return i;
-        }
+        if (depth === 0) return i;
       }
     }
-
     return -1;
   };
 
   /**
-   * Finds the closing parenthesis for an
-   * inline link destination.
-   *
-   * Nested parentheses and quoted titles
-   * are supported.
+   * Finds the closing parenthesis for an inline link destination.
+   * Nested parentheses and quoted titles are supported.
    *
    * @param {string} text
    * @param {number} open
@@ -227,92 +171,65 @@
   const findClosingParen = (text, open) => {
     let depth = 0;
     let quote = null;
-
     for (let i = open; i < text.length; i++) {
       const char = text[i];
-
       if (char === "\\") {
         i += 1;
         continue;
       }
-
       if (quote) {
-        if (char === quote) {
-          quote = null;
-        }
-
+        if (char === quote) quote = null;
         continue;
       }
-
       if (char === '"' || char === "'") {
         quote = char;
         continue;
       }
-
       if (char === "(") {
         depth += 1;
       } else if (char === ")") {
         depth -= 1;
-
-        if (depth === 0) {
-          return i;
-        }
+        if (depth === 0) return i;
       }
     }
-
     return -1;
   };
 
   /**
-   * Parses a Markdown inline-link
-   * destination and optional title.
+   * Parses a Markdown inline-link destination and optional title.
    *
    * @param {string} raw
    * @return {{url:string,title:string}|null}
    */
   const parseDestination = (raw) => {
     const source = raw.trim();
-
-    if (!source) {
-      return null;
-    }
-
+    if (!source) return null;
     let url = "";
     let rest = "";
-
     if (source[0] === "<") {
       let close = -1;
-
       for (let i = 1; i < source.length; i++) {
         if (source[i] === "\\") {
           i += 1;
           continue;
         }
-
         if (source[i] === ">") {
           close = i;
           break;
         }
       }
-
-      if (close === -1) {
-        return null;
-      }
-
+      if (close === -1) return null;
       url = source.slice(1, close);
       rest = source.slice(close + 1).trim();
     } else {
       let depth = 0;
       let i = 0;
-
       for (; i < source.length; i++) {
         const char = source[i];
-
         if (char === "\\") {
           i += 1;
           continue;
         }
-
         if (char === "(") {
           depth += 1;
         } else if (char === ")" && depth > 0) {
@@ -321,35 +238,19 @@
           break;
         }
       }
-
       url = source.slice(0, i);
       rest = source.slice(i).trim();
     }
-
-    if (!url) {
-      return null;
-    }
-
+    if (!url) return null;
     url = url.replace(/\\([\\()<>])/g, "$1");
-
     let title = "";
-
     if (rest) {
       const first = rest[0];
       const last = rest[rest.length - 1];
-
-      const validPair =
-        (first === '"' && last === '"') ||
-        (first === "'" && last === "'") ||
-        (first === "(" && last === ")");
-
-      if (!validPair) {
-        return null;
-      }
-
+      const validPair = (first === '"' && last === '"') || (first === "'" && last === "'") || (first === "(" && last === ")");
+      if (!validPair) return null;
       title = rest.slice(1, -1).replace(/\\([\\"'()])/g, "$1");
     }
-
     return {
       url,
       title
@@ -364,32 +265,28 @@
    * @return {string|null}
    */
   const decodeEntity = (entity) => {
-    const named = { "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&apos;": "\'" };
-
-    if (named[entity]) {
-      return named[entity];
-    }
-
+    const named = {
+      "&amp;": "&",
+      "&lt;": "<",
+      "&gt;": ">",
+      "&quot;": '"',
+      "&apos;": "'"
+    };
+    if (named[entity]) return named[entity];
     let match = entity.match(/^&#(\d+);$/);
-
     if (match) {
       const code = Number(match[1]);
-
       if (Number.isInteger(code) && code >= 0 && code <= 0x10ffff) {
         return String.fromCodePoint(code);
       }
     }
-
     match = entity.match(/^&#x([\da-fA-F]+);$/);
-
     if (match) {
       const code = Number.parseInt(match[1], 16);
-
       if (Number.isInteger(code) && code >= 0 && code <= 0x10ffff) {
         return String.fromCodePoint(code);
       }
     }
-
     return null;
   };
 
@@ -397,24 +294,17 @@
    * Produces plain text suitable
    * for image alt text.
    */
-  const plainText = (text) =>
-    text
-      .replace(/\\([\\`*{}\[\]()#+\-.!_>~|])/g, "$1")
-      .replace(/[`*_~]/g, "");
+  const plainText = (text) => text.replace(/\\([\\`*{}\[\]()#+\-.!_>~|])/g, "$1").replace(/[`*_~]/g, "");
 
   /**
    * Adds target/rel behavior to links.
-   *
+   * 
    * @param {HTMLAnchorElement} anchor
    * @param {Object} options
    */
   const configureAnchor = (anchor, options) => {
-    if (!options.linkTarget) {
-      return;
-    }
-
+    if (!options.linkTarget) return;
     anchor.target = options.linkTarget;
-
     if (options.linkTarget === "_blank") {
       anchor.rel = "noopener noreferrer";
     }
@@ -426,30 +316,19 @@
    */
   const trimBareUrl = (value) => {
     let url = value;
-
-    while (/[.,!?;:]$/.test(url)) {
-      url = url.slice(0, -1);
-    }
-
+    while (/[.,!?;:]$/.test(url)) url = url.slice(0, -1);
     const pairs = [
       ["(", ")"],
       ["[", "]"]
     ];
-
     for (const [open, close] of pairs) {
       while (url.endsWith(close)) {
         const opens = [...url].filter((char) => char === open).length;
-
         const closes = [...url].filter((char) => char === close).length;
-
-        if (closes <= opens) {
-          break;
-        }
-
+        if (closes <= opens) break;
         url = url.slice(0, -1);
       }
     }
-
     return url;
   };
 
@@ -459,15 +338,12 @@
    */
   const appendInline = (parent, text, options) => {
     let buffer = "";
-
     const flush = () => {
       appendText(parent, buffer);
       buffer = "";
     };
-
     for (let i = 0; i < text.length; ) {
       const char = text[i];
-
       /*
        * Backslash escapes.
        */
@@ -476,104 +352,70 @@
         i += 2;
         continue;
       }
-
       /*
        * Inline code supports arbitrary
        * backtick-run delimiters.
        */
       if (char === "`") {
         const run = markerRun(text, i);
-
         const ticks = "`".repeat(run);
-
         const close = text.indexOf(ticks, i + run);
-
         if (close !== -1) {
           flush();
-
           let codeText = text.slice(i + run, close).replace(/\n/g, " ");
-
           if (/^\s.*\s$/.test(codeText) && /\S/.test(codeText)) {
             codeText = codeText.slice(1, -1);
           }
-
           const code = document.createElement("code");
-
           code.className = "byMDinlineCode";
-
           code.textContent = codeText;
-
           parent.appendChild(code);
-
           i = close + run;
           continue;
         }
       }
-
       /*
        * Images and inline links.
        */
       const isImage = options.withImages && text.startsWith("![", i);
-
       const isLink = options.withLinks && char === "[";
-
       if (isImage || isLink) {
         const openBracket = isImage ? i + 1 : i;
-
         const closeBracket = findClosingBracket(text, openBracket);
-
         if (closeBracket !== -1 && text[closeBracket + 1] === "(") {
           const closeParen = findClosingParen(text, closeBracket + 1);
-
           if (closeParen !== -1) {
             const destination = parseDestination(text.slice(closeBracket + 2, closeParen));
-
             if (destination && isSafeUrl(destination.url, isImage)) {
               flush();
-
               const label = text.slice(openBracket + 1, closeBracket);
-
               if (isImage) {
                 const img = document.createElement("img");
-
                 img.className = "byMDimage";
-
                 img.src = destination.url;
-
                 img.alt = plainText(label);
-
                 if (destination.title) {
                   img.title = destination.title;
                 }
-
                 img.loading = "lazy";
-
                 parent.appendChild(img);
               } else {
                 const a = document.createElement("a");
-
                 a.className = "byMDlink";
-
                 a.href = destination.url;
-
                 if (destination.title) {
                   a.title = destination.title;
                 }
-
                 configureAnchor(a, options);
-
                 appendInline(a, label, options);
-
                 parent.appendChild(a);
               }
-
               i = closeParen + 1;
               continue;
             }
           }
         }
       }
-
       /*
        * Explicit Markdown autolinks:
        *
@@ -582,162 +424,106 @@
        */
       if (options.withLinks && char === "<") {
         const close = text.indexOf(">", i + 1);
-
         if (close !== -1) {
           const value = text.slice(i + 1, close);
-
-          const isUrl =
-            /^(?:https?|ftp|ftps):\/\/[^\s<>]+$/i.test(value) && isSafeUrl(value);
-
+          const isUrl = /^(?:https?|ftp|ftps):\/\/[^\s<>]+$/i.test(value) && isSafeUrl(value);
           const isEmail = /^[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+$/.test(value);
-
           if (isUrl || isEmail) {
             flush();
-
             const a = document.createElement("a");
-
             a.className = "byMDlink";
-
             a.href = isEmail ? `mailto:${value}` : value;
-
             a.textContent = value;
-
             configureAnchor(a, options);
-
             parent.appendChild(a);
-
             i = close + 1;
             continue;
           }
         }
       }
-
       /*
        * GFM-style bare URLs
        * and email addresses.
        */
       if (options.withLinks) {
         const rest = text.slice(i);
-
         const urlMatch = rest.match(/^https?:\/\/[^\s<>"']+/i);
-
         if (urlMatch) {
           const url = trimBareUrl(urlMatch[0]);
-
           if (url && isSafeUrl(url)) {
             flush();
-
             const a = document.createElement("a");
-
             a.className = "byMDlink";
-
             a.href = url;
             a.textContent = url;
-
             configureAnchor(a, options);
-
             parent.appendChild(a);
-
             i += url.length;
-
             continue;
           }
         }
-
         const previous = i > 0 ? text[i - 1] : "";
-
         if (!/[\w.%+-]/.test(previous)) {
           const emailMatch = rest.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
-
           if (emailMatch) {
             flush();
-
             const a = document.createElement("a");
-
             a.className = "byMDlink";
-
             a.href = `mailto:${emailMatch[0]}`;
-
             a.textContent = emailMatch[0];
-
             configureAnchor(a, options);
-
             parent.appendChild(a);
-
             i += emailMatch[0].length;
-
             continue;
           }
         }
       }
-
       /*
        * Strong + emphasis combined.
        */
       const triple = text.slice(i, i + 3);
-
       if (triple === "***" || triple === "___") {
         const close = findClosingDelimiter(text, triple, i + 3);
-
         if (close > i + 3) {
           flush();
-
           const strong = document.createElement("strong");
-
           const em = document.createElement("em");
-
           appendInline(em, text.slice(i + 3, close), options);
-
           strong.appendChild(em);
           parent.appendChild(strong);
-
           i = close + 3;
           continue;
         }
       }
-
       /*
        * Strong emphasis.
        */
       const double = text.slice(i, i + 2);
-
       if (double === "**" || double === "__") {
         const close = findClosingDelimiter(text, double, i + 2);
-
         if (close > i + 2) {
           flush();
-
           const strong = document.createElement("strong");
-
           appendInline(strong, text.slice(i + 2, close), options);
-
           parent.appendChild(strong);
-
           i = close + 2;
           continue;
         }
       }
-
       /*
        * GFM strikethrough.
        */
       if (options.withStrikethrough && double === "~~") {
         const close = findClosingDelimiter(text, "~~", i + 2);
-
         if (close > i + 2) {
           flush();
-
           const del = document.createElement("del");
-
           appendInline(del, text.slice(i + 2, close), options);
-
           parent.appendChild(del);
-
           i = close + 2;
           continue;
         }
       }
-
       /*
        * Emphasis.
        *
@@ -746,53 +532,33 @@
        */
       if (char === "*" || char === "_") {
         const previous = i > 0 ? text[i - 1] : "";
-
         const next = text[i + 1] || "";
-
-        const underscoreInsideWord =
-          char === "_" &&
-          /[\p{L}\p{N}]/u.test(previous) &&
-          /[\p{L}\p{N}]/u.test(next);
-
+        const underscoreInsideWord = char === "_" && /[\p{L}\p{N}]/u.test(previous) && /[\p{L}\p{N}]/u.test(next);
         if (!underscoreInsideWord) {
           const close = findClosingDelimiter(text, char, i + 1);
-
           if (close > i + 1) {
             const beforeClose = text[close - 1] || "";
-
             const afterClose = text[close + 1] || "";
-
-            const closingUnderscoreInsideWord =
-              char === "_" &&
-              /[\p{L}\p{N}]/u.test(beforeClose) &&
-              /[\p{L}\p{N}]/u.test(afterClose);
-
+            const closingUnderscoreInsideWord = char === "_" && /[\p{L}\p{N}]/u.test(beforeClose) && /[\p{L}\p{N}]/u.test(afterClose);
             if (!closingUnderscoreInsideWord) {
               flush();
-
               const em = document.createElement("em");
-
               appendInline(em, text.slice(i + 1, close), options);
-
               parent.appendChild(em);
-
               i = close + 1;
               continue;
             }
           }
         }
       }
-
       /*
        * Decode a small entity subset
        * without using innerHTML.
        */
       if (char === "&") {
         const match = text.slice(i).match(/^&(?:amp|lt|gt|quot|apos|#\d+|#x[\da-fA-F]+);/);
-
         if (match) {
           const decoded = decodeEntity(match[0]);
-
           if (decoded !== null) {
             buffer += decoded;
             i += match[0].length;
@@ -800,11 +566,9 @@
           }
         }
       }
-
       buffer += char;
       i += 1;
     }
-
     flush();
   };
 
@@ -826,135 +590,93 @@
   const stripHtmlComments = (source) => {
     const lines = source.split("\n");
     const output = [];
-
     let inComment = false;
     let fence = null;
-
     for (const line of lines) {
       if (fence) {
         output.push(line);
-
         if (fence.close.test(line)) {
           fence = null;
         }
-
         continue;
       }
-
       if (!inComment) {
         const opening = matchFence(line);
-
         if (opening) {
           const marker = opening[1][0];
-
           const minimumLength = opening[1].length;
-
           fence = {
             close: new RegExp(`^ {0,3}${marker === "`" ? "`" : "~"}{${minimumLength},}\\s*$`)
           };
-
           output.push(line);
           continue;
         }
       }
-
       let cursor = 0;
       let visible = "";
-
       while (cursor < line.length) {
         if (inComment) {
           const close = line.indexOf("-->", cursor);
-
           if (close === -1) {
             cursor = line.length;
-
             break;
           }
-
           inComment = false;
           cursor = close + 3;
-
           continue;
         }
-
         const open = line.indexOf("<!--", cursor);
-
         if (open === -1) {
           visible += line.slice(cursor);
-
           break;
         }
-
         visible += line.slice(cursor, open);
-
         inComment = true;
         cursor = open + 4;
       }
-
       output.push(visible);
     }
-
     return output.join("\n");
   };
 
   /**
-   * Removes Markdown hidden-comment/reference
-   * markers such as:
+   * Removes Markdown hidden-comment/reference markers such as:
    *
    * [//]&#58; # (OPTIONAL:SECTION BEGIN)
    */
   const stripHiddenCommentMarkers = (lines) => {
     const output = [];
     let fence = null;
-
     for (const line of lines) {
       if (fence) {
         output.push(line);
-
         if (fence.close.test(line)) {
           fence = null;
         }
-
         continue;
       }
-
       const opening = matchFence(line);
-
       if (opening) {
         const marker = opening[1][0];
-
         const minimumLength = opening[1].length;
-
         fence = {
           close: new RegExp(`^ {0,3}${marker === "`" ? "`" : "~"}{${minimumLength},}\\s*$`)
         };
-
         output.push(line);
         continue;
       }
-
       output.push(/^\s*\[\/\/\]:\s*#\s*\(.*\)\s*$/.test(line) ? "" : line);
     }
-
     return output;
   };
 
   /**
-   * Checks whether a line is a
-   * Markdown horizontal rule.
+   * Checks whether a line is a Markdown horizontal rule.
    */
   const isHorizontalRule = (line) => {
     const value = line.trim();
-
-    if (!value) {
-      return false;
-    }
-
-    return (
-      /^(?:\*\s*){3,}$/.test(value) ||
-      /^(?:-\s*){3,}$/.test(value) ||
-      /^(?:_\s*){3,}$/.test(value)
-    );
+    if (!value) return false;
+    return /^(?:\*\s*){3,}$/.test(value) || /^(?:-\s*){3,}$/.test(value) || /^(?:_\s*){3,}$/.test(value);
   };
 
   /**
@@ -965,24 +687,15 @@
    */
   const matchListItem = (line) => {
     const match = line.match(/^(\s*)([-+*]|(\d+)[.)])\s+(.*)$/);
-
-    if (!match) {
-      return null;
-    }
-
+    if (!match) return null;
     const indent = getIndent(match[1]);
-
     const marker = match[2];
-
     const ordered = /^\d/.test(marker);
-
     return {
       indent,
       ordered,
       start: ordered ? Number(match[3]) : 1,
-
       contentIndent: indent + marker.length + 1,
-
       content: match[4]
     };
   };
@@ -996,50 +709,36 @@
    */
   const splitTableRow = (line) => {
     let source = line.trim();
-
-    if (source.startsWith("|")) {
-      source = source.slice(1);
-    }
-
+    if (source.startsWith("|")) source = source.slice(1);
     if (source.endsWith("|") && !source.endsWith("\\|")) {
       source = source.slice(0, -1);
     }
-
     const cells = [];
     let cell = "";
-
     for (let i = 0; i < source.length; i++) {
       if (source[i] === "\\" && i + 1 < source.length) {
         cell += source[i] + source[i + 1];
         i += 1;
         continue;
       }
-
       if (source[i] === "`") {
         const run = markerRun(source, i);
-
         const ticks = "`".repeat(run);
-
         const close = source.indexOf(ticks, i + run);
-
         if (close !== -1) {
           cell += source.slice(i, close + run);
           i = close + run - 1;
           continue;
         }
       }
-
       if (source[i] === "|") {
         cells.push(cell.trim());
         cell = "";
         continue;
       }
-
       cell += source[i];
     }
-
     cells.push(cell.trim());
-
     return cells;
   };
 
@@ -1050,25 +749,15 @@
    * @return {(string|null)[]|null}
    */
   const parseTableDelimiter = (line) => {
-    if (!line.includes("|")) {
-      return null;
-    }
-
+    if (!line.includes("|")) return null;
     const cells = splitTableRow(line);
-
-    if (!cells.length) {
-      return null;
-    }
-
+    if (!cells.length) return null;
     const alignments = [];
-
     for (const cell of cells) {
       const value = cell.replace(/\s/g, "");
-
       if (!/^:?-{3,}:?$/.test(value)) {
         return null;
       }
-
       if (value.startsWith(":") && value.endsWith(":")) {
         alignments.push("center");
       } else if (value.endsWith(":")) {
@@ -1079,7 +768,6 @@
         alignments.push(null);
       }
     }
-
     return alignments;
   };
 
@@ -1094,40 +782,17 @@
    */
   const startsBlock = (lines, index, options) => {
     const line = lines[index] || "";
-
-    if (!line.trim()) {
-      return true;
-    }
-
-    if (matchFence(line)) {
-      return true;
-    }
-
+    if (!line.trim()) return true;
+    if (matchFence(line)) return true;
     if (/^ {0,3}#{1,6}(?:\s+|$)/.test(line)) {
       return true;
     }
-
-    if (/^ {0,3}>/.test(line)) {
+    if (/^ {0,3}>/.test(line)) return true;
+    if (isHorizontalRule(line)) return true;
+    if (matchListItem(line)) return true;
+    if (options.withTables && index + 1 < lines.length && line.includes("|") && parseTableDelimiter(lines[index + 1])) {
       return true;
     }
-
-    if (isHorizontalRule(line)) {
-      return true;
-    }
-
-    if (matchListItem(line)) {
-      return true;
-    }
-
-    if (
-      options.withTables &&
-      index + 1 < lines.length &&
-      line.includes("|") &&
-      parseTableDelimiter(lines[index + 1])
-    ) {
-      return true;
-    }
-
     return false;
   };
 
@@ -1143,7 +808,6 @@
   const appendInlineLine = (parent, line, last, options) => {
     let source = line;
     let hardBreak = false;
-
     /*
      * Two trailing spaces.
      */
@@ -1157,9 +821,7 @@
       hardBreak = true;
       source = source.slice(0, -1);
     }
-
     appendInline(parent, source, options);
-
     if (!last) {
       if (hardBreak || options.breaks) {
         parent.appendChild(document.createElement("br"));
@@ -1170,7 +832,7 @@
   };
 
   /**
-   * Renders a GFM table.
+   * Renders a Markdown table.
    *
    * @param {Node} parent
    * @param {string[]} lines
@@ -1180,40 +842,24 @@
    */
   const appendTable = (parent, lines, start, options) => {
     const headers = splitTableRow(lines[start]);
-
     const alignments = parseTableDelimiter(lines[start + 1]);
-
-    if (!alignments) {
-      return start;
-    }
-
+    if (!alignments) return start;
     const table = document.createElement("table");
-
     table.className = "byMDtable";
-
     const thead = document.createElement("thead");
-
     const headRow = document.createElement("tr");
-
     for (let column = 0; column < headers.length; column++) {
       const th = document.createElement("th");
-
       if (alignments[column]) {
         th.classList.add(`byMDalign-${alignments[column]}`);
       }
-
       appendInline(th, headers[column], options);
-
       headRow.appendChild(th);
     }
-
     thead.appendChild(headRow);
     table.appendChild(thead);
-
     const tbody = document.createElement("tbody");
-
     let index = start + 2;
-
     while (index < lines.length && lines[index].trim() && lines[index].includes("|")) {
       if (
         startsBlock(lines, index, {
@@ -1223,35 +869,24 @@
       ) {
         break;
       }
-
       const cells = splitTableRow(lines[index]);
-
       const row = document.createElement("tr");
-
       const width = Math.max(headers.length, cells.length);
-
       for (let column = 0; column < width; column++) {
         const td = document.createElement("td");
-
         if (alignments[column]) {
           td.classList.add(`byMDalign-${alignments[column]}`);
         }
-
         appendInline(td, cells[column] || "", options);
-
         row.appendChild(td);
       }
-
       tbody.appendChild(row);
       index += 1;
     }
-
     if (tbody.childNodes.length) {
       table.appendChild(tbody);
     }
-
     parent.appendChild(table);
-
     return index;
   };
 
@@ -1265,48 +900,28 @@
    */
   const appendFencedCode = (parent, lines, start) => {
     const opening = matchFence(lines[start]);
-
     const marker = opening[1][0];
-
     const minimumLength = opening[1].length;
-
     const info = opening[2].trim();
-
     const language = info ? info.split(/\s+/)[0] : "";
-
-    const closePattern = new RegExp(
-      `^ {0,3}${marker === "`" ? "`" : "~"}{${minimumLength},}\\s*$`
-    );
-
+    const closePattern = new RegExp(`^ {0,3}${marker === "`" ? "`" : "~"}{${minimumLength},}\\s*$`);
     const body = [];
     let index = start + 1;
-
     while (index < lines.length && !closePattern.test(lines[index])) {
       body.push(lines[index]);
       index += 1;
     }
-
-    if (index < lines.length) {
-      index += 1;
-    }
-
+    if (index < lines.length) index += 1;
     const pre = document.createElement("pre");
-
     pre.className = "byMDcodeBlock";
-
     const code = document.createElement("code");
-
     if (language && /^[\w.+#-]+$/.test(language)) {
       code.classList.add(`language-${language}`);
-
       code.dataset.language = language;
     }
-
     code.textContent = body.join("\n");
-
     pre.appendChild(code);
     parent.appendChild(pre);
-
     return index;
   };
 
@@ -1322,37 +937,24 @@
   const appendBlockquote = (parent, lines, start, options) => {
     const quoteLines = [];
     let index = start;
-
     while (index < lines.length) {
       const match = lines[index].match(/^ {0,3}> ?(.*)$/);
-
       if (match) {
         quoteLines.push(match[1]);
         index += 1;
         continue;
       }
-
-      if (
-        !lines[index].trim() &&
-        index + 1 < lines.length &&
-        /^ {0,3}>/.test(lines[index + 1])
-      ) {
+      if (!lines[index].trim() && index + 1 < lines.length && /^ {0,3}>/.test(lines[index + 1])) {
         quoteLines.push("");
         index += 1;
         continue;
       }
-
       break;
     }
-
     const quote = document.createElement("blockquote");
-
     quote.className = "byMDblockquote";
-
     renderBlocks(quote, quoteLines, options);
-
     parent.appendChild(quote);
-
     return index;
   };
 
@@ -1368,41 +970,25 @@
    */
   const appendList = (parent, lines, start, options) => {
     const first = matchListItem(lines[start]);
-
-    if (!first) {
-      return start;
-    }
-
+    if (!first) return start;
     const baseIndent = first.indent;
-
     const ordered = first.ordered;
-
     const list = document.createElement(ordered ? "ol" : "ul");
-
     list.className = "byMDlist";
-
     if (ordered && first.start !== 1) {
       list.start = first.start;
     }
-
     let index = start;
-
     while (index < lines.length) {
       const item = matchListItem(lines[index]);
-
       if (!item || item.indent !== baseIndent || item.ordered !== ordered) {
         break;
       }
-
       const itemLines = [item.content];
-
       let next = index + 1;
-
       while (next < lines.length) {
         const line = lines[next];
-
         const candidate = matchListItem(line);
-
         /*
          * A sibling starts the next item.
          * Another list at the same/lower
@@ -1412,13 +998,10 @@
           if (candidate.indent <= baseIndent) {
             break;
           }
-
           itemLines.push(removeIndent(line, item.contentIndent));
-
           next += 1;
           continue;
         }
-
         /*
          * Blank line handling is important:
          * legal documents often contain
@@ -1426,33 +1009,23 @@
          */
         if (!line.trim()) {
           let lookahead = next + 1;
-
           while (lookahead < lines.length && !lines[lookahead].trim()) {
             lookahead += 1;
           }
-
           if (lookahead >= lines.length) {
             next = lookahead;
             break;
           }
-
           const afterBlank = matchListItem(lines[lookahead]);
-
-          if (
-            afterBlank &&
-            afterBlank.indent === baseIndent &&
-            afterBlank.ordered === ordered
-          ) {
+          if (afterBlank && afterBlank.indent === baseIndent && afterBlank.ordered === ordered) {
             next = lookahead;
             break;
           }
-
           if (getIndent(lines[lookahead]) > baseIndent) {
             itemLines.push("");
             next += 1;
             continue;
           }
-
           /*
            * Blank followed by normal
            * unindented content ends
@@ -1461,18 +1034,15 @@
           next = lookahead;
           break;
         }
-
         /*
          * Indented continuation or
          * nested block.
          */
         if (getIndent(line) > baseIndent) {
           itemLines.push(removeIndent(line, item.contentIndent));
-
           next += 1;
           continue;
         }
-
         /*
          * Lazy continuation:
          *
@@ -1486,57 +1056,32 @@
           next += 1;
           continue;
         }
-
         break;
       }
-
       const li = document.createElement("li");
-
       li.className = "byMDlistItem";
-
-      const taskMatch = options.withTasks
-        ? itemLines[0].match(/^\[([ xX])\]\s+(.*)$/)
-        : null;
-
+      const taskMatch = options.withTasks ? itemLines[0].match(/^\[([ xX])\]\s+(.*)$/) : null;
       if (taskMatch) {
         li.classList.add("byMDtask");
-
         const checkbox = document.createElement("input");
-
         checkbox.type = "checkbox";
-
         checkbox.disabled = true;
-
         checkbox.checked = taskMatch[1].toLowerCase() === "x";
-
         checkbox.className = "byMDtaskCheckbox";
-
-        checkbox.setAttribute(
-          "aria-label",
-          checkbox.checked ? "Completed task" : "Incomplete task"
-        );
-
+        checkbox.setAttribute("aria-label", checkbox.checked ? "Completed task" : "Incomplete task");
         li.appendChild(checkbox);
-
         const content = document.createElement("div");
-
         content.className = "byMDtaskContent";
-
         itemLines[0] = taskMatch[2];
-
         renderBlocks(content, itemLines, options);
-
         li.appendChild(content);
       } else {
         renderBlocks(li, itemLines, options);
       }
-
       list.appendChild(li);
       index = next;
     }
-
     parent.appendChild(list);
-
     return index;
   };
 
@@ -1550,7 +1095,6 @@
   function renderBlocks(parent, lines, options) {
     for (let index = 0; index < lines.length; ) {
       const line = lines[index];
-
       /*
        * Blank line.
        */
@@ -1558,7 +1102,6 @@
         index += 1;
         continue;
       }
-
       /*
        * Fenced code.
        */
@@ -1566,7 +1109,6 @@
         index = appendFencedCode(parent, lines, index);
         continue;
       }
-
       /*
        * ATX headings:
        *
@@ -1576,22 +1118,15 @@
        * ###### H6
        */
       const heading = line.match(/^ {0,3}(#{1,6})(?:\s+|$)(.*)$/);
-
       if (heading) {
         const element = document.createElement(`h${heading[1].length}`);
-
         element.className = "byMDheading";
-
         const content = heading[2].replace(/\s+#+\s*$/, "");
-
         appendInline(element, content, options);
-
         parent.appendChild(element);
-
         index += 1;
         continue;
       }
-
       /*
        * Horizontal rule.
        *
@@ -1600,11 +1135,9 @@
        */
       if (isHorizontalRule(line)) {
         parent.appendChild(document.createElement("hr"));
-
         index += 1;
         continue;
       }
-
       /*
        * Blockquote.
        */
@@ -1612,20 +1145,13 @@
         index = appendBlockquote(parent, lines, index, options);
         continue;
       }
-
       /*
        * GFM table.
        */
-      if (
-        options.withTables &&
-        index + 1 < lines.length &&
-        line.includes("|") &&
-        parseTableDelimiter(lines[index + 1])
-      ) {
+      if (options.withTables && index + 1 < lines.length && line.includes("|") && parseTableDelimiter(lines[index + 1])) {
         index = appendTable(parent, lines, index, options);
         continue;
       }
-
       /*
        * Ordered/unordered list.
        */
@@ -1633,7 +1159,6 @@
         index = appendList(parent, lines, index, options);
         continue;
       }
-
       /*
        * Paragraph.
        *
@@ -1641,24 +1166,15 @@
        * another recognized block.
        */
       const paragraphLines = [line];
-
       let next = index + 1;
-
       while (next < lines.length && lines[next].trim() && !startsBlock(lines, next, options)) {
         paragraphLines.push(lines[next]);
         next += 1;
       }
-
       const paragraph = document.createElement("p");
-
       paragraph.className = "byMDparagraph";
-
-      paragraphLines.forEach((value, i) =>
-        appendInlineLine(paragraph, value, i === paragraphLines.length - 1, options)
-      );
-
+      paragraphLines.forEach((value, i) => appendInlineLine(paragraph, value, i === paragraphLines.length - 1, options));
       parent.appendChild(paragraph);
-
       index = next;
     }
   }
@@ -1679,34 +1195,19 @@
    * @param {string|HTMLElement} [markdown]
    * @param {Object} [options]
    *
-   * @param {boolean}
-   * [options.withLinks=true]
-   *
-   * @param {boolean}
-   * [options.withImages=true]
-   *
-   * @param {boolean}
-   * [options.withTables=true]
-   *
-   * @param {boolean}
-   * [options.withTasks=true]
-   *
-   * @param {boolean}
-   * [options.withStrikethrough=true]
-   *
-   * @param {boolean}
-   * [options.breaks=false]
-   *
-   * @param {string|false}
-   * [options.linkTarget="_blank"]
+   * @param {boolean} [options.withLinks=true]
+   * @param {boolean} [options.withImages=true]
+   * @param {boolean} [options.withTables=true]
+   * @param {boolean} [options.withTasks=true]
+   * @param {boolean} [options.withStrikethrough=true]
+   * @param {boolean} [options.breaks=false]
+   * @param {string|false} [options.linkTarget="_blank"]
    */
   global.byMDviewer = function byMDviewer(element, markdown, options = {}) {
     if (!(element instanceof HTMLElement)) {
       throw new TypeError("byMDviewer: element must be an HTMLElement.");
     }
-
     let source = markdown;
-
     /*
      * Pull Markdown from another
      * element.
@@ -1720,11 +1221,9 @@
        */
       source = element.textContent;
     }
-
     if (typeof source !== "string") {
       throw new TypeError("byMDviewer: markdown must be a string or HTMLElement.");
     }
-
     options = {
       withLinks: true,
       withImages: true,
@@ -1735,19 +1234,15 @@
       linkTarget: "_blank",
       ...options
     };
-
     /*
      * Clear target safely.
      */
     element.textContent = "";
-
     element.classList.add("byMDdocument");
-
     /*
      * Normalize line endings/BOM.
      */
     const normalized = source.replace(/\r\n?/g, "\n").replace(/^\uFEFF/, "");
-
     /*
      * Remove invisible Markdown/
      * HTML comments before block
@@ -1763,7 +1258,6 @@
      * [//]&#58; # (OPTIONAL:...)
      */
     const lines = stripHiddenCommentMarkers(stripHtmlComments(normalized).split("\n"));
-
     renderBlocks(element, lines, options);
   };
 })(typeof window !== "undefined" ? window : this);
