@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>easy MD viewer</title>
   <link href="md.css" rel="stylesheet" />
-  <link id="theme" href="md.dark.css" rel="stylesheet" />
+  <link id="byMDtheme" href="md.dark.css" rel="stylesheet" />
   <script src="md.js" defer></script>
 </head>
 
@@ -20,15 +20,23 @@
     a {
       color: #56f;
     }
+
+    a.listed-link {
+      display: inline-block;
+      width: 20rem;
+    }
   </style>
   <p>easy MD viewer</p>
   <p>This is a demo of <a href="https://github.com/byuwur/easy-md-viewer">https://github.com/byuwur/easy-md-viewer</a></p>
-  <a href="javascript:document.querySelector('#theme').setAttribute('href','md.light.css');">Light/Claro</a> |
-  <a href="javascript:document.querySelector('#theme').setAttribute('href','md.dark.css');">Dark/Oscuro</a>
+  <a href="javascript:document.querySelector('#byMDtheme').setAttribute('href','md.light.css');">Light/Claro</a> |
+  <a href="javascript:document.querySelector('#byMDtheme').setAttribute('href','md.dark.css');">Dark/Oscuro</a>
+  <br /><br />
+  <a class="listed-link" href="javascript:render();">DEMO MARKDOWN</a>
+  <a class="listed-link" href="javascript:benchmark();">BENCHMARK MARKDOWN</a>
   <br /><br />
   <div id="byMDrenderer"></div>
   <script>
-    const markdown = `
+    const demoMD = `
 # easy MD viewer
 
 A **lightweight**, dependency-free Markdown viewer that renders directly to the DOM.
@@ -50,8 +58,10 @@ Links work too: [easy JSON viewer](https://github.com/byuwur/easy-json-viewer).
 
 1. Ordered item
 2. Another item
-   - Nested unordered item
-   - Another nested item
+
+- Unordered item
+  - Nested unordered item
+  - Another nested item
 
 5. Ordered lists can start at another number
 6. And continue
@@ -65,12 +75,12 @@ Links work too: [easy JSON viewer](https://github.com/byuwur/easy-json-viewer).
 
 ## Code
 
-~~~js
+\`\`\`js
 byMDviewer(
-    document.getElementById("byMDrenderer"),
-    "# Hello **world**"
+  document.getElementById("byMDrenderer"),
+  "# Hello **world**"
 );
-~~~
+\`\`\`
 
 Raw HTML is intentionally not executed:
 
@@ -79,9 +89,27 @@ Raw HTML is intentionally not executed:
 ---
 
 No npm. No CDN. No dependencies.
-`;
+    `;
+
+    const renderEl = document.getElementById("byMDrenderer");
+    const render = () => byMDviewer(renderEl, demoMD);
+    const renderFetched = (url, options = {}) => {
+      fetch(url)
+        .then((response) => {
+          if (!response.ok) console.warn(`Something went wrong`, response.statusText);
+          return response.text();
+        })
+        .then((response) => {
+          console.log(response);
+          byMDviewer(renderEl, response, options);
+        })
+        .catch((e) => {
+          console.warn(`Something went wrong`, e);
+        });
+    };
+    const benchmark = () => renderFetched(`https://raw.githubusercontent.com/byuwur/easy-md-viewer/main/test.md`);
     document.addEventListener("DOMContentLoaded", () => {
-      byMDviewer(document.getElementById("byMDrenderer"), markdown);
+      render();
     });
   </script>
 </body>
