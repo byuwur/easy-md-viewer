@@ -421,6 +421,39 @@
   };
 
   /**
+   * Trims punctuation commonly following
+   * a bare URL in prose.
+   */
+  const trimBareUrl = (value) => {
+    let url = value;
+
+    while (/[.,!?;:]$/.test(url)) {
+      url = url.slice(0, -1);
+    }
+
+    const pairs = [
+      ["(", ")"],
+      ["[", "]"]
+    ];
+
+    for (const [open, close] of pairs) {
+      while (url.endsWith(close)) {
+        const opens = [...url].filter((char) => char === open).length;
+
+        const closes = [...url].filter((char) => char === close).length;
+
+        if (closes <= opens) {
+          break;
+        }
+
+        url = url.slice(0, -1);
+      }
+    }
+
+    return url;
+  };
+
+  /**
    * Renders inline Markdown without
    * ever using innerHTML.
    */
@@ -574,6 +607,65 @@
             parent.appendChild(a);
 
             i = close + 1;
+            continue;
+          }
+        }
+      }
+
+      /*
+       * GFM-style bare URLs
+       * and email addresses.
+       */
+      if (options.withLinks) {
+        const rest = text.slice(i);
+
+        const urlMatch = rest.match(/^https?:\/\/[^\s<>"']+/i);
+
+        if (urlMatch) {
+          const url = trimBareUrl(urlMatch[0]);
+
+          if (url && isSafeUrl(url)) {
+            flush();
+
+            const a = document.createElement("a");
+
+            a.className = "byMDlink";
+
+            a.href = url;
+            a.textContent = url;
+
+            configureAnchor(a, options);
+
+            parent.appendChild(a);
+
+            i += url.length;
+
+            continue;
+          }
+        }
+
+        const previous = i > 0 ? text[i - 1] : "";
+
+        if (!/[\w.%+-]/.test(previous)) {
+          const emailMatch = rest.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+
+          if (emailMatch) {
+            flush();
+
+            const a = document.createElement("a");
+
+            a.className = "byMDlink";
+
+            a.href = `mailto:${emailMatch[0]}`;
+
+            a.textContent = emailMatch[0];
+
+            configureAnchor(a, options);
+
+            parent.appendChild(a);
+
+            i += emailMatch[0].length;
+
             continue;
           }
         }
