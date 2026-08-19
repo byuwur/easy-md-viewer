@@ -8,3 +8,9 @@
   --by-md-quote: #899;
   --by-md-table-alt: #112;
 }
+.byVIEWthemeToggle {
+  color: #eee;
+}
+.byVIEWthemeToggle::after {
+  left: 1.7rem;
+}

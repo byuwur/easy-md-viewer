@@ -24,7 +24,7 @@ Include the files directly:
 
 ```html
 <link href="md.css" rel="stylesheet" />
-<link id="byMDtheme" href="md.dark.css" rel="stylesheet" />
+<link id="byVIEWtheme" href="md.dark.css" rel="stylesheet" />
 <script src="md.js" defer></script>
 ```
 
@@ -74,11 +74,11 @@ Potentially executable URL schemes such as `javascript:` and `data:` are not acc
 
 ## Themes
 
-Switch themes by changing the byMDtheme stylesheet:
+Switch themes by changing the byVIEWtheme stylesheet:
 
 ```js
-document.querySelector("#byMDtheme").setAttribute("href", "md.light.css");
-document.querySelector("#byMDtheme").setAttribute("href", "md.dark.css");
+document.querySelector("#byVIEWtheme").setAttribute("href", "md.light.css");
+document.querySelector("#byVIEWtheme").setAttribute("href", "md.dark.css");
 ```
 
 ## License

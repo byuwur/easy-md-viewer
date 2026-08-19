@@ -1073,12 +1073,54 @@
   }
 
   /**
+   * Adds a light/dark theme toggle to a renderer.
+   * Expected theme filenames:
+   * - {filename}.light.css
+   * - {filename}.dark.css
+   * @param {HTMLElement} element - Renderer that receives the toggle.
+   * @param {string} filename - Theme stylesheet base filename.
+   * @return {HTMLButtonElement|null} The toggle button, or null when no valid theme stylesheet is loaded.
+   */
+  const appendThemeToggle = (element, filename) => {
+    const escapedFilename = filename.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const themePattern = new RegExp(`${escapedFilename}\\.(light|dark)\\.css(?:[?#].*)?$`, "i");
+    const themeReplacePattern = new RegExp(`${escapedFilename}\\.(light|dark)\\.css`, "i");
+    // Prefer the documented #byVIEWtheme link, but also support automatic detection.
+    const stylesheet = document.getElementById("byVIEWtheme") || [...document.querySelectorAll('link[rel~="stylesheet"]')].find((link) => themePattern.test(link.getAttribute("href") || ""));
+    if (!stylesheet) return null;
+    // Read the active theme from the stylesheet filename.
+    const getTheme = () => {
+      const match = (stylesheet.getAttribute("href") || "").match(themeReplacePattern);
+      return match ? match[1].toLowerCase() : null;
+    };
+    if (!getTheme()) return null;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "byVIEWthemeToggle";
+    button.textContent = "\u263E\uFE0E \u2600\uFE0E"; // ☾︎ ☀︎
+    // Keep accessibility text consistent with the theme actually loaded.
+    const sync = () => {
+      const next = getTheme() === "dark" ? "light" : "dark";
+      button.title = `Switch to ${next} theme`;
+      button.setAttribute("aria-label", button.title);
+    };
+    button.addEventListener("click", () => {
+      const current = getTheme();
+      const next = current === "dark" ? "light" : "dark";
+      const href = stylesheet.getAttribute("href") || "";
+
+      // Replace only the theme filename while preserving paths and query strings.
+      stylesheet.setAttribute("href", href.replace(themeReplacePattern, `${filename}.${next}.css`));
+      sync();
+    });
+    sync();
+    return element.appendChild(button);
+  };
+
+  /**
    * Main API.
-   *
    * Renders Markdown into an HTMLElement.
-   *
    * The Markdown source can be:
-   *
    * 1. A string.
    * 2. Another HTMLElement's textContent.
    * 3. The target element's own textContent
@@ -1095,6 +1137,7 @@
    * @param {boolean} [options.withStrikethrough=true]
    * @param {boolean} [options.breaks=false]
    * @param {string|false} [options.linkTarget="_blank"]
+   * @param {boolean} [options.themeToggle=true] - Appends a theme toggle at the top-right of the element.
    */
   global.byMDviewer = function byMDviewer(element, markdown, options = {}) {
     if (!(element instanceof HTMLElement)) throw new TypeError("byMDviewer: element must be an HTMLElement.");
@@ -1111,12 +1154,14 @@
       withStrikethrough: true,
       breaks: false,
       linkTarget: "_blank",
+      themeToggle: true,
       ...options,
       [HEADING_IDS]: Object.create(null)
     };
     // Clear the target safely.
     element.textContent = "";
     element.classList.add("byMDdocument");
+    if (options.themeToggle) appendThemeToggle(element, "md");
     // Normalize line endings and remove the BOM.
     const normalized = source.replace(/\r\n?/g, "\n").replace(/^\uFEFF/, "");
     // Remove invisible Markdown and HTML comments before block parsing.
