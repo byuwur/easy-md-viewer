@@ -817,6 +817,129 @@
   const matchFence = (line) => line.match(/^ {0,3}(`{3,}|~{3,})([^`]*)$/);
 
   /**
+   * Removes HTML comments while preserving
+   * comment-looking content inside fenced code.
+   *
+   * Raw HTML is not rendered by easy-md-viewer,
+   * but Markdown comments should remain invisible.
+   */
+  const stripHtmlComments = (source) => {
+    const lines = source.split("\n");
+    const output = [];
+
+    let inComment = false;
+    let fence = null;
+
+    for (const line of lines) {
+      if (fence) {
+        output.push(line);
+
+        if (fence.close.test(line)) {
+          fence = null;
+        }
+
+        continue;
+      }
+
+      if (!inComment) {
+        const opening = matchFence(line);
+
+        if (opening) {
+          const marker = opening[1][0];
+
+          const minimumLength = opening[1].length;
+
+          fence = {
+            close: new RegExp(`^ {0,3}${marker === "`" ? "`" : "~"}{${minimumLength},}\\s*$`)
+          };
+
+          output.push(line);
+          continue;
+        }
+      }
+
+      let cursor = 0;
+      let visible = "";
+
+      while (cursor < line.length) {
+        if (inComment) {
+          const close = line.indexOf("-->", cursor);
+
+          if (close === -1) {
+            cursor = line.length;
+
+            break;
+          }
+
+          inComment = false;
+          cursor = close + 3;
+
+          continue;
+        }
+
+        const open = line.indexOf("<!--", cursor);
+
+        if (open === -1) {
+          visible += line.slice(cursor);
+
+          break;
+        }
+
+        visible += line.slice(cursor, open);
+
+        inComment = true;
+        cursor = open + 4;
+      }
+
+      output.push(visible);
+    }
+
+    return output.join("\n");
+  };
+
+  /**
+   * Removes Markdown hidden-comment/reference
+   * markers such as:
+   *
+   * [//]&#58; # (OPTIONAL:SECTION BEGIN)
+   */
+  const stripHiddenCommentMarkers = (lines) => {
+    const output = [];
+    let fence = null;
+
+    for (const line of lines) {
+      if (fence) {
+        output.push(line);
+
+        if (fence.close.test(line)) {
+          fence = null;
+        }
+
+        continue;
+      }
+
+      const opening = matchFence(line);
+
+      if (opening) {
+        const marker = opening[1][0];
+
+        const minimumLength = opening[1].length;
+
+        fence = {
+          close: new RegExp(`^ {0,3}${marker === "`" ? "`" : "~"}{${minimumLength},}\\s*$`)
+        };
+
+        output.push(line);
+        continue;
+      }
+
+      output.push(/^\s*\[\/\/\]:\s*#\s*\(.*\)\s*$/.test(line) ? "" : line);
+    }
+
+    return output;
+  };
+
+  /**
    * Checks whether a line is a
    * Markdown horizontal rule.
    */
@@ -1620,10 +1743,26 @@
 
     element.classList.add("byMDdocument");
 
-    const lines = source
-      .replace(/\r\n?/g, "\n")
-      .replace(/^\uFEFF/, "")
-      .split("\n");
+    /*
+     * Normalize line endings/BOM.
+     */
+    const normalized = source.replace(/\r\n?/g, "\n").replace(/^\uFEFF/, "");
+
+    /*
+     * Remove invisible Markdown/
+     * HTML comments before block
+     * parsing.
+     *
+     * This is important for the
+     * policy documents:
+     *
+     * <!-- hidden config -->
+     *
+     * and
+     *
+     * [//]&#58; # (OPTIONAL:...)
+     */
+    const lines = stripHiddenCommentMarkers(stripHtmlComments(normalized).split("\n"));
 
     renderBlocks(element, lines, options);
   };
