@@ -1,6 +1,6 @@
-# easy MD viewer
+# byuwur/easy-json-viewer
 
-A lightweight, dependency-free JavaScript Markdown viewer that renders Markdown directly into DOM nodes.
+**easy MD Viewer** is a lightweight, dependency-free JavaScript Markdown viewer that renders Markdown directly into DOM nodes.
 
 ## Features
 
