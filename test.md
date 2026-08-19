@@ -349,13 +349,13 @@ Not an email: test@
 
 ## 12. Images
 
-![Example image](https://example.com/image.png)
+![Example image](https://raw.githubusercontent.com/byuwur/easy-md-viewer/main/test.png)
 
-![Example image with title](https://example.com/image.png "Example image")
+![Example image with title](https://raw.githubusercontent.com/byuwur/easy-md-viewer/main/test.png "Example image")
 
-![Alt with **Markdown-looking** text](https://example.com/image.png)
+![Alt with **Markdown-looking** text](https://raw.githubusercontent.com/byuwur/easy-md-viewer/main/test.png)
 
-![Relative image](images/example.png)
+![Relative image](test.png)
 
 Unsafe image should remain text: ![Unsafe image](javascript:alert(1))
 
