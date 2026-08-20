@@ -2,7 +2,7 @@
 
 **easy MD Viewer** is a lightweight and easy-to-use JavaScript library for rendering Markdown text in an HTML document. It provides common Markdown formatting, nested content, GFM-style features, automatic heading anchors, customizable themes, and safe link handling while staying dependency-free.
 
-Test it out at: [codepen.io/byuwur/pen/01a0161a-7099-7a00-9603-665d04c6dea6](https://codepen.io/editor/byuwur/pen/01a0161a-7099-7a00-9603-665d04c6dea6)
+Test it out at: [codepen.io/byuwur/pen/VYPoWMM](https://codepen.io/byuwur/pen/VYPoWMM)
 
 ## Features
 
@@ -34,13 +34,15 @@ Include the required files in your HTML:
 Call `byMDviewer` with the target element, the Markdown text, and optional configuration options:
 
 ```javascript
-const markdown = `# Hello
+const markdown = `
+# Hello
 
 This is **Markdown**.
 
 - Easy
 - Lightweight
-- Dependency-free`;
+- Dependency-free
+`;
 
 byMDviewer(document.getElementById("byMDrenderer"), markdown);
 ```
