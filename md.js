@@ -567,11 +567,11 @@
   const matchFence = (line) => line.match(/^ {0,3}(`{3,}|~{3,})([^`]*)$/);
 
   /**
-   * Removes HTML comments while preserving
-   * comment-looking content inside fenced code.
+   * Removes HTML comments while preserving comment-looking content inside code.
+   * Raw HTML is not rendered by easy-md-viewer, but Markdown comments should remain invisible.
    *
-   * Raw HTML is not rendered by easy-md-viewer,
-   * but Markdown comments should remain invisible.
+   * @param {string} source
+   * @return {string}
    */
   const stripHtmlComments = (source) => {
     const lines = source.split("\n");
@@ -579,11 +579,13 @@
     let inComment = false;
     let fence = null;
     for (const line of lines) {
+      // Preserve everything inside fenced code.
       if (fence) {
         output.push(line);
         if (fence.close.test(line)) fence = null;
         continue;
       }
+      // Detect fenced code before looking for comments.
       if (!inComment) {
         const opening = matchFence(line);
         if (opening) {
@@ -599,6 +601,7 @@
       let cursor = 0;
       let visible = "";
       while (cursor < line.length) {
+        // Continue consuming a multiline HTML comment.
         if (inComment) {
           const close = line.indexOf("-->", cursor);
           if (close === -1) {
@@ -609,14 +612,32 @@
           cursor = close + 3;
           continue;
         }
-        const open = line.indexOf("<!--", cursor);
-        if (open === -1) {
-          visible += line.slice(cursor);
-          break;
+        // Preserve escaped backticks as literal Markdown.
+        if (line[cursor] === "\\" && line[cursor + 1] === "`") {
+          visible += line.slice(cursor, cursor + 2);
+          cursor += 2;
+          continue;
         }
-        visible += line.slice(cursor, open);
-        inComment = true;
-        cursor = open + 4;
+        // Preserve complete inline code spans before looking for comments inside them.
+        if (line[cursor] === "`") {
+          const run = markerRun(line, cursor);
+          const ticks = "`".repeat(run);
+          const close = line.indexOf(ticks, cursor + run);
+
+          if (close !== -1) {
+            visible += line.slice(cursor, close + run);
+            cursor = close + run;
+            continue;
+          }
+        }
+        // Hide HTML comments outside code spans.
+        if (line.startsWith("<!--", cursor)) {
+          inComment = true;
+          cursor += 4;
+          continue;
+        }
+        visible += line[cursor];
+        cursor += 1;
       }
       output.push(visible);
     }
