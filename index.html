@@ -13,6 +13,7 @@
   <link id="byVIEWtheme" href="https://byuwur.github.io/easy-md-viewer/md.light.css" rel="stylesheet" />
   <style>
     body {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
       background: #222;
       color: #eee;
     }
@@ -28,13 +29,15 @@
   </style>
   <p>easy MD viewer</p>
   <p>This is a demo of <a href="https://github.com/byuwur/easy-md-viewer">https://github.com/byuwur/easy-md-viewer</a></p>
+  <!--
   <a href="javascript:document.querySelector('#byVIEWtheme').setAttribute('href','https://byuwur.github.io/easy-md-viewer/md.light.css');">Light/Claro</a> |
   <a href="javascript:document.querySelector('#byVIEWtheme').setAttribute('href','https://byuwur.github.io/easy-md-viewer/md.dark.css');">Dark/Oscuro</a>
   <br /><br />
+  -->
   <a class="listed-link" href="javascript:render();">DEMO MARKDOWN</a>
   <a class="listed-link" href="javascript:benchmark();">BENCHMARK MARKDOWN</a>
   <br /><br />
-  <div id="byMDrenderer"></div>
+  <div id="byMDrenderer" style="max-width:1024px;"></div>
   <script>
     const demoMD = `
 # easy MD viewer
