@@ -21,12 +21,28 @@ Test it out at: [codepen.io/byuwur/pen/VYPoWMM](https://codepen.io/byuwur/pen/VY
 
 ### Installation
 
-Include the required files in your HTML:
+Use the CDN:
+
+```html
+<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.1.final/md.min.css" rel="stylesheet" />
+<link id="byVIEWtheme" href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.1.final/md.light.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.1.final/md.min.js" defer></script>
+```
+
+Or use the local files:
 
 ```html
 <link href="md.css" rel="stylesheet" />
-<link id="byVIEWtheme" href="md.dark.css" rel="stylesheet" />
+<link id="byVIEWtheme" href="md.light.css" rel="stylesheet" />
 <script src="md.js" defer></script>
+```
+
+For testing or development, the version can be omitted to get the latest changes:
+
+```html
+<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer/md.min.css" rel="stylesheet" />
+<link id="byVIEWtheme" href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer/md.light.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer/md.min.js" defer></script>
 ```
 
 ### Basic Usage
