@@ -17,6 +17,7 @@
   font-size: 16px; /* If body has size is already defined */
   word-wrap: break-word;
   padding: 2rem;
+  min-height: 4rem;
 }
 .byMDdocument *,
 .byMDdocument *::before,
