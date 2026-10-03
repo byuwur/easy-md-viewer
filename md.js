@@ -3,7 +3,7 @@
  * File: md.js
  * Desc: Contains the heart of easy MD viewer.
  * Deps: none
- * Copyright (c) 2026 Andrés Trujillo [Mateus] byUwUr
+ * Copyright (c) 2026 Andres Trujillo [Mateus] byUwUr
  * https://github.com/byuwur/easy-md-viewer
  */
 
@@ -1167,6 +1167,69 @@
   };
 
   /**
+   * Adds text size controls for a renderer.
+   * @param {HTMLElement} element - Renderer whose font size is changed.
+   * @param {HTMLElement} controls - Toolbar that receives the controls.
+   * @return {HTMLElement} The text size button group.
+   */
+  const appendFontSizeControls = (element, controls) => {
+    element.dataset.byViewDefaultFontSize ??= element.style.fontSize;
+    const sizes = document.createElement("div");
+    sizes.className = "byVIEWfontSizes";
+    controls.appendChild(sizes);
+    const rootSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    let size = (parseFloat(getComputedStyle(element).fontSize) || rootSize) / rootSize;
+    const decrease = document.createElement("button");
+    const increase = document.createElement("button");
+    const reset = document.createElement("button");
+    reset.textContent = "A";
+    decrease.textContent = "A-";
+    increase.textContent = "A+";
+    for (const [button, title] of [
+      [decrease, "Decrease text size"],
+      [reset, "Reset text size"],
+      [increase, "Increase text size"]
+    ]) {
+      button.type = "button";
+      button.className = "byVIEWfontSize";
+      button.title = title;
+      button.setAttribute("aria-label", title);
+      sizes.appendChild(button);
+    }
+    const sync = () => {
+      decrease.disabled = size <= 0.5;
+      increase.disabled = size >= 3;
+    };
+    for (const [button, step] of [
+      [decrease, -0.125],
+      [increase, 0.125]
+    ]) {
+      button.addEventListener("click", () => {
+        size = Math.max(0.5, Math.min(3, size + step));
+        element.style.fontSize = `${size}rem`;
+        sync();
+      });
+    }
+    reset.addEventListener("click", () => {
+      element.style.fontSize = element.dataset.byViewDefaultFontSize;
+      size = (parseFloat(getComputedStyle(element).fontSize) || rootSize) / rootSize;
+      sync();
+    });
+    sync();
+    return sizes;
+  };
+
+  const appendViewerControls = (element, options, filename) => {
+    const controls = document.createElement("div");
+    controls.className = "byVIEWcontrols";
+    controls.setAttribute("role", "group");
+    controls.setAttribute("aria-label", "Viewer controls");
+    if (options.themeToggle) appendThemeToggle(controls, filename);
+    if (options.fontSizeControls) appendFontSizeControls(element, controls);
+    if (controls.childNodes.length) element.appendChild(controls);
+  };
+
+  /**
    * Main API.
    * Renders Markdown into an HTMLElement.
    * The Markdown source can be:
@@ -1186,7 +1249,8 @@
    * @param {boolean} [options.withStrikethrough=true]
    * @param {boolean} [options.breaks=false]
    * @param {string|false} [options.linkTarget="_blank"]
-   * @param {boolean} [options.themeToggle=true] - Appends a theme toggle at the top-right of the element.
+   * @param {boolean} [options.themeToggle=true] - Adds the theme toggle.
+   * @param {boolean} [options.fontSizeControls=true] - Adds viewer-local text size controls.
    */
   global.byMDviewer = function byMDviewer(element, markdown, options = {}) {
     if (!(element instanceof HTMLElement)) throw new TypeError("byMDviewer: element must be an HTMLElement.");
@@ -1204,13 +1268,14 @@
       breaks: false,
       linkTarget: "_blank",
       themeToggle: true,
+      fontSizeControls: true,
       ...options,
       [HEADING_IDS]: Object.create(null)
     };
     // Clear the target safely.
     element.textContent = "";
     element.classList.add("byMDdocument");
-    if (options.themeToggle) appendThemeToggle(element, "md");
+    appendViewerControls(element, options, "md");
     // Normalize line endings and remove the BOM.
     const normalized = source.replace(/\r\n?/g, "\n").replace(/^\uFEFF/, "");
     // Remove invisible Markdown and HTML comments before block parsing.

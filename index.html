@@ -12,6 +12,14 @@
 <body>
   <link id="byVIEWtheme" href="https://byuwur.github.io/easy-md-viewer/md.light.css" rel="stylesheet" />
   <style>
+    html {
+      font-size: 16px;
+    }
+
+    body {
+      font-size: 1rem;
+    }
+
     body {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
       background: #222;
@@ -37,7 +45,7 @@
   <a class="listed-link" href="javascript:render();">DEMO MARKDOWN</a>
   <a class="listed-link" href="javascript:benchmark();">BENCHMARK MARKDOWN</a>
   <br /><br />
-  <div id="byMDrenderer" style="max-width:1024px;"></div>
+  <div id="byMDrenderer" style="max-width:64rem;"></div>
   <script>
     const demoMD = `
 # easy MD viewer
@@ -109,7 +117,7 @@ No npm. No CDN. No dependencies.
           console.warn(`Something went wrong`, e);
         });
     };
-    const benchmark = () => renderFetched(`https://raw.githubusercontent.com/byuwur/easy-md-viewer/main/test.md`);
+    const benchmark = () => renderFetched("test.md");
     document.addEventListener("DOMContentLoaded", () => {
       render();
     });
