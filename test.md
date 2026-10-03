@@ -735,6 +735,34 @@ Inline: `**bold** *italic* ~~strike~~ [link](https://example.com)`
 
 ---
 
+Nested fences must preserve HTML comments and hidden markers as literal code:
+
+> ~~~html
+> <!-- literal comment in a blockquote -->
+> [//]: # "literal marker in code"
+> ~~~
+
+- Parent
+  - Child
+
+    ~~~html
+    <!-- literal comment in a deep list -->
+    ~~~
+
+> > ~~~html
+> > <!--
+> > literal multiline comment
+> > -->
+> > ~~~
+
+Comments outside code must stay hidden:
+
+> Visible <!-- hidden comment --> text.
+>
+> [//]: # "hidden marker outside code"
+
+---
+
 ## 27. Regression: Pipes
 
 Normal text containing a | pipe should remain normal.
