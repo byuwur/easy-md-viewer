@@ -1,32 +1,26 @@
 # byuwur/easy-md-viewer
 
-**easy MD Viewer** is a lightweight and easy-to-use JavaScript library for rendering Markdown text in an HTML document. It provides common Markdown formatting, nested content, GFM-style features, automatic heading anchors, customizable themes, and safe link handling while staying dependency-free.
+Render Markdown in an HTML page, with light and dark themes. Plain JavaScript, no dependencies or build step.
 
-Test it out at: [codepen.io/byuwur/pen/VYPoWMM](https://codepen.io/byuwur/pen/VYPoWMM)
+Try it on [GitHub Pages](https://byuwur.github.io/easy-md-viewer/) or [CodePen](https://codepen.io/byuwur/pen/VYPoWMM).
 
 ## Features
 
-- **Markdown Rendering**: Renders headings, paragraphs, emphasis, code, lists, blockquotes, horizontal rules, links, images, and other common Markdown syntax.
-- **Heading Anchors**: Automatically generates unique heading IDs so same-document links such as `[Installation](#installation)` work without additional markup.
-- **Nested Content**: Supports nested lists and recursively rendered blockquotes.
-- **GFM Extras**: Includes strikethrough, task lists, tables with alignment, bare URL autolinks, and email autolinks.
-- **Code Blocks**: Supports backtick and tilde fences with optional language metadata, as well as arbitrary-backtick inline code spans.
-- **Flexible Input**: Render a Markdown string, another element's text content, or the target element's own text content.
-- **Customizable Themes**: Includes light and dark themes with an optional built-in theme toggle.
-- **Safe Link Handling**: Rejects executable URL schemes and keeps same-document anchor links in the current tab.
-- **Safe Rendering**: Uses DOM nodes directly instead of generating Markdown HTML through `innerHTML`.
-- **Dependency-Free**: Uses plain JavaScript and DOM APIs without a package manager or build step.
+- Headings, lists, tables, blockquotes, links, images, and code.
+- Nested content, task lists, strikethrough, and automatic heading anchors.
+- Light/dark theme toggle and A-/A+ text size controls.
+- Input from a Markdown string or an element's text.
+- Safe URL handling; raw HTML is displayed as text.
+- Plain JavaScript, with no dependencies or build step.
 
-## Getting Started
-
-### Installation
+## Installation
 
 Use the CDN:
 
 ```html
-<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.2.final/md.min.css" rel="stylesheet" />
-<link id="byVIEWtheme" href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.2.final/md.light.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.2.final/md.min.js" defer></script>
+<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.3.final/md.min.css" rel="stylesheet" />
+<link id="byVIEWtheme" href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.3.final/md.light.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.3.final/md.min.js" defer></script>
 ```
 
 Or use the local files:
@@ -37,194 +31,150 @@ Or use the local files:
 <script src="md.js" defer></script>
 ```
 
-For testing or development, the version can be omitted to get the latest changes:
+For development, omit `@v1.3.final` from the CDN URLs to load the latest changes.
+
+## Usage
+
+Save this as an HTML file beside `md.js`, `md.css`, and `md.light.css`, then open it in a browser. It renders a heading, emphasis, a link, a task list, and a table:
 
 ```html
-<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer/md.min.css" rel="stylesheet" />
-<link id="byVIEWtheme" href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer/md.light.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer/md.min.js" defer></script>
-```
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Markdown viewer example</title>
+    <link href="md.css" rel="stylesheet" />
+    <link id="byVIEWtheme" href="md.light.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="byMDrenderer"></div>
 
-### Basic Usage
+    <script src="md.js"></script>
+    <script>
+      const markdown = `# My project
 
-Call `byMDviewer` with the target element, the Markdown text, and optional configuration options:
+Render **Markdown** directly in your page.
 
-```javascript
-const markdown = `
-# Hello
+[Project source](https://github.com/byuwur/easy-md-viewer)
 
-This is **Markdown**.
+## Checklist
 
-- Easy
-- Lightweight
-- Dependency-free
+- [x] Load the viewer
+- [ ] Write more content
+
+| Feature | Available |
+| --- | --- |
+| Tables | Yes |
+| Themes | Light and dark |
 `;
 
-byMDviewer(document.getElementById("byMDrenderer"), markdown);
+      const target = document.getElementById("byMDrenderer");
+      byMDviewer(target, markdown);
+    </script>
+  </body>
+</html>
 ```
 
-The intended input is Markdown text. The source can be passed directly as a string, read from another HTML element, or omitted to render the target element's own `textContent`.
+The target and library are loaded before the viewer call. Use the CDN URLs from Installation instead of the local paths if preferred. If you load the script with `defer` in the head, run the viewer call after `DOMContentLoaded` or from a later deferred script.
 
-### Options
+### Read from another element
 
-The `byMDviewer` function accepts an optional `options` object:
-
-- `withLinks` (default: `true`): If `true`, Markdown links, supported autolinks, bare URLs, and email addresses are rendered as clickable links.
-- `withImages` (default: `true`): If `true`, supported Markdown images are rendered.
-- `withTables` (default: `true`): If `true`, GFM-style tables are rendered.
-- `withTasks` (default: `true`): If `true`, `[ ]` and `[x]` list items are rendered as disabled task checkboxes.
-- `withStrikethrough` (default: `true`): If `true`, `~~strikethrough~~` is rendered.
-- `breaks` (default: `false`): If `true`, normal line breaks inside paragraphs are rendered as `<br>` elements.
-- `linkTarget` (default: `"_blank"`): Target used by rendered links. Same-document `#anchor` links never receive the external target. Set to `false` to omit target attributes from other links.
-- `themeToggle` (default: `true`): Appends a light/dark theme toggle when a compatible theme stylesheet is found.
-
-### Themes
-
-The built-in theme toggle automatically detects the stylesheet identified by `#byVIEWtheme` or a stylesheet whose filename matches `md.light.css` or `md.dark.css`.
+With the library already loaded, use a hidden source element to keep Markdown separate from its output:
 
 ```html
-<link id="byVIEWtheme" href="md.dark.css" rel="stylesheet" />
+<pre id="markdownSource" hidden>
+# Hello
+
+This is **Markdown** from an element.
+</pre>
+<div id="byMDrenderer"></div>
+
+<script>
+  const source = document.getElementById("markdownSource");
+  const target = document.getElementById("byMDrenderer");
+  byMDviewer(target, source);
+</script>
 ```
 
-The toggle switches only the theme filename while preserving the stylesheet resource path.
+### Render an element's own text
 
-You can disable the automatic toggle:
-
-```javascript
-byMDviewer(document.getElementById("byMDrenderer"), markdown, {
-  themeToggle: false
-});
-```
-
-Themes can also be switched manually by updating the `href` of the theme stylesheet:
-
-```javascript
-document.querySelector("#byVIEWtheme").setAttribute("href", "md.light.css");
-```
-
-```javascript
-document.querySelector("#byVIEWtheme").setAttribute("href", "md.dark.css");
-```
-
-### Rendering From an Element
-
-Pass another HTML element as the Markdown source to render its `textContent`:
-
-```javascript
-byMDviewer(document.getElementById("byMDrenderer"), document.getElementById("markdownSource"));
-```
-
-Or omit the source to render the target element's own `textContent`:
-
-```javascript
-byMDviewer(document.getElementById("byMDrenderer"));
-```
-
-### Heading Anchors
-
-ATX headings automatically receive unique IDs derived from their rendered text:
-
-```md
-## Installation
-```
-
-renders with an anchor equivalent to:
+Omit the second argument to replace the target's Markdown text with rendered content:
 
 ```html
-<h2 id="installation">Installation</h2>
-```
+<div id="byMDrenderer"> # Hello This is **Markdown** inside the target. </div>
 
-This allows normal same-document Markdown links:
-
-```md
-[Installation](#installation)
-```
-
-Repeated headings receive unique IDs in document order:
-
-```text
-example
-example-1
-example-2
-```
-
-Heading IDs also work for headings rendered recursively inside supported nested content.
-
-### Supported Markdown
-
-The renderer supports the common syntax needed for normal Markdown documents:
-
-- ATX headings (`#` through `######`)
-- Paragraphs and Markdown hard line breaks
-- Optional soft line breaks with `breaks: true`
-- Bold, italic, combined emphasis, and strikethrough
-- Arbitrary-backtick inline code
-- Fenced code blocks using backticks or tildes
-- Optional fenced-code language metadata
-- Ordered and unordered lists
-- Nested lists
-- Ordered lists starting at values other than `1`
-- Task lists
-- Recursive blockquotes
-- Horizontal rules
-- Inline links and optional link titles
-- Angle-bracket autolinks
-- Bare URL and email autolinks
-- Images with lazy loading
-- GFM-style tables with column alignment
-- Escaped pipes and inline-code pipes inside tables
-- Markdown backslash escapes
-- Common named and numeric HTML entities
-- HTML comments and `[//]: # (...)` hidden document markers
-
-This project intentionally focuses on practical Markdown rendering rather than implementing every CommonMark edge case or extension.
-
-### Links
-
-Supported links can use relative paths, same-document anchors, or allowed URL protocols.
-
-External links use the configured `linkTarget`:
-
-```md
-[easy MD Viewer](https://github.com/byuwur/easy-md-viewer)
-```
-
-Same-document links remain in the current page regardless of `linkTarget`:
-
-```md
-[Options](#options)
-```
-
-Supported explicit URL protocols include `http`, `https`, `ftp`, `ftps`, `mailto`, and `tel`.
-
-### Safety
-
-**easy MD Viewer** does not execute raw HTML from Markdown. The renderer creates DOM nodes directly and treats unsupported HTML as text instead of inserting generated Markdown through `innerHTML`.
-
-HTML comments are removed from rendered Markdown while comment-looking content inside fenced or inline code remains literal.
-
-Markdown document-control markers using the following form are also hidden:
-
-```md
-[//]: # "OPTIONAL:SECTION"
-```
-
-Rendered links and images only accept supported URL protocols. Potentially executable schemes such as `javascript:` and `data:` are rejected.
-
-### Example Markup
-
-```html
-<link href="md.css" rel="stylesheet" />
-<link id="byVIEWtheme" href="md.dark.css" rel="stylesheet" />
-
-<div id="byMDrenderer"> # easy MD Viewer Render **Markdown** directly from this element. ## Features - Lightweight - Dependency-free - DOM-based </div>
-
-<script src="md.js"></script>
 <script>
   byMDviewer(document.getElementById("byMDrenderer"));
 </script>
 ```
 
+## Options
+
+Pass options as the third argument:
+
+```javascript
+byMDviewer(document.getElementById("byMDrenderer"), markdown, {
+  breaks: true,
+  themeToggle: false
+});
+```
+
+| Option              | Default    | Meaning                                                                                   |
+| ------------------- | ---------- | ----------------------------------------------------------------------------------------- |
+| `withLinks`         | `true`     | Render clickable links, autolinks, bare URLs, and email addresses.                        |
+| `withImages`        | `true`     | Render supported images.                                                                  |
+| `withTables`        | `true`     | Render GFM-style tables.                                                                  |
+| `withTasks`         | `true`     | Render `[ ]` and `[x]` items as disabled checkboxes.                                      |
+| `withStrikethrough` | `true`     | Render `~~strikethrough~~`.                                                               |
+| `breaks`            | `false`    | Turn ordinary paragraph line breaks into `<br>` elements.                                 |
+| `linkTarget`        | `"_blank"` | Target for links; `false` omits it. Same-document anchors always stay in the current tab. |
+| `themeToggle`       | `true`     | Add a toggle when a compatible theme stylesheet is present.                               |
+| `fontSizeControls`  | `true`     | Add A-/A+ buttons to resize this viewer's text.                                           |
+
+## Themes
+
+The toggle finds `#byVIEWtheme` or a stylesheet named `md.light.css` or `md.dark.css`. It changes only the theme filename, keeping the resource path.
+
+A- and A+ change the viewer's font size by `0.125rem`, between `0.5rem` and `3rem`. They work without a theme stylesheet, preserve the size when the target is rendered again, and do not change the rest of the page. Set `fontSizeControls: false` to hide them.
+
+To switch manually:
+
+```javascript
+document.querySelector("#byVIEWtheme").href = "md.dark.css";
+// Use md.light.css for the light theme.
+```
+
+## Supported Markdown
+
+- ATX headings (`#` through `######`), paragraphs, hard line breaks, and optional soft breaks.
+- Bold, italic, combined emphasis, and strikethrough.
+- Inline code with arbitrary backtick lengths; backtick or tilde fences with optional language metadata.
+- Ordered, unordered, nested, and task lists; ordered lists can start above `1`.
+- Recursive blockquotes, horizontal rules, and lazy-loaded images.
+- Inline links with optional titles, angle-bracket autolinks, bare URLs, and email links.
+- GFM-style tables with alignment, escaped pipes, and inline-code pipes.
+- Backslash escapes, common named and numeric HTML entities, and hidden comments/document markers.
+
+This covers practical Markdown documents, not every CommonMark edge case or extension.
+
+### Heading anchors
+
+`## Installation` receives the ID `installation`, so `[Installation](#installation)` works. Repeated headings become `example`, `example-1`, `example-2`, and so on. Supported nested headings receive IDs too.
+
+### Links and raw HTML
+
+Links accept relative paths, same-document anchors, and `http`, `https`, `ftp`, `ftps`, `mailto`, or `tel` URLs. Links and images reject executable schemes such as `javascript:` and `data:`.
+
+The renderer creates DOM nodes and treats unsupported raw HTML as text. It does not execute it. HTML comments are hidden, except inside code. Document markers such as `[//]: # "OPTIONAL:SECTION"` are hidden too.
+
+## Checks
+
+GitHub Actions runs the rendering checks in `tests/rendering.cjs` on pushes and pull requests. It tests local `md.js` in Chromium, including the benchmark document.
+
+For a visual check, serve this folder over HTTP, open `index.html`, and click **BENCHMARK MARKDOWN** to render `test.md`.
+
+CDN examples use the pinned release. Local source fixes require a new release before they reach those URLs.
+
 ## License
 
-MIT (c) Andrés Trujillo [Mateus] byUwUr
+MIT (c) Andres Trujillo [Mateus] byUwUr
