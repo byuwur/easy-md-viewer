@@ -97,6 +97,23 @@
   };
 
   /**
+   * Finds a closing backtick run with exactly the opening run's length.
+   * Skips shorter and longer runs in full so they remain code content.
+   * @param {string} text - Source text.
+   * @param {number} start - Search offset immediately after the opening run.
+   * @param {number} length - Number of backticks in the opening run.
+   * @return {number} Closing run's start index, or -1 when no match exists.
+   */
+  const findClosingCodeRun = (text, start, length) => {
+    for (let index = text.indexOf("`", start); index !== -1; ) {
+      const run = markerRun(text, index);
+      if (run === length) return index;
+      index = text.indexOf("`", index + run);
+    }
+    return -1;
+  };
+
+  /**
    * Finds the next unescaped occurrence of a delimiter.
    * Code spans are skipped while searching.
    *
@@ -113,12 +130,13 @@
       }
       if (text[i] === "`") {
         const run = markerRun(text, i);
-        const ticks = "`".repeat(run);
-        const close = text.indexOf(ticks, i + run);
+        const close = findClosingCodeRun(text, i + run, run);
         if (close !== -1) {
           i = close + run - 1;
           continue;
         }
+        i += run - 1;
+        continue;
       }
       if (text.startsWith(delimiter, i)) return i;
     }
@@ -142,12 +160,13 @@
       }
       if (text[i] === "`") {
         const run = markerRun(text, i);
-        const ticks = "`".repeat(run);
-        const close = text.indexOf(ticks, i + run);
+        const close = findClosingCodeRun(text, i + run, run);
         if (close !== -1) {
           i = close + run - 1;
           continue;
         }
+        i += run - 1;
+        continue;
       }
       if (text[i] === "[") depth += 1;
       else if (text[i] === "]") {
@@ -373,8 +392,7 @@
       // Support arbitrary backtick-run delimiters for inline code.
       if (char === "`") {
         const run = markerRun(text, i);
-        const ticks = "`".repeat(run);
-        const close = text.indexOf(ticks, i + run);
+        const close = findClosingCodeRun(text, i + run, run);
         if (close !== -1) {
           flush();
           let codeText = text.slice(i + run, close).replace(/\n/g, " ");
@@ -386,6 +404,9 @@
           i = close + run;
           continue;
         }
+        buffer += "`".repeat(run);
+        i += run;
+        continue;
       }
       // Handle images and inline links.
       const isImage = options.withImages && text.startsWith("![", i);
@@ -564,7 +585,10 @@
    * @param {string} line
    * @return {RegExpMatchArray|null}
    */
-  const matchFence = (line) => line.match(/^ {0,3}(`{3,}|~{3,})([^`]*)$/);
+  const matchFence = (line) => {
+    const match = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+    return match && (match[1][0] !== "`" || !match[2].includes("`")) ? match : null;
+  };
 
   /**
    * Removes HTML comments while preserving comment-looking content inside code.
@@ -621,14 +645,16 @@
         // Preserve complete inline code spans before looking for comments inside them.
         if (line[cursor] === "`") {
           const run = markerRun(line, cursor);
-          const ticks = "`".repeat(run);
-          const close = line.indexOf(ticks, cursor + run);
+          const close = findClosingCodeRun(line, cursor + run, run);
 
           if (close !== -1) {
             visible += line.slice(cursor, close + run);
             cursor = close + run;
             continue;
           }
+          visible += "`".repeat(run);
+          cursor += run;
+          continue;
         }
         // Hide HTML comments outside code spans.
         if (line.startsWith("<!--", cursor)) {
@@ -668,7 +694,7 @@
         output.push(line);
         continue;
       }
-      output.push(/^\s*\[\/\/\]:\s*#\s*\(.*\)\s*$/.test(line) ? "" : line);
+      output.push(/^\s*\[\/\/\]:\s*#\s*(?:\(.*\)|".*"|'.*')\s*$/.test(line) ? "" : line);
     }
     return output;
   };
@@ -724,13 +750,15 @@
       }
       if (source[i] === "`") {
         const run = markerRun(source, i);
-        const ticks = "`".repeat(run);
-        const close = source.indexOf(ticks, i + run);
+        const close = findClosingCodeRun(source, i + run, run);
         if (close !== -1) {
           cell += source.slice(i, close + run);
           i = close + run - 1;
           continue;
         }
+        cell += "`".repeat(run);
+        i += run - 1;
+        continue;
       }
       if (source[i] === "|") {
         cells.push(cell.trim());
