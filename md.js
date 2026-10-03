@@ -591,18 +591,19 @@
   };
 
   /**
-   * Removes HTML comments while preserving comment-looking content inside code.
+   * Removes HTML comments and hidden markers while preserving code content.
    * Raw HTML is not rendered by easy-md-viewer, but Markdown comments should remain invisible.
    *
-   * @param {string} source
-   * @return {string}
+   * @param {string[]} lines - Source lines at the current nesting level.
+   * @param {Object} options - Renderer options used to detect container boundaries.
+   * @return {string[]} Lines with comments outside code removed.
    */
-  const stripHtmlComments = (source) => {
-    const lines = source.split("\n");
+  const stripComments = (lines, options) => {
     const output = [];
     let inComment = false;
     let fence = null;
-    for (const line of lines) {
+    for (let index = 0; index < lines.length; index++) {
+      const line = lines[index];
       // Preserve everything inside fenced code.
       if (fence) {
         output.push(line);
@@ -619,6 +620,17 @@
             close: new RegExp(`^ {0,3}${marker === "`" ? "`" : "~"}{${minimumLength},}\\s*$`)
           };
           output.push(line);
+          continue;
+        }
+      }
+      // Containers keep their raw content until prefixes/indentation are removed.
+      if (!inComment) {
+        let next;
+        if (/^ {0,3}>/.test(line)) next = readBlockquote(lines, index).next;
+        else if (!isHorizontalRule(line) && matchListItem(line)) next = readListItem(lines, index, options).next;
+        if (next !== undefined) {
+          for (let cursor = index; cursor < next; cursor++) output.push(lines[cursor]);
+          index = next - 1;
           continue;
         }
       }
@@ -665,36 +677,7 @@
         visible += line[cursor];
         cursor += 1;
       }
-      output.push(visible);
-    }
-    return output.join("\n");
-  };
-
-  /**
-   * Removes Markdown hidden-comment/reference markers such as:
-   *
-   * [//]&#58; # (OPTIONAL:SECTION BEGIN)
-   */
-  const stripHiddenCommentMarkers = (lines) => {
-    const output = [];
-    let fence = null;
-    for (const line of lines) {
-      if (fence) {
-        output.push(line);
-        if (fence.close.test(line)) fence = null;
-        continue;
-      }
-      const opening = matchFence(line);
-      if (opening) {
-        const marker = opening[1][0];
-        const minimumLength = opening[1].length;
-        fence = {
-          close: new RegExp(`^ {0,3}${marker === "`" ? "`" : "~"}{${minimumLength},}\\s*$`)
-        };
-        output.push(line);
-        continue;
-      }
-      output.push(/^\s*\[\/\/\]:\s*#\s*(?:\(.*\)|".*"|'.*')\s*$/.test(line) ? "" : line);
+      output.push(/^\s*\[\/\/\]:\s*#\s*(?:\(.*\)|".*"|'.*')\s*$/.test(visible) ? "" : visible);
     }
     return output;
   };
@@ -924,15 +907,12 @@
   };
 
   /**
-   * Renders a blockquote recursively.
-   *
-   * @param {Node} parent
-   * @param {string[]} lines
-   * @param {number} start
-   * @param {Object} options
-   * @return {number}
+   * Reads a blockquote and removes one level of quote prefixes.
+   * @param {string[]} lines - Source lines.
+   * @param {number} start - Opening line index.
+   * @return {{lines: string[], next: number}} Quote content and first following line.
    */
-  const appendBlockquote = (parent, lines, start, options) => {
+  const readBlockquote = (lines, start) => {
     const quoteLines = [];
     let index = start;
     while (index < lines.length) {
@@ -949,11 +929,89 @@
       }
       break;
     }
+    return { lines: quoteLines, next: index };
+  };
+
+  /**
+   * Renders a blockquote recursively.
+   *
+   * @param {Node} parent
+   * @param {string[]} lines
+   * @param {number} start
+   * @param {Object} options
+   * @return {number}
+   */
+  const appendBlockquote = (parent, lines, start, options) => {
+    const { lines: quoteLines, next } = readBlockquote(lines, start);
     const quote = document.createElement("blockquote");
     quote.className = "byMDblockquote";
     renderBlocks(quote, quoteLines, options);
     parent.appendChild(quote);
-    return index;
+    return next;
+  };
+
+  /**
+   * Reads one list item's continuations and nested blocks.
+   * @param {string[]} lines - Source lines.
+   * @param {number} start - Opening line index.
+   * @param {Object} options - Renderer options used to detect block boundaries.
+   * @return {{lines: string[], next: number}} Item content and first following line.
+   */
+  const readListItem = (lines, start, options) => {
+    const item = matchListItem(lines[start]);
+    const baseIndent = item.indent;
+    const ordered = item.ordered;
+    const itemLines = [item.content];
+    let next = start + 1;
+    while (next < lines.length) {
+      const line = lines[next];
+      const candidate = matchListItem(line);
+      // A sibling starts the next item.
+      // Another list at the same or lower indentation ends this list.
+      if (candidate) {
+        if (candidate.indent <= baseIndent) break;
+        itemLines.push(removeIndent(line, item.contentIndent));
+        next += 1;
+        continue;
+      }
+      // Keep blank-line handling strict so normal content after lists does not get swallowed.
+      if (!line.trim()) {
+        let lookahead = next + 1;
+        while (lookahead < lines.length && !lines[lookahead].trim()) lookahead += 1;
+        if (lookahead >= lines.length) {
+          next = lookahead;
+          break;
+        }
+        const afterBlank = matchListItem(lines[lookahead]);
+        if (afterBlank && afterBlank.indent === baseIndent && afterBlank.ordered === ordered) {
+          next = lookahead;
+          break;
+        }
+        if (getIndent(lines[lookahead]) > baseIndent) {
+          itemLines.push("");
+          next += 1;
+          continue;
+        }
+        // A blank line followed by normal unindented content ends the list.
+        next = lookahead;
+        break;
+      }
+      // Handle indented continuations and nested blocks.
+      if (getIndent(line) > baseIndent) {
+        itemLines.push(removeIndent(line, item.contentIndent));
+        next += 1;
+        continue;
+      }
+      // Allow lazy continuation text inside a list item.
+      // A new block terminates the lazy continuation.
+      if (!startsBlock(lines, next, options)) {
+        itemLines.push(line);
+        next += 1;
+        continue;
+      }
+      break;
+    }
+    return { lines: itemLines, next };
   };
 
   /**
@@ -978,56 +1036,7 @@
     while (index < lines.length) {
       const item = matchListItem(lines[index]);
       if (!item || item.indent !== baseIndent || item.ordered !== ordered) break;
-      const itemLines = [item.content];
-      let next = index + 1;
-      while (next < lines.length) {
-        const line = lines[next];
-        const candidate = matchListItem(line);
-        // A sibling starts the next item.
-        // Another list at the same or lower indentation ends this list.
-        if (candidate) {
-          if (candidate.indent <= baseIndent) break;
-          itemLines.push(removeIndent(line, item.contentIndent));
-          next += 1;
-          continue;
-        }
-        // Keep blank-line handling strict so normal content after lists does not get swallowed.
-        if (!line.trim()) {
-          let lookahead = next + 1;
-          while (lookahead < lines.length && !lines[lookahead].trim()) lookahead += 1;
-          if (lookahead >= lines.length) {
-            next = lookahead;
-            break;
-          }
-          const afterBlank = matchListItem(lines[lookahead]);
-          if (afterBlank && afterBlank.indent === baseIndent && afterBlank.ordered === ordered) {
-            next = lookahead;
-            break;
-          }
-          if (getIndent(lines[lookahead]) > baseIndent) {
-            itemLines.push("");
-            next += 1;
-            continue;
-          }
-          // A blank line followed by normal unindented content ends the list.
-          next = lookahead;
-          break;
-        }
-        // Handle indented continuations and nested blocks.
-        if (getIndent(line) > baseIndent) {
-          itemLines.push(removeIndent(line, item.contentIndent));
-          next += 1;
-          continue;
-        }
-        // Allow lazy continuation text inside a list item.
-        // A new block terminates the lazy continuation.
-        if (!startsBlock(lines, next, options)) {
-          itemLines.push(line);
-          next += 1;
-          continue;
-        }
-        break;
-      }
+      const { lines: itemLines, next } = readListItem(lines, index, options);
       const li = document.createElement("li");
       li.className = "byMDlistItem";
       const taskMatch = options.withTasks ? itemLines[0].match(/^\[([ xX])\]\s+(.*)$/) : null;
@@ -1061,6 +1070,7 @@
    * @param {Object} options
    */
   function renderBlocks(parent, lines, options) {
+    lines = stripComments(lines, options);
     for (let index = 0; index < lines.length; ) {
       const line = lines[index];
       // Skip blank lines.
@@ -1278,9 +1288,6 @@
     appendViewerControls(element, options, "md");
     // Normalize line endings and remove the BOM.
     const normalized = source.replace(/\r\n?/g, "\n").replace(/^\uFEFF/, "");
-    // Remove invisible Markdown and HTML comments before block parsing.
-    // This keeps document-control metadata out of rendered policy documents.
-    const lines = stripHiddenCommentMarkers(stripHtmlComments(normalized).split("\n"));
-    renderBlocks(element, lines, options);
+    renderBlocks(element, normalized.split("\n"), options);
   };
 })(typeof window !== "undefined" ? window : this);

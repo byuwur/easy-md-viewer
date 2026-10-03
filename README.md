@@ -18,9 +18,9 @@ Try it on [GitHub Pages](https://byuwur.github.io/easy-md-viewer/) or [CodePen](
 Use the CDN:
 
 ```html
-<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.3.final/md.min.css" rel="stylesheet" />
-<link id="byVIEWtheme" href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.3.final/md.light.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.3.final/md.min.js" defer></script>
+<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.4.final/md.min.css" rel="stylesheet" />
+<link id="byVIEWtheme" href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.4.final/md.light.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.4.final/md.min.js" defer></script>
 ```
 
 Or use the local files:
@@ -31,7 +31,7 @@ Or use the local files:
 <script src="md.js" defer></script>
 ```
 
-For development, omit `@v1.3.final` from the CDN URLs to load the latest changes.
+For development, omit `@v1.4.final` from the CDN URLs to load the latest changes.
 
 ## Usage
 
@@ -165,7 +165,7 @@ This covers practical Markdown documents, not every CommonMark edge case or exte
 
 Links accept relative paths, same-document anchors, and `http`, `https`, `ftp`, `ftps`, `mailto`, or `tel` URLs. Links and images reject executable schemes such as `javascript:` and `data:`.
 
-The renderer creates DOM nodes and treats unsupported raw HTML as text. It does not execute it. HTML comments are hidden, except inside code. Document markers such as `[//]: # "OPTIONAL:SECTION"` are hidden too.
+The renderer creates DOM nodes and treats unsupported raw HTML as text. It does not execute it. HTML comments are hidden, except inside code, including fences nested in blockquotes and lists. Document markers such as `[//]: # "OPTIONAL:SECTION"` are hidden too.
 
 ## Checks
 
