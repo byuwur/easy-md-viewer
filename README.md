@@ -1,5 +1,7 @@
 # byuwur/easy-md-viewer
 
+![easy-md-viewer preview](prev.jpg)
+
 Render Markdown in an HTML page, with light and dark themes. Plain JavaScript, no dependencies or build step.
 
 Try it on [GitHub Pages](https://byuwur.github.io/easy-md-viewer/) or [CodePen](https://codepen.io/byuwur/pen/VYPoWMM).
