@@ -171,7 +171,7 @@ The renderer creates DOM nodes and treats unsupported raw HTML as text. It does 
 
 GitHub Actions runs the rendering checks in `tests/rendering.cjs` on pushes and pull requests. It tests local `md.js` in Chromium, including the benchmark document.
 
-For a visual check, serve this folder over HTTP, open `index.html`, and click **BENCHMARK MARKDOWN** to render `test.md`.
+For a visual check, serve this folder over HTTP, open `index.html`, and choose the benchmark in the Document menu to render `test.md`.
 
 CDN examples use the pinned release. Local source fixes require a new release before they reach those URLs.
 

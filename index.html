@@ -1,125 +1,1156 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>easy MD viewer</title>
-  <link href="md.css" rel="stylesheet" />
-  <script src="md.js" defer></script>
+  <title>easy-md-viewer = Markdown with no overhead</title>
+  <meta name="description" content="A dependency-free Markdown viewer for plain JavaScript websites. Edit Markdown, explore the real renderer, and copy a working integration." />
+  <meta name="author" content="Andres Trujillo [Mateus] byUwUr" />
+  <meta name="theme-color" content="#141619" />
+  <link rel="canonical" href="https://byuwur.github.io/easy-md-viewer/" />
+  <link rel="icon" href="https://byuwur.github.io/img/logo.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="easy-md-viewer" />
+  <meta property="og:title" content="easy-md-viewer = Markdown with no overhead" />
+  <meta property="og:description" content="Plain JavaScript. Real Markdown. Try the interactive playground and drop the viewer into your project." />
+  <meta property="og:url" content="https://byuwur.github.io/easy-md-viewer/" />
+  <meta property="og:image" content="https://byuwur.github.io/img/logo.png" />
+  <meta property="og:image:alt" content="BONYUR byUwUr" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v19.4/css/shards.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v19.4/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v19.4/css/fontawesome.min.css" />
+  <script src="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v19.4/js/bootstrap.min.js" defer></script>
 </head>
 
 <body>
-  <link id="byVIEWtheme" href="https://byuwur.github.io/easy-md-viewer/md.light.css" rel="stylesheet" />
+  <a class="skip-link" href="#playground">Skip to playground</a>
+  <header class="border-bottom">
+    <nav class="navbar navbar-expand-md site-width" aria-label="Main navigation">
+      <a class="navbar-brand" href="#"><span class="brand-mark" aria-hidden="true">md↓</span>easy-md-viewer</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#site-menu" aria-controls="site-menu" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+      <div class="collapse navbar-collapse" id="site-menu">
+        <div class="navbar-nav ms-auto align-items-md-center gap-md-2">
+          <a class="nav-link" href="#playground">Playground</a>
+          <a class="nav-link" href="#get-started">Get started</a>
+          <a class="nav-link" href="https://github.com/byuwur/easy-md-viewer#readme">Docs <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i></a>
+          <a class="btn btn-quiet px-3" href="https://github.com/byuwur/easy-md-viewer"><i class="fa-brands fa-github me-1" aria-hidden="true"></i> GitHub</a>
+          <button id="site-theme" class="btn btn-quiet px-3" type="button" aria-label="Switch website to light theme"><i class="fa-solid fa-sun me-1" aria-hidden="true"></i> <span>Light</span></button>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="site-width">
+    <section class="intro" aria-labelledby="site-title">
+      <p class="small font-monospace text-body-secondary mb-3">A small tool by BONYUR @byUwUr</p>
+      <h1 id="site-title" class="mb-3">Markdown, <span>with no overhead.</span></h1>
+      <p class="text-body-secondary mb-0">Plain JavaScript. No dependencies. Open source. Free. Forever.</p>
+    </section>
+
+    <section id="playground" aria-labelledby="playground-title">
+      <div class="playground border">
+        <div class="playground-toolbar bg-body-tertiary px-4 py-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <h2 id="playground-title" class="h6 m-0 fw-semibold">Playground</h2>
+          <div class="source-picker">
+            <label class="small font-monospace text-body-secondary d-block mb-1" for="document-source">Document</label>
+            <select id="document-source" class="form-select">
+              <option value="showcase">Default showcase</option>
+              <option value="features">Full feature showcase</option>
+              <option value="benchmark">Benchmark = test.md</option>
+              <option value="custom">Custom Markdown</option>
+              <option value="local">Local file…</option>
+              <option value="example" hidden>Feature example</option>
+            </select>
+          </div>
+        </div>
+        <div id="source-error" class="alert alert-danger small m-0" role="alert" hidden>
+          <span id="source-error-text"></span>
+          <button id="retry-source" class="btn btn-quiet btn-sm ms-2" type="button" hidden>Retry</button>
+        </div>
+        <div id="features" class="discovery border-bottom px-3 py-2 d-flex flex-wrap align-items-center gap-1" aria-label="Markdown examples">
+          <span class="small font-monospace text-body-secondary me-2">Try it!</span>
+          <button class="feature-chip" type="button" data-example="headings" aria-pressed="false"># headings</button>
+          <button class="feature-chip" type="button" data-example="formatting" aria-pressed="false">**formatting**</button>
+          <button class="feature-chip" type="button" data-example="code" aria-pressed="false">`code`</button>
+          <button class="feature-chip" type="button" data-example="lists" aria-pressed="false">↳ nesting</button>
+          <button class="feature-chip" type="button" data-example="tasks" aria-pressed="false">[x] tasks</button>
+          <button class="feature-chip" type="button" data-example="tables" aria-pressed="false">| tables |</button>
+          <button class="feature-chip" type="button" data-example="links" aria-pressed="false">↗ links</button>
+          <button class="feature-chip" type="button" data-example="images" aria-pressed="false">![images]</button>
+          <button class="feature-chip" type="button" data-example="escapes" aria-pressed="false">\ escapes</button>
+          <button class="feature-chip" type="button" data-example="safety" aria-pressed="false">&lt;html&gt; &amp; URLs</button>
+        </div>
+        <div class="mobile-tabs nav nav-pills nav-fill d-md-none border-bottom p-2 gap-2" role="tablist" aria-label="Playground panels">
+          <button id="config-tab" class="nav-link" type="button" data-bs-toggle="tab" data-bs-target="#config-panel" data-panel="config" role="tab" aria-controls="config-panel" aria-selected="false"><i class="fa-solid fa-sliders me-1"
+              aria-hidden="true"></i> Configure</button>
+          <button id="source-tab" class="nav-link" type="button" data-bs-toggle="tab" data-bs-target="#source-panel" data-panel="source" role="tab" aria-controls="source-panel" aria-selected="false"><i class="fa-solid fa-code me-1"
+              aria-hidden="true"></i> Source</button>
+          <button id="preview-tab" class="nav-link active" type="button" data-bs-toggle="tab" data-bs-target="#preview-panel" data-panel="preview" role="tab" aria-controls="preview-panel" aria-selected="true"><i class="fa-solid fa-eye me-1"
+              aria-hidden="true"></i> Preview</button>
+        </div>
+        <div class="tab-content row g-0">
+          <section id="config-panel" class="tab-pane panel flex-column d-md-flex config-panel col-12 col-lg-3" aria-labelledby="config-heading">
+            <div class="panel-heading border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 px-4 py-3">
+              <h3 id="config-heading" class="h6 m-0 fw-semibold flex-shrink-0"><span class="small font-monospace text-body-secondary me-2">01</span>Configure</h3>
+            </div>
+            <div class="border-bottom">
+              <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 px-3 py-2">
+                <div class="btn-group" role="group" aria-label="Options view">
+                  <button class="btn btn-quiet btn-sm" type="button" data-options-view="form" aria-controls="config-form" aria-pressed="true">Form</button>
+                  <button class="btn btn-quiet btn-sm" type="button" data-options-view="json" aria-controls="options-json-panel" aria-pressed="false">JSON</button>
+                </div>
+                <div class="d-flex flex-wrap justify-content-end gap-2 ms-auto">
+                  <button class="btn btn-quiet btn-sm" id="copy-options" type="button" hidden><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> Copy</button>
+                  <button id="reset-options" class="btn btn-quiet btn-sm" type="button"><i class="fa-solid fa-rotate-left me-1" aria-hidden="true"></i> Reset</button>
+                </div>
+              </div>
+              <p class="small text-body-secondary mx-3 my-0" id="options-copy-status" role="status" aria-live="polite"></p>
+            </div>
+            <form id="config-form" class="panel-body" aria-label="Viewer configuration">
+              <div class="accordion accordion-flush">
+                <div class="accordion-item">
+                  <h4 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#render-settings" aria-expanded="true" aria-controls="render-settings">Rendering</button></h4>
+                  <div id="render-settings" class="accordion-collapse collapse show">
+                    <div class="accordion-body" id="render-options"></div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <h4 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#viewer-settings" aria-expanded="true" aria-controls="viewer-settings">Viewer controls</button></h4>
+                  <div id="viewer-settings" class="accordion-collapse collapse show">
+                    <div class="accordion-body" id="viewer-options"></div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <h4 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#appearance-settings" aria-expanded="true" aria-controls="appearance-settings">Preview
+                      appearance</button></h4>
+                  <div id="appearance-settings" class="accordion-collapse collapse show">
+                    <div class="accordion-body">
+                      <fieldset>
+                        <legend class="option-label mb-2">Document theme</legend>
+                        <div class="btn-group w-100" role="group" aria-label="Document theme">
+                          <input class="btn-check" type="radio" name="previewTheme" id="preview-light" value="light" checked />
+                          <label class="btn btn-quiet flex-fill" for="preview-light">Light</label>
+                          <input class="btn-check" type="radio" name="previewTheme" id="preview-dark" value="dark" />
+                          <label class="btn btn-quiet flex-fill" for="preview-dark">Dark</label>
+                        </div>
+                        <p class="option-description mt-2 mb-0">Loads md.light.css or md.dark.css.</p>
+                      </fieldset>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+            <div class="panel-body overflow-hidden" id="options-json-panel" hidden>
+              <textarea class="source-editor" id="options-json" readonly spellcheck="false" wrap="off" aria-label="Viewer options as JSON"></textarea>
+            </div>
+          </section>
+
+          <section id="source-panel" class="tab-pane panel flex-column d-md-flex source-panel col-12 col-md-6 col-lg-4" aria-labelledby="source-heading">
+            <div class="panel-heading border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 px-4 py-3">
+              <h3 id="source-heading" class="h6 m-0 fw-semibold flex-shrink-0"><span class="small font-monospace text-body-secondary me-2">02</span>Markdown</h3>
+              <div class="d-flex gap-1">
+                <button id="restore-source" class="btn btn-quiet btn-sm" type="button"><i class="fa-solid fa-rotate-left me-1" aria-hidden="true"></i> Restore</button>
+                <button id="copy-markdown" class="btn btn-quiet btn-sm" type="button"><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> Copy</button>
+              </div>
+            </div>
+            <div class="panel-body">
+              <textarea id="markdown-source" class="source-editor" aria-label="Editable Markdown source" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off"
+                title="Ctrl / ⌘ + Enter to render. Tab moves focus." placeholder="# Your document&#10;&#10;Write Markdown here…"></textarea>
+            </div>
+          </section>
+
+          <!-- Real library preview; Bootstrap stays outside the iframe -->
+          <section id="preview-panel" class="tab-pane active panel flex-column d-md-flex preview-panel col-12 col-md-6 col-lg-5" aria-labelledby="preview-heading">
+            <div class="panel-heading border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 px-4 py-3">
+              <h3 id="preview-heading" class="h6 m-0 fw-semibold flex-shrink-0"><span class="small font-monospace text-body-secondary me-2">03</span>Live preview</h3>
+              <span class="font-monospace text-body-secondary small"><span id="render-status" role="status">Loading…</span></span>
+            </div>
+            <div class="panel-body"><iframe id="preview-frame" title="Live Markdown document" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe></div>
+          </section>
+        </div>
+        <dl class="metric-strip bg-body-tertiary m-0 border-top row g-0">
+          <div class="metric p-3 col-6 col-md-3">
+            <dt class="small fw-normal font-monospace text-body-secondary mb-2">Source size</dt>
+            <dd class="m-0 font-monospace" id="metric-size">—</dd>
+          </div>
+          <div class="metric p-3 col-6 col-md-3">
+            <dt class="small fw-normal font-monospace text-body-secondary mb-2">Lines</dt>
+            <dd class="m-0 font-monospace" id="metric-lines">—</dd>
+          </div>
+          <div class="metric p-3 col-6 col-md-3">
+            <dt class="small fw-normal font-monospace text-body-secondary mb-2" title="Synchronous byMDviewer() call; excludes browser paint and resource loading">Renderer call</dt>
+            <dd class="m-0 font-monospace" id="metric-time">—</dd>
+          </div>
+          <div class="metric p-3 col-6 col-md-3">
+            <dt class="small fw-normal font-monospace text-body-secondary mb-2">DOM elements</dt>
+            <dd class="m-0 font-monospace" id="metric-nodes">—</dd>
+          </div>
+        </dl>
+      </div>
+      <div class="discovery py-4 border-bottom d-flex flex-wrap align-items-center gap-2">
+        <span class="small font-monospace text-body-secondary me-2">Try it!</span>
+        <button id="open-file" class="btn btn-quiet" type="button"><i class="fa-solid fa-folder-open me-1" aria-hidden="true"></i> Open .md file</button>
+        <input id="local-file" type="file" accept=".md,.markdown,text/markdown,text/plain" hidden />
+        <button id="rerun-benchmark" class="btn btn-quiet" type="button" title="Time the synchronous byMDviewer() call; excludes browser paint and resource loading"><i class="fa-solid fa-rotate-right me-1" aria-hidden="true"></i>
+          <span>Rerun measurement</span></button>
+        <span id="document-state" class="font-monospace text-body-secondary small ms-sm-auto">Original</span>
+      </div>
+
+      <div id="feedback" class="small text-body-secondary mt-2" role="status" aria-live="polite"></div>
+    </section>
+
+    <section id="get-started" class="get-started py-5 row gy-4 gx-lg-5" aria-labelledby="integration-title">
+      <div class="col-lg-4">
+        <h2 id="integration-title" class="h2 mb-3">Get started</h2>
+        <p class="text-body-secondary">Copy your document and settings as a working HTML file.</p>
+        <p class="text-body-secondary small">Playground powered by <a class="site-link" href="https://github.com/byuwur/spa.js" target="_blank" rel="noopener">SPA.js</a>.</p>
+        <p id="integration-note" class="text-body-secondary small mb-2">CDN pinned to v1.4.final. Local source may include newer fixes.</p>
+        <a class="site-link small" href="https://github.com/byuwur/easy-md-viewer#usage" target="_blank" rel="noopener">Read the full API <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i></a>
+      </div>
+      <div class="col-lg-8">
+        <div class="code-box bg-body-tertiary border">
+          <div class="code-toolbar px-4 py-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <fieldset class="m-0">
+              <legend class="visually-hidden">Integration assets</legend>
+              <div class="btn-group" role="group" aria-label="Integration assets">
+                <input class="btn-check" type="radio" name="integrationMode" id="integration-cdn" value="cdn" checked />
+                <label class="btn btn-quiet" for="integration-cdn">CDN</label>
+                <input class="btn-check" type="radio" name="integrationMode" id="integration-local" value="local" />
+                <label class="btn btn-quiet" for="integration-local">Local files</label>
+              </div>
+            </fieldset>
+            <button id="copy-integration" class="btn btn-accent btn-sm px-3" type="button"><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> Copy HTML</button>
+          </div>
+          <label class="visually-hidden" for="integration-code">Complete HTML integration example</label>
+          <textarea id="integration-code" class="integration-code" readonly spellcheck="false" wrap="off"></textarea>
+          <p id="integration-feedback" class="small text-body-secondary mx-4 my-0" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer border-top py-4 small">
+    <div class="site-width d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <p class="m-0">&copy; <span id="year-txt">2026</span>, Made with <i class="fa-solid fa-heart" role="img" aria-label="love"></i> by <a class="site-link" href="https://byuwur.co" target="_blank" rel="noopener">BONYUR @byUwUr</a></p>
+      <div class="d-flex flex-wrap gap-3">
+        <a class="site-link" href="https://github.com/byuwur/easy-md-viewer/blob/main/LICENSE.md">MIT license</a>
+        <a class="site-link" href="https://github.com/byuwur/easy-md-viewer">Source &amp; contributions <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i></a>
+        <a class="site-link" href="https://ko-fi.com/byuwur">Buy me a Pandebono <i class="fa-brands fa-ko-fi ms-1" aria-hidden="true"></i></a>
+      </div>
+    </div>
+  </footer>
+  <noscript>
+    <p class="site-width">Enable JavaScript to use the playground. The <a href="https://github.com/byuwur/easy-md-viewer#readme">README</a> includes integration examples.</p>
+  </noscript>
+
   <style>
+    /* =============
+       === FONT & THEMES ===
+       ============= */
+    @font-face {
+      font-family: Archivo;
+      src: url("https://cdn.jsdelivr.net/gh/byuwur/spa.js@v19.4/css/webfonts/archivo.ttf") format("truetype");
+      font-weight: 100 900;
+      font-display: swap;
+    }
+
+    :root {
+      --page-bg: #141619;
+      --panel-bg: #1b1e22;
+      --editor-bg: #171a1e;
+      --panel-line: #393e44;
+      --ink: #efeee8;
+      --muted: #a5abb2;
+      --accent: #91bcff;
+      --accent-ink: #102849;
+      --danger: #ffb0a5;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      --bs-body-font-family: Archivo, system-ui, sans-serif;
+      --bs-font-monospace: var(--mono);
+      --bs-body-bg: var(--page-bg);
+      --bs-body-color: var(--ink);
+      --bs-secondary-color: var(--muted);
+      --bs-border-color: var(--panel-line);
+      --bs-tertiary-bg: var(--panel-bg);
+      --bs-tertiary-bg-rgb: 27, 30, 34;
+      --bs-link-color: var(--accent);
+      --bs-link-hover-color: var(--ink);
+      --bs-border-radius: 0;
+      --bs-border-radius-sm: 0;
+      --bs-border-radius-lg: 0;
+      color-scheme: dark;
+    }
+
+    :root[data-bs-theme="light"] {
+      --page-bg: #f5f6f7;
+      --panel-bg: #fff;
+      --editor-bg: #f0f2f4;
+      --panel-line: #cdd2d7;
+      --ink: #20252b;
+      --muted: #59636e;
+      --accent: #215fba;
+      --accent-ink: #fff;
+      --danger: #b42318;
+      --bs-tertiary-bg-rgb: 255, 255, 255;
+      color-scheme: light;
+    }
+
+    /* =============
+       === LAYOUT & NAVIGATION ===
+       ============= */
     html {
-      font-size: 16px;
+      scroll-padding-top: 1rem;
     }
 
-    body {
+    ::selection {
+      background: var(--accent);
+      color: var(--accent-ink);
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .site-width {
+      max-width: 1480px;
+      margin-inline: auto;
+      padding-inline: clamp(1rem, 3vw, 3rem);
+    }
+
+    .site-link {
+      color: var(--ink);
+      text-underline-offset: .25em;
+    }
+
+    .site-link:hover {
+      color: var(--accent);
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 10;
+      left: 1rem;
+      top: -5rem;
+      padding: .75rem;
+      background: var(--accent);
+      color: var(--accent-ink);
+    }
+
+    .skip-link:focus {
+      top: 1rem;
+    }
+
+    .navbar {
+      min-height: 76px;
+    }
+
+    .navbar-brand {
+      color: var(--ink);
       font-size: 1rem;
+      font-weight: 650;
     }
 
-    body {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
-      background: #222;
-      color: #eee;
+    .brand-mark {
+      display: inline-grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      margin-right: .5rem;
+      background: var(--accent);
+      color: var(--accent-ink);
+      font: bold 1.1rem var(--mono);
     }
 
-    a {
-      color: #56f;
+    .navbar .nav-link {
+      color: var(--muted);
+      padding: .75rem;
     }
 
-    a.listed-link {
-      display: inline-block;
-      width: 20rem;
+    .navbar .nav-link:hover {
+      color: var(--ink);
+    }
+
+    .intro {
+      padding-block: 3rem 2rem;
+    }
+
+    .intro h1 {
+      font-size: clamp(2.5rem, 4.6vw, 4.5rem);
+      font-weight: 650;
+      line-height: 1.08;
+    }
+
+    .intro h1 span {
+      color: var(--accent);
+    }
+
+    /* =============
+       === CONTROLS ===
+       ============= */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      font-weight: 600;
+    }
+
+    .btn-accent {
+      --bs-btn-bg: var(--accent);
+      --bs-btn-color: var(--accent-ink);
+      --bs-btn-border-color: var(--accent);
+      --bs-btn-hover-bg: var(--accent);
+      --bs-btn-hover-color: var(--accent-ink);
+      --bs-btn-hover-border-color: var(--ink);
+    }
+
+    .btn-quiet {
+      --bs-btn-color: var(--ink);
+      --bs-btn-border-color: var(--panel-line);
+      --bs-btn-hover-color: var(--ink);
+      --bs-btn-hover-bg: var(--panel-bg);
+      --bs-btn-hover-border-color: var(--accent);
+    }
+
+    .btn i,
+    .nav-link i {
+      font-size: .85em;
+    }
+
+    .btn-quiet[aria-pressed="true"],
+    .btn-check:checked+.btn-quiet {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--accent-ink);
+    }
+
+    .form-select,
+    .form-control {
+      min-height: 44px;
+      background-color: var(--editor-bg);
+      color: var(--ink);
+    }
+
+    .form-select:focus,
+    .form-control:focus {
+      background-color: var(--editor-bg);
+      color: var(--ink);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 .15rem color-mix(in srgb, var(--accent) 20%, transparent);
+    }
+
+    .form-switch {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding-left: 0;
+      margin: 0;
+      min-height: 48px;
+    }
+
+    .form-switch .form-check-input {
+      order: 2;
+      float: none;
+      flex-shrink: 0;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .form-switch .form-check-label,
+    .option-label {
+      flex: 1;
+      cursor: pointer;
+      padding-block: .5rem;
+    }
+
+    .form-check-input:checked {
+      background-color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .form-text,
+    .option-description {
+      font-size: .8125rem;
+      color: var(--muted);
+    }
+
+    .mobile-tabs {
+      --bs-nav-link-color: var(--muted);
+      --bs-nav-pills-link-active-bg: var(--accent);
+      --bs-nav-pills-link-active-color: var(--accent-ink);
+    }
+
+    /* =============
+       === PLAYGROUND & CODE ===
+       ============= */
+    .source-picker {
+      width: min(100%, 18rem);
+    }
+
+    .panel {
+      min-width: 0;
+      height: clamp(34rem, 68dvh, 46rem);
+    }
+
+    .panel+.panel,
+    .metric+.metric {
+      border-left: 1px solid var(--panel-line);
+    }
+
+    .tab-content>.panel.active {
+      display: flex;
+    }
+
+    .panel-heading {
+      min-height: 68px;
+    }
+
+    .panel-heading .btn {
+      white-space: nowrap;
+      min-height: 34px;
+    }
+
+    .panel-body {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+    }
+
+    /* Each editor and iframe owns its scrolling; the panel must not scroll too. */
+    .source-panel .panel-body,
+    .preview-panel .panel-body {
+      overflow: hidden;
+    }
+
+    .source-editor,
+    .integration-code {
+      display: block;
+      width: 100%;
+      height: 100%;
+      resize: none;
+      border: 0;
+      padding: 1.25rem 1.5rem;
+      background: var(--editor-bg);
+      color: var(--ink);
+      font: .875rem/1.8 var(--mono);
+      white-space: pre;
+      overflow: auto;
+      tab-size: 2;
+    }
+
+    .source-editor:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+
+    .source-editor[aria-invalid="true"] {
+      outline: 2px solid var(--danger);
+      outline-offset: -2px;
+    }
+
+    .integration-code {
+      height: 28rem;
+    }
+
+    .panel-footer {
+      border-top: 1px solid var(--panel-line);
+      padding: .75rem 1.5rem;
+      font: .8125rem/1.5 var(--mono);
+      color: var(--muted);
+    }
+
+    #preview-frame {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .feature-chip {
+      min-height: 34px;
+      border: 1px solid transparent;
+      background: transparent;
+      padding: .3rem .5rem;
+      font: .875rem var(--mono);
+      color: var(--muted);
+    }
+
+    .feature-chip:hover,
+    .feature-chip[aria-pressed="true"] {
+      color: var(--accent);
+      border-color: var(--panel-line);
+    }
+
+    .accordion {
+      --bs-accordion-bg: var(--panel-bg);
+      --bs-accordion-active-bg: var(--panel-bg);
+      --bs-accordion-active-color: var(--accent);
+    }
+
+    .accordion-button {
+      font: .875rem var(--mono);
+    }
+
+    /* =============
+       === RESPONSIVE LAYOUT ===
+       ============= */
+    @media (min-width: 768px) and (max-width: 991px) {
+      .config-panel {
+        height: auto;
+        border-bottom: 1px solid var(--panel-line);
+      }
+
+      .config-panel .panel-body {
+        overflow: visible;
+      }
+
+      .config-panel #options-json-panel {
+        height: 20rem;
+        flex: none;
+      }
+
+      .source-panel {
+        border-left: 0 !important;
+      }
+
+      .config-panel .accordion {
+        display: flex;
+      }
+
+      .config-panel .accordion-item {
+        flex: 1;
+        min-width: 0;
+        border: 0;
+      }
+
+      .config-panel .accordion-item+.accordion-item {
+        border-left: 1px solid var(--panel-line);
+      }
+
+    }
+
+    @media (max-width: 1399px) {
+      .panel-heading {
+        min-height: 7rem;
+        align-content: center;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .panel {
+        height: 31rem;
+        border-left: 0 !important;
+      }
+
+      .source-picker {
+        width: 100%;
+      }
+
+      .panel-heading .btn {
+        min-height: 44px;
+      }
+
+      .metric:nth-child(3) {
+        border-left: 0;
+      }
+
+      .metric:nth-child(n+3) {
+        border-top: 1px solid var(--panel-line);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+      }
     }
   </style>
-  <p>easy MD viewer</p>
-  <p>This is a demo of <a href="https://github.com/byuwur/easy-md-viewer">https://github.com/byuwur/easy-md-viewer</a></p>
-  <!--
-  <a href="javascript:document.querySelector('#byVIEWtheme').setAttribute('href','https://byuwur.github.io/easy-md-viewer/md.light.css');">Light/Claro</a> |
-  <a href="javascript:document.querySelector('#byVIEWtheme').setAttribute('href','https://byuwur.github.io/easy-md-viewer/md.dark.css');">Dark/Oscuro</a>
-  <br /><br />
-  -->
-  <a class="listed-link" href="javascript:render();">DEMO MARKDOWN</a>
-  <a class="listed-link" href="javascript:benchmark();">BENCHMARK MARKDOWN</a>
-  <br /><br />
-  <div id="byMDrenderer" style="max-width:64rem;"></div>
+
   <script>
-    const demoMD = `
-# easy MD viewer
-
-A **lightweight**, dependency-free Markdown viewer that renders directly to the DOM.
-
-## Inline syntax
-
-Text can be *italic*, **bold**, ***both***, ~~struck out~~, or contain \`inline code\`.
-
-Links work too: [easy JSON viewer](https://github.com/byuwur/easy-json-viewer).
-
-> ### Blockquotes
->
-> Blockquotes recursively support **Markdown**.
->
-> - [x] Nested task
-> - [ ] Another task
-
-## Lists
-
-1. Ordered item
-2. Another item
-
-- Unordered item
-  - Nested unordered item
-  - Another nested item
-
-5. Ordered lists can start at another number
-6. And continue
-
-## Table
-
-| Feature | Support | Alignment |
-| :--- | :---: | ---: |
-| Tables | **Yes** | Right |
-| Escaped pipes | A \\| B | \`x|y\` |
-
-## Code
-
-\`\`\`js
-byMDviewer(
-  document.getElementById("byMDrenderer"),
-  "# Hello **world**"
-);
-\`\`\`
-
-Raw HTML is intentionally not executed:
-
-\`<script>alert("nope")<\/script>\`
-
----
-
-No npm. No CDN. No dependencies.
-    `;
-    const renderEl = document.getElementById("byMDrenderer");
-    const render = () => byMDviewer(renderEl, demoMD);
-    const renderFetched = (url, options = {}) => {
-      fetch(url)
-        .then((response) => {
-          if (!response.ok) console.warn(`Something went wrong`, response.statusText);
-          return response.text();
-        })
-        .then((response) => {
-          console.log(response);
-          byMDviewer(renderEl, response, options);
-        })
-        .catch((e) => {
-          console.warn(`Something went wrong`, e);
-        });
-    };
-    const benchmark = () => renderFetched("test.md");
     document.addEventListener("DOMContentLoaded", () => {
-      render();
+      "use strict";
+
+      // =============
+      // === STATE & SAMPLES ===
+      // =============
+      const optionDefinitions = [
+        { name: "withLinks", label: "Links", description: "Links, URLs & email addresses", default: true, example: "links" },
+        { name: "withImages", label: "Images", description: "Responsive, lazy-loaded images", default: true, example: "images" },
+        { name: "withTables", label: "Tables", description: "Columns & text alignment", default: true, example: "tables" },
+        { name: "withTasks", label: "Task lists", description: "Read-only task checkboxes", default: true, example: "tasks" },
+        { name: "withStrikethrough", label: "Strikethrough", description: "Render ~~crossed-out text~~", default: true, example: "formatting" },
+        { name: "breaks", label: "Soft line breaks", description: "Keep paragraph line breaks", default: false, example: "breaks" },
+        { name: "themeToggle", label: "Theme toggle", description: "Native light/dark switch", default: true, group: "viewer", example: "controls" },
+        { name: "fontSizeControls", label: "Text size controls", description: "Native A− / A / A+ buttons", default: true, group: "viewer", example: "controls" }
+      ];
+      const defaults = { ...Object.fromEntries(optionDefinitions.map(option => [option.name, option.default])), linkTarget: "_blank" };
+      const editor = document.getElementById("markdown-source");
+      const frame = document.getElementById("preview-frame");
+      const sourceSelect = document.getElementById("document-source");
+      const state = {
+        source: "showcase",
+        options: { ...defaults },
+        theme: "light",
+        integrationMode: "cdn",
+        drafts: {},
+        originals: {},
+        sourceRequest: 0,
+        renderTimer: null,
+        previewReady: false
+      };
+
+      const showcase = `# A little Markdown. A real document.
+
+Write something useful. Let **easy-md-viewer** handle the rendering.
+
+## Start small
+
+No packages to install. No build step to configure.
+
+~~~js
+byMDviewer(container, "# Hello **world**");
+~~~
+
+## Make yourself at home
+
+- [x] Edit this Markdown
+- [x] Try the options on the left
+- [ ] Drop the viewer into your website
+
+| You bring | The viewer brings |
+| :--- | :--- |
+| Plain Markdown | A readable document |
+| Your website | Light & dark themes |
+| A few lines of JS | No dependencies |
+
+> Simple is complicated enough.
+
+[Read the docs](https://github.com/byuwur/easy-md-viewer#readme) = [Back to the start](#a-little-markdown-a-real-document)
+`;
+      const examples = {
+        headings: { label: "Headings & anchors", markdown: "# Your document\n\n[Jump to installation](#installation)\n\n## Installation\n\nHeadings get automatic IDs.\n\n### A smaller heading\n\n## Installation\n\nRepeated headings get unique IDs: installation-1.\n\n[Jump to the second one](#installation-1)" },
+        formatting: { label: "Inline formatting", markdown: "# A few well-chosen words\n\n**Bold**, *italic*, ***both***, and ~~a change of plan~~.\n\nA little `inline code` goes a long way." },
+        code: { label: "Code blocks", markdown: "# Code, as written\n\nInline: `const ready = true;`\n\n~~~javascript\nconst container = document.getElementById(\"document\");\nbyMDviewer(container, \"# Hello **world**\");\n~~~\n\nLanguage metadata is preserved; syntax highlighting is not included.\n\n~~~html\n<!-- Comments inside code stay visible. -->\n<div>Raw code stays code.</div>\n~~~" },
+        lists: { label: "Lists & nested quotes", markdown: "# A place for everything\n\n- Project\n  - Source\n    - md.js\n  - Styles\n    - md.css\n\n5. Pick a container\n6. Render your Markdown\n\n> A blockquote can contain Markdown.\n>\n> - **Even lists.**\n>   - And nested items.\n>\n> > Or another quote." },
+        tasks: { label: "Task lists", markdown: "# A tiny checklist\n\n- [x] Keep it simple\n- [x] Render a real document\n- [ ] Write the next thing\n\nThese are document checkboxes, not editable form inputs.\n\n1. [x] Ordered tasks work too\n2. [ ] Ship when ready" },
+        tables: { label: "Tables & alignment", markdown: "# Everything lines up\n\n| Feature | Status | Lines of glue |\n| :--- | :---: | ---: |\n| Tables | **Ready** | 1 |\n| Themes | Ready | 2 |\n| Escaped pipes | A \\| B | `x|y` |\n\nLeft, center, and right alignment. Wide tables scroll inside the document." },
+        links: { label: "Links & autolinks", markdown: "# A connected document\n\n[The repository](https://github.com/byuwur/easy-md-viewer \"easy-md-viewer on GitHub\")\n\n<https://example.com>\n\nhttps://example.com/docs\n\nhello@example.com\n\n[Jump within this document](#next-step)\n\n## Next step\n\nHeading anchors stay in this document, whatever the link target." },
+        images: { label: "Images", markdown: "# A picture, included\n\n![Markdown viewer sample image](test.png \"Bundled test.png\")\n\nImages are responsive and lazy-loaded. This image comes from the repository." },
+        escapes: { label: "Escapes & entities", markdown: "# The literal details\n\n\\*These asterisks stay visible.\\*\n\n\\# This is not a heading.\n\nAT&amp;T = &copy; = &#9733; = &#x2665;\n\n`&amp; stays literal inside code`\n\n<!-- This comment is intentionally hidden. -->\n\nThe HTML comment above is hidden." },
+        safety: { label: "Raw HTML & URL handling", markdown: "# Text stays text\n\n<strong>This is literal HTML, not a bold element.</strong>\n\n<script>alert(\"This stays text.\")<\/script>\n\n[An allowed HTTPS link](https://example.com)\n\n[An executable URL](javascript:alert(1))\n\n![A rejected data URL](data:text/plain,example)\n\nExecutable URL schemes are rejected. This demonstrates the current renderer; it is not a general-purpose HTML sanitizer." },
+        breaks: { label: "Soft line breaks", markdown: "# One paragraph, two lines\n\nThis is the first line.\nThis is the second line.\n\nEnable Soft line breaks to keep that break.\n\nThis line has two trailing spaces.  \nThat hard break works with either setting." },
+        controls: { label: "Native viewer controls", markdown: "# Settle in for a read\n\nTry the theme switch and **A− / A / A+** in the document toolbar.\n\n## Your reading space\n\nText size belongs to this viewer. It stays put when you edit the source or change a rendering option.\n\nThe document theme and the website theme are independent." }
+      };
+      state.originals = {
+        showcase,
+        features: "# The full feature showcase\n\nA practical Markdown subset. Explore each example above, or read through them here.\n\n" + Object.values(examples).map(example => example.markdown.replace(/^# /, "## ")).join("\n\n---\n\n"),
+        custom: "# Hello, world\n\nMake this document **yours**.\n"
+      };
+      state.drafts = { ...state.originals };
+
+      // =============
+      // === CONFIGURATION ===
+      // =============
+      function buildConfigurator() {
+        for (const option of optionDefinitions) {
+          const row = document.createElement("div");
+          row.className = "option-row d-flex align-items-center gap-2 form-switch";
+          row.innerHTML = `<input class="form-check-input" type="checkbox" role="switch" id="${option.name}" name="${option.name}" aria-describedby="${option.name}-description" ${option.default ? "checked" : ""} />
+            <label class="option-label flex-grow-1" for="${option.name}">${option.label}<span class="option-description d-block mt-1" id="${option.name}-description">${option.description}</span></label>
+            <button class="btn btn-link btn-sm p-1 flex-shrink-0 font-monospace text-decoration-none" type="button" data-example="${option.example}" aria-label="Show ${option.label.toLowerCase()} example" title="Show example">Try <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i></button>`;
+          document.getElementById(option.group === "viewer" ? "viewer-options" : "render-options").append(row);
+        }
+        document.getElementById("render-options").insertAdjacentHTML("beforeend", `<div class="mt-3">
+          <label class="option-label mb-1" for="linkTarget">Open links in</label>
+          <select class="form-select form-select-sm config-select" name="linkTarget" id="linkTarget">
+            <option value="_blank">New tab (_blank)</option><option value="_self">Current frame (_self)</option><option value="false">Browser default (no target)</option>
+          </select></div>`);
+      }
+
+      // =============
+      // === SOURCE LOADING ===
+      // =============
+      // Source/document management: drafts are authoritative; async loads cannot replace a newer selection.
+      function showSourceError(message = "", retry = false) {
+        document.getElementById("source-error").hidden = !message;
+        document.getElementById("source-error-text").textContent = message;
+        document.getElementById("retry-source").hidden = !retry;
+      }
+
+      function updateSourceState() {
+        const edited = state.drafts[state.source] !== state.originals[state.source];
+        document.getElementById("document-state").textContent = edited ? "Edited" : "Original";
+        document.getElementById("restore-source").disabled = !edited;
+      }
+
+      async function selectSource(source) {
+        const request = ++state.sourceRequest;
+        state.source = source;
+        sourceSelect.value = source;
+        document.querySelectorAll(".feature-chip").forEach(button => button.setAttribute("aria-pressed", "false"));
+        showSourceError();
+        editor.disabled = true;
+        document.getElementById("render-status").textContent = "Loading…";
+        document.getElementById("copy-markdown").disabled = true;
+        document.getElementById("restore-source").disabled = true;
+        if (source === "benchmark" && state.drafts.benchmark === undefined) {
+          try {
+            if (location.protocol === "file:") throw new Error("file-protocol");
+            const response = await fetch("test.md");
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const markdown = await response.text();
+            if (request !== state.sourceRequest) return;
+            state.originals.benchmark = markdown;
+            state.drafts.benchmark = markdown;
+          } catch (error) {
+            if (request !== state.sourceRequest) return;
+            sourceSelect.value = source;
+            editor.value = "";
+            document.getElementById("render-status").textContent = "Source unavailable";
+            clearPreview();
+            const message = error.message === "file-protocol"
+              ? "To fetch test.md, serve this folder over HTTP. You can also open test.md with Open .md file."
+              : `Could not load test.md (${error.message}). Retry or open the file locally.`;
+            showSourceError(message, location.protocol !== "file:");
+            return;
+          }
+        }
+        if (request !== state.sourceRequest) return;
+        editor.value = state.drafts[source] ?? "";
+        editor.disabled = false;
+        document.getElementById("copy-markdown").disabled = false;
+        editor.scrollTop = 0;
+        updateSourceState();
+        renderPreview(true);
+      }
+
+      async function loadLocalFile(file) {
+        if (!file) return;
+        if (!/\.(md|markdown)$/i.test(file.name)) {
+          showSourceError("Choose a .md or .markdown file.");
+          return;
+        }
+        const request = ++state.sourceRequest;
+        try {
+          const markdown = await file.text();
+          if (request !== state.sourceRequest) return;
+          state.originals.local = markdown;
+          state.drafts.local = markdown;
+          sourceSelect.querySelector('[value="local"]').textContent = file.name;
+          await selectSource("local");
+          setMobilePanel("source");
+          document.getElementById("feedback").textContent = `Opened ${file.name}.`;
+        } catch {
+          if (request === state.sourceRequest) showSourceError("Could not read that file. Try opening it again.");
+        }
+      }
+
+      // =============
+      // === PREVIEW ===
+      // =============
+      function clearPreview() {
+        clearTimeout(state.renderTimer);
+        if (state.previewReady) frame.contentDocument.getElementById("document").textContent = "";
+        for (const name of ["size", "lines", "time", "nodes"]) document.getElementById(`metric-${name}`).textContent = "—";
+        document.getElementById("rerun-benchmark").disabled = true;
+        document.getElementById("copy-integration").disabled = true;
+        document.getElementById("integration-code").value = "Select an available document to generate the integration example.";
+      }
+
+      function renderPreview(resetScroll = false) {
+        clearTimeout(state.renderTimer);
+        generateIntegration();
+        if (!state.previewReady || state.drafts[state.source] === undefined) return;
+        const markdown = state.drafts[state.source];
+        try {
+          const previewWindow = frame.contentWindow;
+          const target = previewWindow.document.getElementById("document");
+          const scrollTop = resetScroll ? 0 : previewWindow.scrollY;
+          const start = performance.now();
+          previewWindow.byMDviewer(target, markdown, state.options);
+          const duration = performance.now() - start;
+          const hasContent = !!markdown.trim();
+          target.style.minHeight = hasContent ? "" : "0";
+          previewWindow.scrollTo(0, scrollTop);
+          const bytes = new TextEncoder().encode(markdown).length;
+          document.getElementById("metric-size").textContent = bytes < 1024 ? `${bytes} B` : `${(bytes / 1024).toFixed(1)} KiB`;
+          document.getElementById("metric-size").title = `${bytes.toLocaleString()} UTF-8 bytes`;
+          document.getElementById("metric-lines").textContent = markdown ? markdown.split(/\r\n?|\n/).length.toLocaleString() : "0";
+          document.getElementById("metric-time").textContent = `${duration.toFixed(2)} ms`;
+          document.getElementById("metric-nodes").textContent = target.querySelectorAll("*").length.toLocaleString();
+          document.getElementById("render-status").textContent = hasContent ? "Live" : "Empty document";
+          previewWindow.document.getElementById("empty-document").hidden = hasContent;
+          document.getElementById("rerun-benchmark").disabled = false;
+          document.getElementById("rerun-benchmark").querySelector("span").textContent = state.source === "benchmark" ? "Rerun benchmark" : "Rerun measurement";
+        } catch {
+          document.getElementById("render-status").textContent = "Preview unavailable";
+          showSourceError("The preview could not render. Choose another document or reload the page.");
+        }
+      }
+
+      function scheduleRender() {
+        clearTimeout(state.renderTimer);
+        document.getElementById("render-status").textContent = "Updating…";
+        state.renderTimer = setTimeout(renderPreview, editor.value.length > 10000 ? 300 : 120);
+      }
+
+      function initializePreview() {
+        // A persistent srcdoc loads the actual library once; subsequent edits call its public API.
+        const base = new URL("./", location.href).href.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+        frame.addEventListener("load", () => {
+          try {
+            state.previewReady = typeof frame.contentWindow.byMDviewer === "function";
+            if (!state.previewReady) throw new Error("Renderer missing");
+            const themeLink = frame.contentDocument.getElementById("byVIEWtheme");
+            new MutationObserver(syncPreviewTheme).observe(themeLink, { attributes: true, attributeFilter: ["href"] });
+            frame.contentDocument.addEventListener("click", event => {
+              const anchor = event.target.closest("a[href]");
+              if (!anchor) return;
+              if (!anchor.getAttribute("href").startsWith("#")) {
+                if (anchor.target !== "_blank") {
+                  state.previewReady = false;
+                  document.getElementById("render-status").textContent = "Opening link…";
+                }
+                return;
+              }
+              event.preventDefault();
+              const id = anchor.getAttribute("href").slice(1);
+              let decoded = id;
+              try { decoded = decodeURIComponent(id); } catch { /* Malformed percent escapes can be literal heading IDs. */ }
+              const heading = frame.contentDocument.getElementById(decoded);
+              heading?.scrollIntoView();
+            });
+            setPreviewTheme(state.theme);
+          } catch {
+            state.previewReady = false;
+            document.getElementById("render-status").textContent = "Preview unavailable";
+            showSourceError("The preview left this document or md.js could not load. Reload the preview to continue.");
+            document.getElementById("rerun-benchmark").querySelector("span").textContent = "Reload preview";
+            document.getElementById("rerun-benchmark").disabled = false;
+          }
+        });
+        frame.srcdoc = `<!doctype html>
+<html lang="en"><head><base href="${base}">
+<link rel="stylesheet" href="md.css">
+<link id="byVIEWtheme" rel="stylesheet" href="md.light.css">
+<style>
+  html { font-size: 16px; color-scheme: light; } body { margin: 0; background: #fff; }
+  .byMDdocument { min-height: 100vh; padding: 1.8rem; }
+  .byVIEWcontrols { position: relative; top: auto; right: auto; flex-direction: row; justify-content: flex-end; align-items: center; margin-bottom: 1.5rem; }
+  .byMDheading { scroll-margin-top: 1rem; }
+  #empty-document { padding: 2rem; font: 1rem/1.6 system-ui, sans-serif; color: #777; }
+  @media (max-width: 400px) { .byMDdocument { padding: 1.25rem; } }
+  @media (prefers-reduced-motion: reduce) { *, *::after { transition: none !important; } }
+</style>
+<script src="md.js"><\/script></head>
+<body><main id="document" aria-label="Rendered Markdown"></main><p id="empty-document" hidden>Start typing in Source to see your document here.</p></body></html>`;
+      }
+
+      // =============
+      // === VIEWER THEME ===
+      // =============
+      // Theme handling: the native viewer owns the active stylesheet; the configurator observes it.
+      function syncPreviewTheme() {
+        const href = frame.contentDocument.getElementById("byVIEWtheme").getAttribute("href");
+        state.theme = href.includes("md.dark.css") ? "dark" : "light";
+        document.getElementById(`preview-${state.theme}`).checked = true;
+        frame.contentDocument.documentElement.style.colorScheme = state.theme;
+        frame.contentDocument.body.style.background = state.theme === "dark" ? "#000" : "#fff";
+        generateIntegration();
+      }
+
+      function setPreviewTheme(theme) {
+        state.theme = theme;
+        document.getElementById(`preview-${theme}`).checked = true;
+        if (!state.previewReady) {
+          generateIntegration();
+          return;
+        }
+        frame.contentDocument.getElementById("byVIEWtheme").setAttribute("href", `md.${theme}.css`);
+        renderPreview();
+      }
+
+      // =============
+      // === FEATURE EXAMPLES ===
+      // =============
+      // Feature demonstrations preserve the other document drafts and the selected options.
+      function showExample(name) {
+        const example = examples[name];
+        if (!example) return;
+        state.originals.example = example.markdown;
+        state.drafts.example = example.markdown;
+        selectSource("example");
+        sourceSelect.querySelector('[value="example"]').textContent = example.label;
+        document.querySelectorAll(".feature-chip").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.example === name)));
+        setMobilePanel("preview");
+        document.getElementById("feedback").textContent = `${example.label}. Your other document drafts are kept.`;
+      }
+
+      // =============
+      // === INTEGRATION ===
+      // =============
+      // Integration code generation: use the documented release, and serialize only API overrides.
+      function generateIntegration() {
+        // Themes belong to the stylesheet; this is the complete viewer API configuration.
+        document.getElementById("options-json").value = JSON.stringify(state.options, null, 2);
+        const markdown = state.drafts[state.source];
+        if (markdown === undefined) return;
+        const cdn = state.integrationMode === "cdn";
+        const path = cdn ? "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.4.final/" : "";
+        const changedOptions = Object.fromEntries(Object.entries(state.options).filter(([key, value]) => value !== defaults[key]));
+        const options = Object.keys(changedOptions).length ? ", " + JSON.stringify(changedOptions, null, 2) : "";
+        const source = JSON.stringify(markdown).replace(/</g, "\\u003c");
+        document.getElementById("integration-code").value = `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Markdown document</title>
+  <link rel="stylesheet" href="${path}${cdn ? "md.min.css" : "md.css"}" />
+  <link id="byVIEWtheme" rel="stylesheet" href="${path}md.${state.theme}.css" />
+</head>
+<body>
+  <div id="document"></div>
+  <script src="${path}${cdn ? "md.min.js" : "md.js"}"><\/script>
+  <script>
+    const markdown = ${source};
+    byMDviewer(document.getElementById("document"), markdown${options});
+  <\/script>
+</body>
+</html>`;
+        document.getElementById("copy-integration").disabled = false;
+        document.getElementById("integration-note").textContent = cdn
+          ? "CDN pinned to v1.4.final. Local source may include newer fixes."
+          : "Place the HTML beside md.js, md.css, md.light.css, and md.dark.css.";
+      }
+
+      // =============
+      // === CLIPBOARD ===
+      // =============
+      async function copyText(text, fallback, status) {
+        try {
+          await navigator.clipboard.writeText(text);
+          status.textContent = fallback.id === "options-json" ? "Viewer options copied." : "Copied!";
+        } catch {
+          fallback.focus();
+          fallback.select();
+          status.textContent = "Clipboard unavailable. Press Ctrl+C or ⌘C to copy the selected text.";
+        }
+      }
+
+      function setMobilePanel(panel) {
+        bootstrap.Tab.getOrCreateInstance(document.getElementById(`${panel}-tab`)).show();
+      }
+
+      // =============
+      // === EVENTS ===
+      // =============
+      buildConfigurator();
+      document.querySelectorAll("[data-options-view]").forEach(button => button.addEventListener("click", () => {
+        const jsonView = button.dataset.optionsView === "json";
+        document.getElementById("config-form").hidden = jsonView;
+        document.getElementById("options-json-panel").hidden = !jsonView;
+        document.getElementById("copy-options").hidden = !jsonView;
+        document.querySelectorAll("[data-options-view]").forEach(choice => choice.setAttribute("aria-pressed", String(choice === button)));
+      }));
+      document.getElementById("copy-options").addEventListener("click", () => {
+        const options = document.getElementById("options-json");
+        copyText(options.value, options, document.getElementById("options-copy-status"));
+      });
+      document.getElementById("config-form").addEventListener("submit", event => event.preventDefault());
+      document.getElementById("config-form").addEventListener("change", event => {
+        const field = event.target;
+        if (field.name === "previewTheme") return setPreviewTheme(field.value);
+        if (!(field.name in defaults)) return;
+        state.options[field.name] = field.type === "checkbox" ? field.checked : field.value === "false" ? false : field.value;
+        renderPreview();
+      });
+      document.getElementById("reset-options").addEventListener("click", () => {
+        state.options = { ...defaults };
+        document.getElementById("config-form").reset();
+        if (state.previewReady) frame.contentDocument.getElementById("document").style.fontSize = "";
+        setPreviewTheme("light");
+        document.getElementById("feedback").textContent = "Default options, light preview, and default text size restored.";
+      });
+      sourceSelect.addEventListener("change", () => {
+        if (sourceSelect.value === "local" && state.drafts.local === undefined) {
+          sourceSelect.value = state.source;
+          document.getElementById("local-file").click();
+        } else selectSource(sourceSelect.value);
+      });
+      document.getElementById("open-file").addEventListener("click", () => document.getElementById("local-file").click());
+      document.getElementById("local-file").addEventListener("change", event => {
+        loadLocalFile(event.target.files[0]);
+        event.target.value = "";
+      });
+      document.getElementById("retry-source").addEventListener("click", () => selectSource(state.source));
+      editor.addEventListener("input", () => {
+        state.drafts[state.source] = editor.value;
+        updateSourceState();
+        scheduleRender();
+      });
+      editor.addEventListener("keydown", event => {
+        if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+          event.preventDefault();
+          renderPreview();
+          setMobilePanel("preview");
+        }
+      });
+      document.getElementById("restore-source").addEventListener("click", () => {
+        state.drafts[state.source] = state.originals[state.source];
+        editor.value = state.drafts[state.source];
+        updateSourceState();
+        renderPreview(true);
+        document.getElementById("feedback").textContent = "Current source restored. Other drafts are kept.";
+      });
+      document.addEventListener("click", event => {
+        const example = event.target.closest("[data-example]");
+        if (example) showExample(example.dataset.example);
+      });
+
+      document.getElementById("rerun-benchmark").addEventListener("click", () => {
+        if (!state.previewReady) {
+          showSourceError();
+          frame.srcdoc = frame.srcdoc;
+        } else renderPreview();
+      });
+      document.querySelectorAll('[name="integrationMode"]').forEach(input => input.addEventListener("change", () => {
+        state.integrationMode = input.value;
+        generateIntegration();
+      }));
+      document.getElementById("copy-markdown").addEventListener("click", () => {
+        setMobilePanel("source");
+        copyText(editor.value, editor, document.getElementById("feedback"));
+      });
+      document.getElementById("copy-integration").addEventListener("click", () => {
+        generateIntegration();
+        const code = document.getElementById("integration-code");
+        copyText(code.value, code, document.getElementById("integration-feedback"));
+      });
+      document.getElementById("site-theme").addEventListener("click", event => {
+        const button = event.currentTarget;
+        const theme = document.documentElement.dataset.bsTheme === "dark" ? "light" : "dark";
+        const next = theme === "dark" ? "light" : "dark";
+        document.documentElement.dataset.bsTheme = theme;
+        button.querySelector("span").textContent = next === "light" ? "Light" : "Dark";
+        button.querySelector("i").className = `fa-solid fa-${next === "light" ? "sun" : "moon"} me-1`;
+        button.setAttribute("aria-label", `Switch website to ${next} theme`);
+        document.querySelector('meta[name="theme-color"]').content = getComputedStyle(document.documentElement).getPropertyValue("--page-bg").trim();
+      });
+      // =============
+      // === INITIALIZATION ===
+      // =============
+      document.getElementById("year-txt").textContent = new Date().getFullYear();
+      selectSource("showcase");
+      initializePreview();
     });
   </script>
 </body>
