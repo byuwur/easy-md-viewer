@@ -669,7 +669,7 @@
           continue;
         }
         // Hide HTML comments outside code spans.
-        if (line.startsWith("<!--", cursor)) {
+        if (line.startsWith(`<!--`, cursor)) {
           inComment = true;
           cursor += 4;
           continue;
