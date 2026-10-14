@@ -97,6 +97,10 @@ test("Markdown rendering", async (t) => {
       }, code);
       assert.equal(generated.markdown, markdown);
       assert.equal(generated.options.withLinks, false);
+      await playground.route("**/test.md", route => route.fulfill({ status: 503, body: "Unavailable" }));
+      await playground.locator("#document-source").selectOption("benchmark");
+      await playground.waitForFunction(() => document.getElementById("render-status").textContent === "Source unavailable");
+      assert.equal(await playground.locator("#copy-integration").isDisabled(), true);
       assert.deepEqual(errors, []);
       await playground.close();
     });

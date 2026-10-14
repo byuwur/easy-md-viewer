@@ -844,6 +844,7 @@
 
       async function selectSource(source) {
         const request = ++state.sourceRequest;
+        clearTimeout(state.renderTimer);
         state.source = source;
         sourceSelect.value = source;
         document.querySelectorAll(".feature-chip").forEach(button => button.setAttribute("aria-pressed", "false"));
@@ -852,6 +853,7 @@
         document.getElementById("render-status").textContent = "Loading…";
         document.getElementById("copy-markdown").disabled = true;
         document.getElementById("restore-source").disabled = true;
+        generateIntegration();
         if (source === "benchmark" && state.drafts.benchmark === undefined) {
           try {
             if (location.protocol === "file:") throw new Error("file-protocol");
@@ -867,9 +869,10 @@
             editor.value = "";
             document.getElementById("render-status").textContent = "Source unavailable";
             clearPreview();
-            const message = error.message === "file-protocol"
-              ? "To fetch test.md, serve this folder over HTTP. You can also open test.md with Open .md file."
-              : `Could not load test.md (${error.message}). Retry or open the file locally.`;
+            const message =
+              error.message === "file-protocol"
+                ? "To fetch test.md, serve this folder over HTTP. You can also open test.md with Open .md file."
+                : `Could not load test.md (${error.message}). Retry or open the file locally.`;
             showSourceError(message, location.protocol !== "file:");
             return;
           }
@@ -1067,7 +1070,12 @@
         // Themes belong to the stylesheet; this is the complete viewer API configuration.
         document.getElementById("options-json").value = JSON.stringify(state.options, null, 2);
         const markdown = state.drafts[state.source];
-        if (markdown === undefined) return;
+        const available = markdown !== undefined && !editor.disabled;
+        document.getElementById("copy-integration").disabled = !available;
+        if (!available) {
+          document.getElementById("integration-code").value = "Select an available document to generate the integration example.";
+          return;
+        }
         const cdn = state.integrationMode === "cdn";
         const path = cdn ? "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.4.final/" : "";
         const changedOptions = Object.fromEntries(Object.entries(state.options).filter(([key, value]) => value !== defaults[key]));
@@ -1105,7 +1113,6 @@
         document.getElementById("integration-note").textContent = cdn
           ? "CDN pinned to v1.4.final. Local source may include newer fixes."
           : "Place the HTML beside md.js, md.css, md.light.css, and md.dark.css.";
-        document.getElementById("copy-integration").disabled = false;
       }
 
       // =============
