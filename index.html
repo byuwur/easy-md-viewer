@@ -235,7 +235,7 @@
             <button id="copy-integration" class="btn btn-accent btn-sm px-3" type="button"><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> Copy HTML</button>
           </div>
           <label class="visually-hidden" for="integration-code">Complete HTML integration example</label>
-          <textarea id="integration-code" class="integration-code" readonly spellcheck="false" wrap="off"></textarea>
+          <textarea id="integration-code" class="integration-code" readonly spellcheck="false" wrap="soft"></textarea>
           <p id="integration-feedback" class="small text-body-secondary mx-4 my-0" role="status" aria-live="polite"></p>
         </div>
       </div>
@@ -562,6 +562,8 @@
       white-space: pre;
       overflow: auto;
       tab-size: 2;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
     }
 
     .source-editor:focus {
