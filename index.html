@@ -1330,9 +1330,6 @@
       }
 
       function downloadHTML() {
-        const base = "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.4.final/";
-        const sample = "# A little Markdown. A real document.\nWrite something useful. Let **easy-md-viewer** handle the rendering.";
-        const source = JSON.stringify(sample, null, 2).replaceAll("\n", "\n              ");
         const html = dedent(/* HTML */ `
           <!doctype html>
           <html lang="en">
@@ -1340,15 +1337,15 @@
               <meta charset="utf-8" />
               <meta name="viewport" content="width=device-width, initial-scale=1" />
               <title>My Markdown document</title>
-              <link rel="stylesheet" href="${base}md.min.css" />
-              <link id="byVIEWtheme" rel="stylesheet" href="${base}md.light.css" />
-              ${`<script src="${base}md.min.js" defer><\/script>`}
+              <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.4.final/md.min.css" />
+              <link id="byVIEWtheme" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.4.final/md.light.css" />
+              ${'<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.4.final/md.min.js" defer><\/script>'}
             </head>
             <body>
               <div id="document"></div>
               ${"<script>"}
-                const markdown = ${source};
                 document.addEventListener("DOMContentLoaded", () => {
+                  const markdown = "# A little Markdown. A real document.\\n\\nWrite something useful. Let **easy-md-viewer** handle the rendering.";
                   byMDviewer(document.getElementById("document"), markdown);
                 });
               ${"<\/script>"}

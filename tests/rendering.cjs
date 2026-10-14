@@ -105,11 +105,8 @@ test("Markdown rendering", async (t) => {
         await route.fulfill({ body, contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
       });
       try {
-        for (const editedPreset of [false]) {
-          if (editedPreset) {
-            await playground.locator("#source-preset").selectOption("bigNumbers");
-            await playground.locator("#json-source").fill('{"balance":"-900719925474099312349","unit":"edited","extra":42}');
-          }
+        for (const editedSource of [false, true]) {
+          if (editedSource) await playground.locator("#markdown-source").fill("# Edited document\n\nThis should not change the download.");
           const [download] = await Promise.all([playground.waitForEvent("download"), playground.locator("#download-html").click()]);
           assert.equal(download.suggestedFilename(), "my-markdown-document.html");
           const file = path.join(directory, download.suggestedFilename());
@@ -119,7 +116,9 @@ test("Markdown rendering", async (t) => {
           await exported.goto(pathToFileURL(file).href);
           await exported.waitForFunction(() => document.getElementById("document").children.length > 0);
           assert.equal(await exported.evaluate(() => window.injected), undefined);
-          assert.equal(await exported.evaluate(() => markdown), "# A little Markdown. A real document.\nWrite something useful. Let **easy-md-viewer** handle the rendering.");
+          assert.equal(await exported.locator("#document h1").textContent(), "A little Markdown. A real document.");
+          assert.equal(await exported.locator("#document p").textContent(), "Write something useful. Let easy-md-viewer handle the rendering.");
+          assert.equal(await exported.locator("#document p strong").textContent(), "easy-md-viewer");
           assert.equal(await exported.locator("head script[src][defer]").count(), 1);
           assert.equal(await exported.locator("body script[src], body link[rel='stylesheet']").count(), 0);
           assert.equal(await exported.locator("#byVIEWtheme").getAttribute("href").then(href => href.endsWith("md.light.css")), true);
