@@ -215,8 +215,10 @@
     <section id="get-started" class="get-started py-5 row gy-4 gx-lg-5" aria-labelledby="integration-title">
       <div class="col-xl-4">
         <h2 id="integration-title" class="h2 mb-3">Get started</h2>
-        <p class="text-body-secondary">Copy your document and settings as a working HTML file.</p>
-        <p class="text-body-secondary small">Playground powered by <a class="site-link" href="https://github.com/byuwur/spa.js" target="_blank" rel="noopener">SPA.js</a>.</p>
+        <p class="text-body-secondary">Copy your integration or download a short Markdown sample with default settings.</p>
+        <p class="text-body-secondary small">
+          Downloads are compact starters with default settings and CDN links. Linked images still need their original files or URLs.
+        </p>
         <p id="integration-note" class="text-body-secondary small mb-2">CDN pinned to v1.4.final. Local source may include newer fixes.</p>
         <a class="site-link small" href="https://github.com/byuwur/easy-md-viewer#usage" target="_blank" rel="noopener">Read the full API <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i></a>
       </div>
@@ -232,7 +234,9 @@
                 <label class="btn btn-quiet" for="integration-local">Local files</label>
               </div>
             </fieldset>
-            <button id="copy-integration" class="btn btn-accent btn-sm px-3" type="button"><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> Copy HTML</button>
+            <div class="d-flex flex-wrap gap-2"><button id="copy-integration" class="btn btn-quiet btn-sm px-3" type="button"><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> Copy HTML</button>
+              <button id="download-html" class="btn btn-accent btn-sm px-3" type="button"><i class="fa-solid fa-download me-1" aria-hidden="true"></i> Download HTML</button>
+            </div>
           </div>
           <label class="visually-hidden" for="integration-code">Complete HTML integration example</label>
           <textarea id="integration-code" class="integration-code" readonly spellcheck="false" wrap="soft"></textarea>
@@ -1118,6 +1122,43 @@
       // =============
       // === CLIPBOARD ===
       // =============
+      function downloadHTML() {
+        const base = "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.4.final/";
+        const sample = "# A little Markdown. A real document.\nWrite something useful. Let **easy-md-viewer** handle the rendering.";
+        const source = JSON.stringify(sample, null, 2).replaceAll("\n", "\n              ");
+        const html = dedent(/* HTML */ `
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="utf-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <title>My Markdown document</title>
+              <link rel="stylesheet" href="${base}md.min.css" />
+              <link id="byVIEWtheme" rel="stylesheet" href="${base}md.light.css" />
+              ${`<script src="${base}md.min.js" defer><\/script>`}
+            </head>
+            <body>
+              <div id="document"></div>
+              ${"<script>"}
+                const markdown = ${source};
+                document.addEventListener("DOMContentLoaded", () => {
+                  byMDviewer(document.getElementById("document"), markdown);
+                });
+              ${"<\/script>"}
+            </body>
+          </html>
+        `);
+        const url = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "my-markdown-document.html";
+        document.body.append(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        document.getElementById("integration-feedback").textContent = "Downloaded. The starter uses default viewer settings and CDN files.";
+      }
+
       async function copyText(text, fallback, status) {
         try {
           await navigator.clipboard.writeText(text);
@@ -1218,6 +1259,7 @@
         const code = document.getElementById("integration-code");
         copyText(code.value, code, document.getElementById("integration-feedback"));
       });
+      document.getElementById("download-html").addEventListener("click", downloadHTML);
       document.getElementById("site-theme").addEventListener("click", event => {
         const button = event.currentTarget;
         const theme = document.documentElement.dataset.bsTheme === "dark" ? "light" : "dark";

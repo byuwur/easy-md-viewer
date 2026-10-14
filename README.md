@@ -79,6 +79,8 @@ Render **Markdown** directly in your page.
 
 The target and library are loaded before the viewer call. Use the CDN URLs from Installation instead of the local paths if preferred. If you load the script with `defer` in the head, run the viewer call after `DOMContentLoaded` or from a later deferred script.
 
+The landing page copies your current Markdown and settings into an integration example. **Download HTML** creates a compact starter with a short sample and default viewer settings. It loads the pinned viewer release and themes from the CDN, so viewing it requires an internet connection. CDN/local tabs apply to the copied example.
+
 ### Read from another element
 
 With the library already loaded, use a hidden source element to keep Markdown separate from its output:
@@ -171,7 +173,7 @@ The renderer creates DOM nodes and treats unsupported raw HTML as text. It does 
 
 ## Checks
 
-GitHub Actions runs the rendering checks in `tests/rendering.cjs` on pushes and pull requests. It tests local `md.js` in Chromium, including the benchmark document.
+GitHub Actions runs the rendering checks in `tests/rendering.cjs` on pushes and pull requests. It tests local `md.js` in Chromium, including the benchmark document and compact playground downloads using default settings.
 
 For a visual check, serve this folder over HTTP, open `index.html`, and choose the benchmark in the Document menu to render `test.md`.
 

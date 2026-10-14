@@ -1,7 +1,9 @@
 const assert = require("node:assert/strict");
 const path = require("node:path");
+const os = require("node:os");
 const fs = require("node:fs/promises");
 const test = require("node:test");
+const { pathToFileURL } = require("node:url");
 const { chromium } = require("playwright");
 
 test("Markdown rendering", async (t) => {
@@ -66,7 +68,7 @@ test("Markdown rendering", async (t) => {
       }, markdown);
       assert.equal(heading, "easy MD Viewer BenchMarkDown");
     });
-    await t.test("integration examples preserve Markdown and selected options", async () => {
+    await t.test("compact downloads use default samples and deferred head assets", async () => {
       const playground = await browser.newPage();
       const errors = [];
       playground.on("pageerror", error => errors.push(error.message));
@@ -87,20 +89,56 @@ test("Markdown rendering", async (t) => {
       assert.ok(code.includes('document.addEventListener("DOMContentLoaded"'));
       assert.ok(code.includes('"withLinks": false'));
       assert.ok(code.includes('src="md.js" defer'));
-      const generated = await playground.evaluate(html => {
-        const doc = new DOMParser().parseFromString(html, "text/html");
-        let rendered;
-        const initialization = doc.querySelector("script:not([src])").textContent;
-        new Function("document", "byMDviewer", initialization)(doc, (_, markdown, options) => { rendered = { markdown, options }; });
-        doc.dispatchEvent(new Event("DOMContentLoaded"));
-        return rendered;
-      }, code);
-      assert.equal(generated.markdown, markdown);
-      assert.equal(generated.options.withLinks, false);
+      for (const name of ["themeToggle", "fontSizeControls"]) {
+        await playground.locator(`#${name}`).evaluate(element => {
+          element.checked = false;
+          element.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+      }
+      const directory = await fs.mkdtemp(path.join(os.tmpdir(), "viewer-starter-"));
+      const exported = await browser.newPage();
+      exported.on("pageerror", error => errors.push(error.message));
+      await exported.route("https://cdn.jsdelivr.net/**", async route => {
+        const file = path.basename(new URL(route.request().url()).pathname).replace(".min.", ".");
+        const body = await fs.readFile(path.join(__dirname, "..", file));
+        if (file.endsWith(".js")) await new Promise(resolve => setTimeout(resolve, 75));
+        await route.fulfill({ body, contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
+      });
+      try {
+        for (const editedPreset of [false]) {
+          if (editedPreset) {
+            await playground.locator("#source-preset").selectOption("bigNumbers");
+            await playground.locator("#json-source").fill('{"balance":"-900719925474099312349","unit":"edited","extra":42}');
+          }
+          const [download] = await Promise.all([playground.waitForEvent("download"), playground.locator("#download-html").click()]);
+          assert.equal(download.suggestedFilename(), "my-markdown-document.html");
+          const file = path.join(directory, download.suggestedFilename());
+          await download.saveAs(file);
+          const html = await fs.readFile(file, "utf8");
+          assert.ok(Buffer.byteLength(html) < 2048, "Starter should stay small");
+          await exported.goto(pathToFileURL(file).href);
+          await exported.waitForFunction(() => document.getElementById("document").children.length > 0);
+          assert.equal(await exported.evaluate(() => window.injected), undefined);
+          assert.equal(await exported.evaluate(() => markdown), "# A little Markdown. A real document.\nWrite something useful. Let **easy-md-viewer** handle the rendering.");
+          assert.equal(await exported.locator("head script[src][defer]").count(), 1);
+          assert.equal(await exported.locator("body script[src], body link[rel='stylesheet']").count(), 0);
+          assert.equal(await exported.locator("#byVIEWtheme").getAttribute("href").then(href => href.endsWith("md.light.css")), true);
+          const background = await exported.locator("#document").evaluate(element => getComputedStyle(element).backgroundColor);
+          await exported.locator(".byVIEWthemeToggle").click();
+          await exported.waitForFunction(before => getComputedStyle(document.getElementById("document")).backgroundColor !== before, background);
+          const fontSize = await exported.locator("#document").evaluate(element => parseFloat(getComputedStyle(element).fontSize));
+          await exported.locator(".byVIEWfontSize").nth(2).click();
+          assert.ok(await exported.locator("#document").evaluate((element, before) => parseFloat(getComputedStyle(element).fontSize) > before, fontSize));
+        }
+      } finally {
+        await exported.close();
+        await fs.rm(directory, { recursive: true, force: true });
+      }
       await playground.route("**/test.md", route => route.fulfill({ status: 503, body: "Unavailable" }));
       await playground.locator("#document-source").selectOption("benchmark");
       await playground.waitForFunction(() => document.getElementById("render-status").textContent === "Source unavailable");
       assert.equal(await playground.locator("#copy-integration").isDisabled(), true);
+      assert.equal(await playground.locator("#download-html").isDisabled(), false);
       assert.deepEqual(errors, []);
       await playground.close();
     });
