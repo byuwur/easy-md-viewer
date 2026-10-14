@@ -702,6 +702,12 @@
     document.addEventListener("DOMContentLoaded", () => {
       "use strict";
 
+      // Keep templates aligned while preserving their content indentation.
+      function dedent(text) {
+        const indentation = text.match(/\n([ \t]*)/)[1];
+        return text.replace(new RegExp(`^${indentation}`, "gm"), "").trim();
+      }
+
       // =============
       // === STATE & SAMPLES ===
       // =============
@@ -731,34 +737,36 @@
         previewReady: false
       };
 
-      const showcase = `# A little Markdown. A real document.
+      const showcase =
+        dedent(`
+          # A little Markdown. A real document.
 
-Write something useful. Let **easy-md-viewer** handle the rendering.
+          Write something useful. Let **easy-md-viewer** handle the rendering.
 
-## Start small
+          ## Start small
 
-No packages to install. No build step to configure.
+          No packages to install. No build step to configure.
 
-~~~js
-byMDviewer(container, "# Hello **world**");
-~~~
+          ~~~js
+          byMDviewer(container, "# Hello **world**");
+          ~~~
 
-## Make yourself at home
+          ## Make yourself at home
 
-- [x] Edit this Markdown
-- [x] Try the options on the left
-- [ ] Drop the viewer into your website
+          - [x] Edit this Markdown
+          - [x] Try the options on the left
+          - [ ] Drop the viewer into your website
 
-| You bring | The viewer brings |
-| :--- | :--- |
-| Plain Markdown | A readable document |
-| Your website | Light & dark themes |
-| A few lines of JS | No dependencies |
+          | You bring | The viewer brings |
+          | :--- | :--- |
+          | Plain Markdown | A readable document |
+          | Your website | Light & dark themes |
+          | A few lines of JS | No dependencies |
 
-> Simple is complicated enough.
+          > Simple is complicated enough.
 
-[Read the docs](https://github.com/byuwur/easy-md-viewer#readme) = [Back to the start](#a-little-markdown-a-real-document)
-`;
+          [Read the docs](https://github.com/byuwur/easy-md-viewer#readme) = [Back to the start](#a-little-markdown-a-real-document)
+        `) + "\n";
       const examples = {
         headings: { label: "Headings & anchors", markdown: "# Your document\n\n[Jump to installation](#installation)\n\n## Installation\n\nHeadings get automatic IDs.\n\n### A smaller heading\n\n## Installation\n\nRepeated headings get unique IDs: installation-1.\n\n[Jump to the second one](#installation-1)" },
         formatting: { label: "Inline formatting", markdown: "# A few well-chosen words\n\n**Bold**, *italic*, ***both***, and ~~a change of plan~~.\n\nA little `inline code` goes a long way." },
@@ -775,11 +783,16 @@ byMDviewer(container, "# Hello **world**");
       };
       state.originals = {
         showcase,
-        features: `# The full feature showcase
+        features: dedent(`
+          # The full feature showcase
 
-A practical Markdown subset. Explore each example above, or read through them here.
+          A practical Markdown subset. Explore each example above, or read through them here.
 
-${Object.values(examples).map(example => example.markdown.replace(/^# /, "## ")).join("\n\n---\n\n")}`,
+          ${Object.values(examples)
+            .map(example => example.markdown.replace(/^# /, "## "))
+            .join("\n\n---\n\n")
+            .replaceAll("\n", "\n          ")}
+        `),
         custom: "# Hello, world\n\nMake this document **yours**.\n"
       };
       state.drafts = { ...state.originals };
@@ -791,16 +804,26 @@ ${Object.values(examples).map(example => example.markdown.replace(/^# /, "## "))
         for (const option of optionDefinitions) {
           const row = document.createElement("div");
           row.className = "option-row d-flex align-items-center gap-2 form-switch";
-          row.innerHTML = /* HTML */ `<input class="form-check-input" type="checkbox" role="switch" id="${option.name}" name="${option.name}" aria-describedby="${option.name}-description" ${option.default ? "checked" : ""} />
+          row.innerHTML = dedent(/* HTML */ `
+            <input class="form-check-input" type="checkbox" role="switch" id="${option.name}" name="${option.name}" aria-describedby="${option.name}-description" ${option.default ? "checked" : ""} />
             <label class="option-label flex-grow-1" for="${option.name}">${option.label}<span class="option-description d-block mt-1" id="${option.name}-description">${option.description}</span></label>
-            <button class="btn btn-link btn-sm p-1 flex-shrink-0 font-monospace text-decoration-none" type="button" data-example="${option.example}" aria-label="Show ${option.label.toLowerCase()} example" title="Show example">Try <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i></button>`;
+            <button class="btn btn-link btn-sm p-1 flex-shrink-0 font-monospace text-decoration-none" type="button" data-example="${option.example}" aria-label="Show ${option.label.toLowerCase()} example" title="Show example">Try <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i></button>
+          `);
           document.getElementById(option.group === "viewer" ? "viewer-options" : "render-options").append(row);
         }
-        document.getElementById("render-options").insertAdjacentHTML("beforeend", /* HTML */ `<div class="mt-3">
-          <label class="option-label mb-1" for="linkTarget">Open links in</label>
-          <select class="form-select form-select-sm config-select" name="linkTarget" id="linkTarget">
-            <option value="_blank">New tab (_blank)</option><option value="_self">Current frame (_self)</option><option value="false">Browser default (no target)</option>
-          </select></div>`);
+        document.getElementById("render-options").insertAdjacentHTML(
+          "beforeend",
+          dedent(/* HTML */ `
+            <div class="mt-3">
+              <label class="option-label mb-1" for="linkTarget">Open links in</label>
+              <select class="form-select form-select-sm config-select" name="linkTarget" id="linkTarget">
+                <option value="_blank">New tab (_blank)</option>
+                <option value="_self">Current frame (_self)</option>
+                <option value="false">Browser default (no target)</option>
+              </select>
+            </div>
+          `)
+        );
       }
 
       // =============
@@ -952,7 +975,11 @@ ${Object.values(examples).map(example => example.markdown.replace(/^# /, "## "))
               event.preventDefault();
               const id = anchor.getAttribute("href").slice(1);
               let decoded = id;
-              try { decoded = decodeURIComponent(id); } catch { /* Malformed percent escapes can be literal heading IDs. */ }
+              try {
+                decoded = decodeURIComponent(id);
+              } catch {
+                /* Malformed percent escapes can be literal heading IDs. */
+              }
               const heading = frame.contentDocument.getElementById(decoded);
               heading?.scrollIntoView();
             });
@@ -966,21 +993,30 @@ ${Object.values(examples).map(example => example.markdown.replace(/^# /, "## "))
           }
         });
         // Interpolate scripts so escaped closing tags do not confuse HTML highlighting.
-        frame.srcdoc = /* HTML */ `<!doctype html>
-<html lang="en"><head><base href="${base}">
-<link rel="stylesheet" href="md.css">
-<link id="byVIEWtheme" rel="stylesheet" href="md.light.css">
-<style>
-  html { font-size: 16px; color-scheme: light; } body { margin: 0; background: #fff; }
-  .byMDdocument { min-height: 100vh; padding: 1.8rem; }
-  .byVIEWcontrols { position: relative; top: auto; right: auto; flex-direction: row; justify-content: flex-end; align-items: center; margin-bottom: 1.5rem; }
-  .byMDheading { scroll-margin-top: 1rem; }
-  #empty-document { padding: 2rem; font: 1rem/1.6 system-ui, sans-serif; color: #777; }
-  @media (max-width: 400px) { .byMDdocument { padding: 1.25rem; } }
-  @media (prefers-reduced-motion: reduce) { *, *::after { transition: none !important; } }
-</style>
-${'<script src="md.js"><\/script>'}</head>
-<body><main id="document" aria-label="Rendered Markdown"></main><p id="empty-document" hidden>Start typing in Source to see your document here.</p></body></html>`;
+        frame.srcdoc = dedent(/* HTML */ `
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <base href="${base}">
+              <link rel="stylesheet" href="md.css">
+              <link id="byVIEWtheme" rel="stylesheet" href="md.light.css">
+              <style>
+                html { font-size: 16px; color-scheme: light; } body { margin: 0; background: #fff; }
+                .byMDdocument { min-height: 100vh; padding: 1.8rem; }
+                .byVIEWcontrols { position: relative; top: auto; right: auto; flex-direction: row; justify-content: flex-end; align-items: center; margin-bottom: 1.5rem; }
+                .byMDheading { scroll-margin-top: 1rem; }
+                #empty-document { padding: 2rem; font: 1rem/1.6 system-ui, sans-serif; color: #777; }
+                @media (max-width: 400px) { .byMDdocument { padding: 1.25rem; } }
+                @media (prefers-reduced-motion: reduce) { *, *::after { transition: none !important; } }
+              </style>
+              ${'<script src="md.js"><\/script>'}
+            </head>
+            <body>
+              <main id="document" aria-label="Rendered Markdown"></main>
+              <p id="empty-document" hidden>Start typing in Source to see your document here.</p>
+            </body>
+          </html>
+        `);
       }
 
       // =============
