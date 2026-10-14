@@ -489,10 +489,21 @@
       color: var(--muted);
     }
 
-    .mobile-tabs {
+    .mobile-tabs.nav.nav-pills {
+      background: var(--panel-bg);
       --bs-nav-link-color: var(--muted);
       --bs-nav-pills-link-active-bg: var(--accent);
       --bs-nav-pills-link-active-color: var(--accent-ink);
+    }
+
+    .mobile-tabs.nav .nav-link {
+      background-color: transparent;
+      color: var(--muted);
+    }
+
+    .mobile-tabs.nav .nav-link.active {
+      background-color: var(--accent);
+      color: var(--accent-ink);
     }
 
     /* =============
