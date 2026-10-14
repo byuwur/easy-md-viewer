@@ -142,6 +142,14 @@ test("Markdown rendering", async (t) => {
       assert.deepEqual(errors, []);
       await playground.close();
     });
+    await t.test("legacy demo loads styles and deferred scripts from the head", async () => {
+      const html = await fs.readFile(path.join(__dirname, "..", "index.old.html"), "utf8");
+      const structure = await page.evaluate(html => {
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        return { themes: doc.querySelectorAll("head #byVIEWtheme").length, libraries: doc.querySelectorAll("head script[src][defer]").length, bodyAssets: doc.querySelectorAll("body script[src], body link[rel='stylesheet']").length };
+      }, html);
+      assert.deepEqual(structure, { themes: 1, libraries: 1, bodyAssets: 0 });
+    });
   } finally {
     await browser.close();
   }
