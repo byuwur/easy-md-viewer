@@ -66,6 +66,40 @@ test("Markdown rendering", async (t) => {
       }, markdown);
       assert.equal(heading, "easy MD Viewer BenchMarkDown");
     });
+    await t.test("integration examples preserve Markdown and selected options", async () => {
+      const playground = await browser.newPage();
+      const errors = [];
+      playground.on("pageerror", error => errors.push(error.message));
+      await playground.route("**/*", async route => {
+        const url = new URL(route.request().url());
+        if (url.origin !== "https://viewer.test") return route.abort();
+        const file = path.basename(url.pathname);
+        const body = await fs.readFile(path.join(__dirname, "..", file));
+        await route.fulfill({ body, contentType: file.endsWith(".html") ? "text/html" : file.endsWith(".js") ? "text/javascript" : "text/css" });
+      });
+      await playground.goto("https://viewer.test/index.html");
+      const markdown = '# Downloaded document\n\n**Unicode: á 👋**\n\n</script><script>window.injected=true</script>\n\n`backticks` and ${literal}';
+      await playground.locator("#markdown-source").fill(markdown);
+      await playground.locator("#withLinks").uncheck();
+      await playground.locator("#preview-dark").check();
+      await playground.locator("#integration-local").check();
+      const code = await playground.locator("#integration-code").inputValue();
+      assert.ok(code.includes('document.addEventListener("DOMContentLoaded"'));
+      assert.ok(code.includes('"withLinks": false'));
+      assert.ok(code.includes('src="md.js" defer'));
+      const generated = await playground.evaluate(html => {
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        let rendered;
+        const initialization = doc.querySelector("script:not([src])").textContent;
+        new Function("document", "byMDviewer", initialization)(doc, (_, markdown, options) => { rendered = { markdown, options }; });
+        doc.dispatchEvent(new Event("DOMContentLoaded"));
+        return rendered;
+      }, code);
+      assert.equal(generated.markdown, markdown);
+      assert.equal(generated.options.withLinks, false);
+      assert.deepEqual(errors, []);
+      await playground.close();
+    });
   } finally {
     await browser.close();
   }

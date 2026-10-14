@@ -1073,29 +1073,39 @@
         const changedOptions = Object.fromEntries(Object.entries(state.options).filter(([key, value]) => value !== defaults[key]));
         const options = Object.keys(changedOptions).length ? `, ${JSON.stringify(changedOptions, null, 2)}` : "";
         const source = JSON.stringify(markdown).replace(/</g, "\\u003c");
-        const scripts = `<script src="${path}${cdn ? "md.min.js" : "md.js"}"><\/script>
-  <script>
-    const markdown = ${source};
-    byMDviewer(document.getElementById("document"), markdown${options});
-  <\/script>`;
-        document.getElementById("integration-code").value = /* HTML */ `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My Markdown document</title>
-  <link rel="stylesheet" href="${path}${cdn ? "md.min.css" : "md.css"}" />
-  <link id="byVIEWtheme" rel="stylesheet" href="${path}md.${state.theme}.css" />
-</head>
-<body>
-  <div id="document"></div>
-  ${scripts}
-</body>
-</html>`;
-        document.getElementById("copy-integration").disabled = false;
+        const initialization = [
+          `const markdown = ${source};`,
+          `byMDviewer(document.getElementById("document"), markdown${options});`
+        ].join("\n");
+        // Interpolate script tags so escaped closing tags do not trap HTML highlighting.
+        const scripts = dedent(/* HTML */ `
+          ${"<script>"}
+            document.addEventListener("DOMContentLoaded", () => {
+              ${initialization.replaceAll("\n", "\n              ")}
+            });
+          ${"<\/script>"}
+        `);
+        document.getElementById("integration-code").value = dedent(/* HTML */ `
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="utf-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <title>My Markdown document</title>
+              <link rel="stylesheet" href="${path}${cdn ? "md.min.css" : "md.css"}" />
+              <link id="byVIEWtheme" rel="stylesheet" href="${path}md.${state.theme}.css" />
+              ${`<script src="${path}${cdn ? "md.min.js" : "md.js"}" defer><\/script>`}
+            </head>
+            <body>
+              <div id="document"></div>
+              ${scripts.replaceAll("\n", "\n              ")}
+            </body>
+          </html>
+        `);
         document.getElementById("integration-note").textContent = cdn
           ? "CDN pinned to v1.4.final. Local source may include newer fixes."
           : "Place the HTML beside md.js, md.css, md.light.css, and md.dark.css.";
+        document.getElementById("copy-integration").disabled = false;
       }
 
       // =============
