@@ -40,14 +40,18 @@
   <header class="border-bottom">
     <nav class="navbar navbar-expand-md site-width" aria-label="Main navigation">
       <a class="navbar-brand" href="#"><span class="brand-mark" aria-hidden="true">md↓</span>easy-md-viewer</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#site-menu" aria-controls="site-menu" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#site-menu" aria-controls="site-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
       <div class="collapse navbar-collapse" id="site-menu">
         <div class="navbar-nav ms-auto align-items-md-center gap-md-2">
           <a class="nav-link" href="#playground">Playground</a>
           <a class="nav-link" href="#get-started">Get started</a>
           <a class="nav-link" href="https://github.com/byuwur/easy-md-viewer#readme">Docs <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i></a>
           <a class="btn btn-quiet px-3" href="https://github.com/byuwur/easy-md-viewer"><i class="fa-brands fa-github me-1" aria-hidden="true"></i> GitHub</a>
-          <button id="site-theme" class="btn btn-quiet px-3" type="button" aria-label="Switch website to light theme"><i class="fa-solid fa-sun me-1" aria-hidden="true"></i> <span>Light</span></button>
+          <button id="site-theme" class="btn btn-quiet px-3" type="button" aria-label="Switch website to light theme">
+            <i class="fa-solid fa-sun me-1" aria-hidden="true"></i> <span>Light</span>
+          </button>
         </div>
       </div>
     </nav>
@@ -94,27 +98,80 @@
           <button class="feature-chip" type="button" data-example="safety" aria-pressed="false">&lt;html&gt; &amp; URLs</button>
         </div>
         <div class="mobile-tabs nav nav-pills nav-fill d-md-none border-bottom p-2 gap-2" role="tablist" aria-label="Playground panels">
-          <button id="config-tab" class="nav-link" type="button" data-bs-toggle="tab" data-bs-target="#config-panel" data-panel="config" role="tab" aria-controls="config-panel" aria-selected="false"><i class="fa-solid fa-sliders me-1"
-              aria-hidden="true"></i> Configure</button>
-          <button id="source-tab" class="nav-link" type="button" data-bs-toggle="tab" data-bs-target="#source-panel" data-panel="source" role="tab" aria-controls="source-panel" aria-selected="false"><i class="fa-solid fa-code me-1"
-              aria-hidden="true"></i> Source</button>
-          <button id="preview-tab" class="nav-link active" type="button" data-bs-toggle="tab" data-bs-target="#preview-panel" data-panel="preview" role="tab" aria-controls="preview-panel" aria-selected="true"><i class="fa-solid fa-eye me-1"
-              aria-hidden="true"></i> Preview</button>
+          <button
+            id="config-tab"
+            class="nav-link"
+            type="button"
+            data-bs-toggle="tab"
+            data-bs-target="#config-panel"
+            data-panel="config"
+            role="tab"
+            aria-controls="config-panel"
+            aria-selected="false">
+            <i class="fa-solid fa-sliders me-1" aria-hidden="true"></i> Configure
+          </button>
+          <button
+            id="source-tab"
+            class="nav-link"
+            type="button"
+            data-bs-toggle="tab"
+            data-bs-target="#source-panel"
+            data-panel="source"
+            role="tab"
+            aria-controls="source-panel"
+            aria-selected="false">
+            <i class="fa-solid fa-code me-1" aria-hidden="true"></i> Source
+          </button>
+          <button
+            id="preview-tab"
+            class="nav-link active"
+            type="button"
+            data-bs-toggle="tab"
+            data-bs-target="#preview-panel"
+            data-panel="preview"
+            role="tab"
+            aria-controls="preview-panel"
+            aria-selected="true">
+            <i class="fa-solid fa-eye me-1" aria-hidden="true"></i> Preview
+          </button>
         </div>
         <div class="tab-content row g-0">
-          <section id="config-panel" class="tab-pane panel flex-column d-md-flex config-panel col-12 col-xl-3" aria-labelledby="config-heading">
+          <section
+            id="config-panel"
+            class="tab-pane panel flex-column d-md-flex config-panel col-12 col-xl-3"
+            aria-labelledby="config-heading">
             <div class="panel-heading border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 px-4 py-3">
-              <h3 id="config-heading" class="h6 m-0 fw-semibold flex-shrink-0"><span class="small font-monospace text-body-secondary me-2">01</span>Configure</h3>
+              <h3 id="config-heading" class="h6 m-0 fw-semibold flex-shrink-0">
+                <span class="small font-monospace text-body-secondary me-2">01</span>Configure
+              </h3>
             </div>
             <div class="border-bottom">
               <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 px-3 py-2">
                 <div class="btn-group" role="group" aria-label="Options view">
-                  <button class="btn btn-quiet btn-sm" type="button" data-options-view="form" aria-controls="config-form" aria-pressed="true">Form</button>
-                  <button class="btn btn-quiet btn-sm" type="button" data-options-view="json" aria-controls="options-json-panel" aria-pressed="false">JSON</button>
+                  <button
+                    class="btn btn-quiet btn-sm"
+                    type="button"
+                    data-options-view="form"
+                    aria-controls="config-form"
+                    aria-pressed="true">
+                    Form
+                  </button>
+                  <button
+                    class="btn btn-quiet btn-sm"
+                    type="button"
+                    data-options-view="json"
+                    aria-controls="options-json-panel"
+                    aria-pressed="false">
+                    JSON
+                  </button>
                 </div>
                 <div class="d-flex flex-wrap justify-content-end gap-2 ms-auto">
-                  <button class="btn btn-quiet btn-sm" id="copy-options" type="button" hidden><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> Copy</button>
-                  <button id="reset-options" class="btn btn-quiet btn-sm" type="button"><i class="fa-solid fa-rotate-left me-1" aria-hidden="true"></i> Reset</button>
+                  <button class="btn btn-quiet btn-sm" id="copy-options" type="button" hidden>
+                    <i class="fa-solid fa-copy me-1" aria-hidden="true"></i> Copy
+                  </button>
+                  <button id="reset-options" class="btn btn-quiet btn-sm" type="button">
+                    <i class="fa-solid fa-rotate-left me-1" aria-hidden="true"></i> Reset
+                  </button>
                 </div>
               </div>
               <p class="small text-body-secondary mx-3 my-0" id="options-copy-status" role="status" aria-live="polite"></p>
@@ -122,20 +179,49 @@
             <form id="config-form" class="panel-body" aria-label="Viewer configuration">
               <div class="accordion accordion-flush">
                 <div class="accordion-item">
-                  <h4 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#render-settings" aria-expanded="true" aria-controls="render-settings">Rendering</button></h4>
+                  <h4 class="accordion-header">
+                    <button
+                      class="accordion-button"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#render-settings"
+                      aria-expanded="true"
+                      aria-controls="render-settings">
+                      Rendering
+                    </button>
+                  </h4>
                   <div id="render-settings" class="accordion-collapse collapse show">
                     <div class="accordion-body" id="render-options"></div>
                   </div>
                 </div>
                 <div class="accordion-item">
-                  <h4 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#viewer-settings" aria-expanded="true" aria-controls="viewer-settings">Viewer controls</button></h4>
+                  <h4 class="accordion-header">
+                    <button
+                      class="accordion-button"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#viewer-settings"
+                      aria-expanded="true"
+                      aria-controls="viewer-settings">
+                      Viewer controls
+                    </button>
+                  </h4>
                   <div id="viewer-settings" class="accordion-collapse collapse show">
                     <div class="accordion-body" id="viewer-options"></div>
                   </div>
                 </div>
                 <div class="accordion-item">
-                  <h4 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#appearance-settings" aria-expanded="true" aria-controls="appearance-settings">Preview
-                      appearance</button></h4>
+                  <h4 class="accordion-header">
+                    <button
+                      class="accordion-button"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#appearance-settings"
+                      aria-expanded="true"
+                      aria-controls="appearance-settings">
+                      Preview appearance
+                    </button>
+                  </h4>
                   <div id="appearance-settings" class="accordion-collapse collapse show">
                     <div class="accordion-body">
                       <fieldset>
@@ -154,31 +240,64 @@
               </div>
             </form>
             <div class="panel-body overflow-hidden" id="options-json-panel" hidden>
-              <textarea class="source-editor" id="options-json" readonly spellcheck="false" wrap="off" aria-label="Viewer options as JSON"></textarea>
+              <textarea
+                class="source-editor"
+                id="options-json"
+                readonly
+                spellcheck="false"
+                wrap="off"
+                aria-label="Viewer options as JSON"></textarea>
             </div>
           </section>
 
-          <section id="source-panel" class="tab-pane panel flex-column d-md-flex source-panel col-12 col-md-6 col-xl-4" aria-labelledby="source-heading">
+          <section
+            id="source-panel"
+            class="tab-pane panel flex-column d-md-flex source-panel col-12 col-md-6 col-xl-4"
+            aria-labelledby="source-heading">
             <div class="panel-heading border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 px-4 py-3">
-              <h3 id="source-heading" class="h6 m-0 fw-semibold flex-shrink-0"><span class="small font-monospace text-body-secondary me-2">02</span>Markdown</h3>
+              <h3 id="source-heading" class="h6 m-0 fw-semibold flex-shrink-0">
+                <span class="small font-monospace text-body-secondary me-2">02</span>Markdown
+              </h3>
               <div class="d-flex gap-1">
-                <button id="restore-source" class="btn btn-quiet btn-sm" type="button"><i class="fa-solid fa-rotate-left me-1" aria-hidden="true"></i> Restore</button>
-                <button id="copy-markdown" class="btn btn-quiet btn-sm" type="button"><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> Copy</button>
+                <button id="restore-source" class="btn btn-quiet btn-sm" type="button">
+                  <i class="fa-solid fa-rotate-left me-1" aria-hidden="true"></i> Restore
+                </button>
+                <button id="copy-markdown" class="btn btn-quiet btn-sm" type="button">
+                  <i class="fa-solid fa-copy me-1" aria-hidden="true"></i> Copy
+                </button>
               </div>
             </div>
             <div class="panel-body">
-              <textarea id="markdown-source" class="source-editor" aria-label="Editable Markdown source" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off"
-                title="Ctrl / ⌘ + Enter to render. Tab moves focus." placeholder="# Your document&#10;&#10;Write Markdown here…"></textarea>
+              <textarea
+                id="markdown-source"
+                class="source-editor"
+                aria-label="Editable Markdown source"
+                spellcheck="false"
+                autocapitalize="off"
+                autocomplete="off"
+                wrap="off"
+                title="Ctrl / ⌘ + Enter to render. Tab moves focus."
+                placeholder="# Your document&#10;&#10;Write Markdown here…"></textarea>
             </div>
           </section>
 
           <!-- Real library preview; Bootstrap stays outside the iframe -->
-          <section id="preview-panel" class="tab-pane active panel flex-column d-md-flex preview-panel col-12 col-md-6 col-xl-5" aria-labelledby="preview-heading">
+          <section
+            id="preview-panel"
+            class="tab-pane active panel flex-column d-md-flex preview-panel col-12 col-md-6 col-xl-5"
+            aria-labelledby="preview-heading">
             <div class="panel-heading border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 px-4 py-3">
-              <h3 id="preview-heading" class="h6 m-0 fw-semibold flex-shrink-0"><span class="small font-monospace text-body-secondary me-2">03</span>Live preview</h3>
+              <h3 id="preview-heading" class="h6 m-0 fw-semibold flex-shrink-0">
+                <span class="small font-monospace text-body-secondary me-2">03</span>Live preview
+              </h3>
               <span class="font-monospace text-body-secondary small"><span id="render-status" role="status">Loading…</span></span>
             </div>
-            <div class="panel-body"><iframe id="preview-frame" title="Live Markdown document" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe></div>
+            <div class="panel-body">
+              <iframe
+                id="preview-frame"
+                title="Live Markdown document"
+                sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+            </div>
           </section>
         </div>
         <dl class="metric-strip bg-body-tertiary m-0 border-top row g-0">
@@ -191,7 +310,11 @@
             <dd class="m-0 font-monospace" id="metric-lines">—</dd>
           </div>
           <div class="metric p-3 col-6 col-md-3">
-            <dt class="small fw-normal font-monospace text-body-secondary mb-2" title="Synchronous byMDviewer() call; excludes browser paint and resource loading">Renderer call</dt>
+            <dt
+              class="small fw-normal font-monospace text-body-secondary mb-2"
+              title="Synchronous byMDviewer() call; excludes browser paint and resource loading">
+              Renderer call
+            </dt>
             <dd class="m-0 font-monospace" id="metric-time">—</dd>
           </div>
           <div class="metric p-3 col-6 col-md-3">
@@ -202,10 +325,17 @@
       </div>
       <div class="discovery py-4 border-bottom d-flex flex-wrap align-items-center gap-2">
         <span class="small font-monospace text-body-secondary me-2">Try it!</span>
-        <button id="open-file" class="btn btn-quiet" type="button"><i class="fa-solid fa-folder-open me-1" aria-hidden="true"></i> Open .md file</button>
+        <button id="open-file" class="btn btn-quiet" type="button">
+          <i class="fa-solid fa-folder-open me-1" aria-hidden="true"></i> Open .md file
+        </button>
         <input id="local-file" type="file" accept=".md,.markdown,text/markdown,text/plain" hidden />
-        <button id="rerun-benchmark" class="btn btn-quiet" type="button" title="Time the synchronous byMDviewer() call; excludes browser paint and resource loading"><i class="fa-solid fa-rotate-right me-1" aria-hidden="true"></i>
-          <span>Rerun measurement</span></button>
+        <button
+          id="rerun-benchmark"
+          class="btn btn-quiet"
+          type="button"
+          title="Time the synchronous byMDviewer() call; excludes browser paint and resource loading">
+          <i class="fa-solid fa-rotate-right me-1" aria-hidden="true"></i> <span>Rerun measurement</span>
+        </button>
         <span id="document-state" class="font-monospace text-body-secondary small ms-sm-auto">Original</span>
       </div>
 
@@ -222,7 +352,9 @@
         <p class="text-body-secondary small">
           Playground powered by <a class="site-link" href="https://github.com/byuwur/spa.js" target="_blank" rel="noopener">SPA.js</a>.
         </p>
-        <p id="integration-note" class="text-body-secondary small mb-2">CDN pinned to v1.4.final. Local source may include newer fixes.</p>
+        <p id="integration-note" class="text-body-secondary small mb-2">
+          CDN pinned to v1.4.final. Local source may include newer fixes.
+        </p>
         <a class="site-link small" href="https://github.com/byuwur/easy-md-viewer#usage" target="_blank" rel="noopener">Read the full API <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i></a>
       </div>
       <div class="col-lg-8">
@@ -237,8 +369,13 @@
                 <label class="btn btn-quiet" for="integration-local">Local files</label>
               </div>
             </fieldset>
-            <div class="d-flex flex-wrap gap-2"><button id="copy-integration" class="btn btn-quiet btn-sm px-3" type="button"><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> Copy HTML</button>
-              <button id="download-html" class="btn btn-accent btn-sm px-3" type="button"><i class="fa-solid fa-download me-1" aria-hidden="true"></i> Download HTML</button>
+            <div class="d-flex flex-wrap gap-2">
+              <button id="copy-integration" class="btn btn-quiet btn-sm px-3" type="button">
+                <i class="fa-solid fa-copy me-1" aria-hidden="true"></i> Copy HTML
+              </button>
+              <button id="download-html" class="btn btn-accent btn-sm px-3" type="button">
+                <i class="fa-solid fa-download me-1" aria-hidden="true"></i> Download HTML
+              </button>
             </div>
           </div>
           <label class="visually-hidden" for="integration-code">Complete HTML integration example</label>
@@ -247,12 +384,14 @@
         </div>
       </div>
     </section>
-
   </main>
 
   <footer class="site-footer border-top py-4 small">
     <div class="site-width d-flex flex-wrap justify-content-between align-items-center gap-3">
-      <p class="m-0">&copy; <span id="year-txt"></span>, Made with <i class="fa-solid fa-heart" role="img" aria-label="love"></i> by <a class="site-link" href="https://byuwur.co" target="_blank" rel="noopener">BONYUR @byUwUr</a></p>
+      <p class="m-0">
+        &copy; <span id="year-txt"></span>, Made with <i class="fa-solid fa-heart" role="img" aria-label="love"></i> by
+        <a class="site-link" href="https://byuwur.co" target="_blank" rel="noopener">BONYUR @byUwUr</a>
+      </p>
       <div class="d-flex flex-wrap gap-3">
         <a class="site-link" href="https://github.com/byuwur/easy-md-viewer/blob/main/LICENSE.md">MIT license</a>
         <a class="site-link" href="https://github.com/byuwur/easy-md-viewer">Source &amp; contributions <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i></a>
@@ -261,13 +400,16 @@
     </div>
   </footer>
   <noscript>
-    <p class="site-width">Enable JavaScript to use the playground. The <a href="https://github.com/byuwur/easy-md-viewer#readme">README</a> includes integration examples.</p>
+    <p class="site-width">
+      Enable JavaScript to use the playground. The <a href="https://github.com/byuwur/easy-md-viewer#readme">README</a> includes
+      integration examples.
+    </p>
   </noscript>
 
   <style>
     /* =============
-       === FONT & THEMES ===
-       ============= */
+             === FONT & THEMES ===
+             ============= */
     @font-face {
       font-family: Archivo;
       src: url("https://cdn.jsdelivr.net/gh/byuwur/spa.js@v19.4/css/webfonts/archivo.ttf") format("truetype");
@@ -317,8 +459,8 @@
     }
 
     /* =============
-       === LAYOUT & NAVIGATION ===
-       ============= */
+             === LAYOUT & NAVIGATION ===
+             ============= */
     html {
       scroll-padding-top: 1rem;
     }
@@ -341,7 +483,7 @@
 
     .site-link {
       color: var(--ink);
-      text-underline-offset: .25em;
+      text-underline-offset: 0.25em;
     }
 
     .site-link:hover {
@@ -353,7 +495,7 @@
       z-index: 10;
       left: 1rem;
       top: -5rem;
-      padding: .75rem;
+      padding: 0.75rem;
       background: var(--accent);
       color: var(--accent-ink);
     }
@@ -377,7 +519,7 @@
       place-items: center;
       width: 34px;
       height: 34px;
-      margin-right: .5rem;
+      margin-right: 0.5rem;
       background: var(--accent);
       color: var(--accent-ink);
       font: bold 1.1rem var(--mono);
@@ -385,7 +527,7 @@
 
     .navbar .nav-link {
       color: var(--muted);
-      padding: .75rem;
+      padding: 0.75rem;
     }
 
     .navbar .nav-link:hover {
@@ -407,8 +549,8 @@
     }
 
     /* =============
-       === CONTROLS ===
-       ============= */
+             === CONTROLS ===
+             ============= */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -436,7 +578,7 @@
 
     .btn i,
     .nav-link i {
-      font-size: .85em;
+      font-size: 0.85em;
     }
 
     .btn-quiet[aria-pressed="true"],
@@ -458,13 +600,13 @@
       background-color: var(--editor-bg);
       color: var(--ink);
       border-color: var(--accent);
-      box-shadow: 0 0 0 .15rem color-mix(in srgb, var(--accent) 20%, transparent);
+      box-shadow: 0 0 0 0.15rem color-mix(in srgb, var(--accent) 20%, transparent);
     }
 
     .form-switch {
       display: flex;
       align-items: center;
-      gap: .75rem;
+      gap: 0.75rem;
       padding-left: 0;
       margin: 0;
       min-height: 48px;
@@ -482,7 +624,7 @@
     .option-label {
       flex: 1;
       cursor: pointer;
-      padding-block: .5rem;
+      padding-block: 0.5rem;
     }
 
     .form-check-input:checked {
@@ -492,7 +634,7 @@
 
     .form-text,
     .option-description {
-      font-size: .8125rem;
+      font-size: 0.8125rem;
       color: var(--muted);
     }
 
@@ -514,8 +656,8 @@
     }
 
     /* =============
-       === PLAYGROUND & CODE ===
-       ============= */
+             === PLAYGROUND & CODE ===
+             ============= */
     .source-picker {
       width: min(100%, 18rem);
     }
@@ -565,7 +707,7 @@
       padding: 1.25rem 1.5rem;
       background: var(--editor-bg);
       color: var(--ink);
-      font: .875rem/1.8 var(--mono);
+      font: 0.875rem/1.8 var(--mono);
       white-space: pre;
       overflow: auto;
       tab-size: 2;
@@ -589,8 +731,8 @@
 
     .panel-footer {
       border-top: 1px solid var(--panel-line);
-      padding: .75rem 1.5rem;
-      font: .8125rem/1.5 var(--mono);
+      padding: 0.75rem 1.5rem;
+      font: 0.8125rem/1.5 var(--mono);
       color: var(--muted);
     }
 
@@ -605,8 +747,8 @@
       min-height: 34px;
       border: 1px solid transparent;
       background: transparent;
-      padding: .3rem .5rem;
-      font: .875rem var(--mono);
+      padding: 0.3rem 0.5rem;
+      font: 0.875rem var(--mono);
       color: var(--muted);
     }
 
@@ -623,12 +765,12 @@
     }
 
     .accordion-button {
-      font: .875rem var(--mono);
+      font: 0.875rem var(--mono);
     }
 
     /* =============
-       === RESPONSIVE LAYOUT ===
-       ============= */
+             === RESPONSIVE LAYOUT ===
+             ============= */
     @media (min-width: 768px) and (max-width: 1199px) {
       .config-panel {
         height: auto;
@@ -661,10 +803,10 @@
       .config-panel .accordion-item+.accordion-item {
         border-left: 1px solid var(--panel-line);
       }
-
     }
 
-    @media (min-width: 768px) and (max-width: 991px), (min-width: 1200px) and (max-width: 1399px) {
+    @media (min-width: 768px) and (max-width: 991px),
+    (min-width: 1200px) and (max-width: 1399px) {
       .panel-heading {
         min-height: 7rem;
         align-content: center;
@@ -689,7 +831,7 @@
         border-left: 0;
       }
 
-      .metric:nth-child(n+3) {
+      .metric:nth-child(n + 3) {
         border-top: 1px solid var(--panel-line);
       }
     }
@@ -709,7 +851,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       "use strict";
 
-      // Keep templates aligned while preserving their content indentation.
+      // Keep templates aligned with the code while preserving their content indentation.
       function dedent(text) {
         const indentation = text.match(/\n([ \t]*)/)[1];
         return text.replace(new RegExp(`^${indentation}`, "gm"), "").trim();
@@ -725,8 +867,22 @@
         { name: "withTasks", label: "Task lists", description: "Read-only task checkboxes", default: true, example: "tasks" },
         { name: "withStrikethrough", label: "Strikethrough", description: "Render ~~crossed-out text~~", default: true, example: "formatting" },
         { name: "breaks", label: "Soft line breaks", description: "Keep paragraph line breaks", default: false, example: "breaks" },
-        { name: "themeToggle", label: "Theme toggle", description: "Native light/dark switch", default: true, group: "viewer", example: "controls" },
-        { name: "fontSizeControls", label: "Text size controls", description: "Native A− / A / A+ buttons", default: true, group: "viewer", example: "controls" }
+        {
+          name: "themeToggle",
+          label: "Theme toggle",
+          description: "Native light/dark switch",
+          default: true,
+          group: "viewer",
+          example: "controls"
+        },
+        {
+          name: "fontSizeControls",
+          label: "Text size controls",
+          description: "Native A− / A / A+ buttons",
+          default: true,
+          group: "viewer",
+          example: "controls"
+        }
       ];
       const defaults = { ...Object.fromEntries(optionDefinitions.map(option => [option.name, option.default])), linkTarget: "_blank" };
       const editor = document.getElementById("markdown-source");
@@ -775,18 +931,66 @@
           [Read the docs](https://github.com/byuwur/easy-md-viewer#readme) = [Back to the start](#a-little-markdown-a-real-document)
         `) + "\n";
       const examples = {
-        headings: { label: "Headings & anchors", markdown: "# Your document\n\n[Jump to installation](#installation)\n\n## Installation\n\nHeadings get automatic IDs.\n\n### A smaller heading\n\n## Installation\n\nRepeated headings get unique IDs: installation-1.\n\n[Jump to the second one](#installation-1)" },
-        formatting: { label: "Inline formatting", markdown: "# A few well-chosen words\n\n**Bold**, *italic*, ***both***, and ~~a change of plan~~.\n\nA little `inline code` goes a long way." },
-        code: { label: "Code blocks", markdown: "# Code, as written\n\nInline: `const ready = true;`\n\n~~~javascript\nconst container = document.getElementById(\"document\");\nbyMDviewer(container, \"# Hello **world**\");\n~~~\n\nLanguage metadata is preserved; syntax highlighting is not included.\n\n~~~html\n<!-- Comments inside code stay visible. -->\n<div>Raw code stays code.</div>\n~~~" },
-        lists: { label: "Lists & nested quotes", markdown: "# A place for everything\n\n- Project\n  - Source\n    - md.js\n  - Styles\n    - md.css\n\n5. Pick a container\n6. Render your Markdown\n\n> A blockquote can contain Markdown.\n>\n> - **Even lists.**\n>   - And nested items.\n>\n> > Or another quote." },
-        tasks: { label: "Task lists", markdown: "# A tiny checklist\n\n- [x] Keep it simple\n- [x] Render a real document\n- [ ] Write the next thing\n\nThese are document checkboxes, not editable form inputs.\n\n1. [x] Ordered tasks work too\n2. [ ] Ship when ready" },
-        tables: { label: "Tables & alignment", markdown: "# Everything lines up\n\n| Feature | Status | Lines of glue |\n| :--- | :---: | ---: |\n| Tables | **Ready** | 1 |\n| Themes | Ready | 2 |\n| Escaped pipes | A \\| B | `x|y` |\n\nLeft, center, and right alignment. Wide tables scroll inside the document." },
-        links: { label: "Links & autolinks", markdown: "# A connected document\n\n[The repository](https://github.com/byuwur/easy-md-viewer \"easy-md-viewer on GitHub\")\n\n<https://example.com>\n\nhttps://example.com/docs\n\nhello@example.com\n\n[Jump within this document](#next-step)\n\n## Next step\n\nHeading anchors stay in this document, whatever the link target." },
-        images: { label: "Images", markdown: "# A picture, included\n\n![Markdown viewer sample image](test.png \"Bundled test.png\")\n\nImages are responsive and lazy-loaded. This image comes from the repository." },
-        escapes: { label: "Escapes & entities", markdown: "# The literal details\n\n\\*These asterisks stay visible.\\*\n\n\\# This is not a heading.\n\nAT&amp;T = &copy; = &#9733; = &#x2665;\n\n`&amp; stays literal inside code`\n\n<!-- This comment is intentionally hidden. -->\n\nThe HTML comment above is hidden." },
-        safety: { label: "Raw HTML & URL handling", markdown: "# Text stays text\n\n<strong>This is literal HTML, not a bold element.</strong>\n\n<script>alert(\"This stays text.\")<\/script>\n\n[An allowed HTTPS link](https://example.com)\n\n[An executable URL](javascript:alert(1))\n\n![A rejected data URL](data:text/plain,example)\n\nExecutable URL schemes are rejected. This demonstrates the current renderer; it is not a general-purpose HTML sanitizer." },
-        breaks: { label: "Soft line breaks", markdown: "# One paragraph, two lines\n\nThis is the first line.\nThis is the second line.\n\nEnable Soft line breaks to keep that break.\n\nThis line has two trailing spaces.  \nThat hard break works with either setting." },
-        controls: { label: "Native viewer controls", markdown: "# Settle in for a read\n\nTry the theme switch and **A− / A / A+** in the document toolbar.\n\n## Your reading space\n\nText size belongs to this viewer. It stays put when you edit the source or change a rendering option.\n\nThe document theme and the website theme are independent." }
+        headings: {
+          label: "Headings & anchors",
+          markdown:
+            "# Your document\n\n[Jump to installation](#installation)\n\n## Installation\n\nHeadings get automatic IDs.\n\n### A smaller heading\n\n## Installation\n\nRepeated headings get unique IDs: installation-1.\n\n[Jump to the second one](#installation-1)"
+        },
+        formatting: {
+          label: "Inline formatting",
+          markdown:
+            "# A few well-chosen words\n\n**Bold**, *italic*, ***both***, and ~~a change of plan~~.\n\nA little `inline code` goes a long way."
+        },
+        code: {
+          label: "Code blocks",
+          markdown:
+            '# Code, as written\n\nInline: `const ready = true;`\n\n~~~javascript\nconst container = document.getElementById("document");\nbyMDviewer(container, "# Hello **world**");\n~~~\n\nLanguage metadata is preserved; syntax highlighting is not included.\n\n~~~html\n<!-- Comments inside code stay visible. -->\n<div>Raw code stays code.</div>\n~~~'
+        },
+        lists: {
+          label: "Lists & nested quotes",
+          markdown:
+            "# A place for everything\n\n- Project\n  - Source\n    - md.js\n  - Styles\n    - md.css\n\n5. Pick a container\n6. Render your Markdown\n\n> A blockquote can contain Markdown.\n>\n> - **Even lists.**\n>   - And nested items.\n>\n> > Or another quote."
+        },
+        tasks: {
+          label: "Task lists",
+          markdown:
+            "# A tiny checklist\n\n- [x] Keep it simple\n- [x] Render a real document\n- [ ] Write the next thing\n\nThese are document checkboxes, not editable form inputs.\n\n1. [x] Ordered tasks work too\n2. [ ] Ship when ready"
+        },
+        tables: {
+          label: "Tables & alignment",
+          markdown:
+            "# Everything lines up\n\n| Feature | Status | Lines of glue |\n| :--- | :---: | ---: |\n| Tables | **Ready** | 1 |\n| Themes | Ready | 2 |\n| Escaped pipes | A \\| B | `x|y` |\n\nLeft, center, and right alignment. Wide tables scroll inside the document."
+        },
+        links: {
+          label: "Links & autolinks",
+          markdown:
+            '# A connected document\n\n[The repository](https://github.com/byuwur/easy-md-viewer "easy-md-viewer on GitHub")\n\n<https://example.com>\n\nhttps://example.com/docs\n\nhello@example.com\n\n[Jump within this document](#next-step)\n\n## Next step\n\nHeading anchors stay in this document, whatever the link target.'
+        },
+        images: {
+          label: "Images",
+          markdown:
+            '# A picture, included\n\n![Markdown viewer sample image](test.png "Bundled test.png")\n\nImages are responsive and lazy-loaded. This image comes from the repository.'
+        },
+        escapes: {
+          label: "Escapes & entities",
+          markdown:
+            "# The literal details\n\n\\*These asterisks stay visible.\\*\n\n\\# This is not a heading.\n\nAT&amp;T = &copy; = &#9733; = &#x2665;\n\n`&amp; stays literal inside code`\n\n<!-- This comment is intentionally hidden. -->\n\nThe HTML comment above is hidden."
+        },
+        safety: {
+          label: "Raw HTML & URL handling",
+          markdown:
+            '# Text stays text\n\n<strong>This is literal HTML, not a bold element.</strong>\n\n<script>alert("This stays text.")<\/script>\n\n[An allowed HTTPS link](https://example.com)\n\n[An executable URL](javascript:alert(1))\n\n![A rejected data URL](data:text/plain,example)\n\nExecutable URL schemes are rejected. This demonstrates the current renderer; it is not a general-purpose HTML sanitizer.'
+        },
+        breaks: {
+          label: "Soft line breaks",
+          markdown:
+            "# One paragraph, two lines\n\nThis is the first line.\nThis is the second line.\n\nEnable Soft line breaks to keep that break.\n\nThis line has two trailing spaces.  \nThat hard break works with either setting."
+        },
+        controls: {
+          label: "Native viewer controls",
+          markdown:
+            "# Settle in for a read\n\nTry the theme switch and **A− / A / A+** in the document toolbar.\n\n## Your reading space\n\nText size belongs to this viewer. It stays put when you edit the source or change a rendering option.\n\nThe document theme and the website theme are independent."
+        }
       };
       state.originals = {
         showcase,
@@ -950,7 +1154,8 @@
           document.getElementById("render-status").textContent = hasContent ? "Live" : "Empty document";
           previewWindow.document.getElementById("empty-document").hidden = hasContent;
           document.getElementById("rerun-benchmark").disabled = false;
-          document.getElementById("rerun-benchmark").querySelector("span").textContent = state.source === "benchmark" ? "Rerun benchmark" : "Rerun measurement";
+          document.getElementById("rerun-benchmark").querySelector("span").textContent =
+            state.source === "benchmark" ? "Rerun benchmark" : "Rerun measurement";
         } catch {
           document.getElementById("render-status").textContent = "Preview unavailable";
           showSourceError("The preview could not render. Choose another document or reload the page.");
@@ -1064,7 +1269,9 @@
         state.drafts.example = example.markdown;
         selectSource("example");
         sourceSelect.querySelector('[value="example"]').textContent = example.label;
-        document.querySelectorAll(".feature-chip").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.example === name)));
+        document
+          .querySelectorAll(".feature-chip")
+          .forEach(button => button.setAttribute("aria-pressed", String(button.dataset.example === name)));
         setMobilePanel("preview");
         document.getElementById("feedback").textContent = `${example.label}. Your other document drafts are kept.`;
       }
@@ -1122,9 +1329,6 @@
           : "Place the HTML beside md.js, md.css, md.light.css, and md.dark.css.";
       }
 
-      // =============
-      // === CLIPBOARD ===
-      // =============
       function downloadHTML() {
         const base = "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.4.final/";
         const sample = "# A little Markdown. A real document.\nWrite something useful. Let **easy-md-viewer** handle the rendering.";
@@ -1162,6 +1366,9 @@
         document.getElementById("integration-feedback").textContent = "Downloaded. The starter uses default viewer settings and CDN files.";
       }
 
+      // =============
+      // === CLIPBOARD ===
+      // =============
       async function copyText(text, fallback, status) {
         try {
           await navigator.clipboard.writeText(text);
@@ -1181,13 +1388,15 @@
       // === EVENTS ===
       // =============
       buildConfigurator();
-      document.querySelectorAll("[data-options-view]").forEach(button => button.addEventListener("click", () => {
-        const jsonView = button.dataset.optionsView === "json";
-        document.getElementById("config-form").hidden = jsonView;
-        document.getElementById("options-json-panel").hidden = !jsonView;
-        document.getElementById("copy-options").hidden = !jsonView;
-        document.querySelectorAll("[data-options-view]").forEach(choice => choice.setAttribute("aria-pressed", String(choice === button)));
-      }));
+      document.querySelectorAll("[data-options-view]").forEach(button =>
+        button.addEventListener("click", () => {
+          const jsonView = button.dataset.optionsView === "json";
+          document.getElementById("config-form").hidden = jsonView;
+          document.getElementById("options-json-panel").hidden = !jsonView;
+          document.getElementById("copy-options").hidden = !jsonView;
+          document.querySelectorAll("[data-options-view]").forEach(choice => choice.setAttribute("aria-pressed", String(choice === button)));
+        })
+      );
       document.getElementById("copy-options").addEventListener("click", () => {
         const options = document.getElementById("options-json");
         copyText(options.value, options, document.getElementById("options-copy-status"));
@@ -1249,10 +1458,12 @@
           frame.srcdoc = frame.srcdoc;
         } else renderPreview();
       });
-      document.querySelectorAll('[name="integrationMode"]').forEach(input => input.addEventListener("change", () => {
-        state.integrationMode = input.value;
-        generateIntegration();
-      }));
+      document.querySelectorAll('[name="integrationMode"]').forEach(input =>
+        input.addEventListener("change", () => {
+          state.integrationMode = input.value;
+          generateIntegration();
+        })
+      );
       document.getElementById("copy-markdown").addEventListener("click", () => {
         setMobilePanel("source");
         copyText(editor.value, editor, document.getElementById("feedback"));
@@ -1271,7 +1482,9 @@
         button.querySelector("span").textContent = next === "light" ? "Light" : "Dark";
         button.querySelector("i").className = `fa-solid fa-${next === "light" ? "sun" : "moon"} me-1`;
         button.setAttribute("aria-label", `Switch website to ${next} theme`);
-        document.querySelector('meta[name="theme-color"]').content = getComputedStyle(document.documentElement).getPropertyValue("--page-bg").trim();
+        document.querySelector('meta[name="theme-color"]').content = getComputedStyle(document.documentElement)
+          .getPropertyValue("--page-bg")
+          .trim();
       });
       // =============
       // === INITIALIZATION ===

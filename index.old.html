@@ -105,15 +105,15 @@ No npm. No CDN. No dependencies.
     const render = () => byMDviewer(renderEl, demoMD);
     const renderFetched = (url, options = {}) => {
       fetch(url)
-        .then((response) => {
+        .then(response => {
           if (!response.ok) console.warn(`Something went wrong`, response.statusText);
           return response.text();
         })
-        .then((response) => {
+        .then(response => {
           console.log(response);
           byMDviewer(renderEl, response, options);
         })
-        .catch((e) => {
+        .catch(e => {
           console.warn(`Something went wrong`, e);
         });
     };
