@@ -68,11 +68,20 @@ test("Markdown rendering", async (t) => {
       }, markdown);
       assert.equal(heading, "easy MD Viewer BenchMarkDown");
     });
-    await t.test("compact downloads use default samples and deferred head assets", async () => {
+    await t.test("displayed, copied, and downloaded starters match with CDN or local assets", async () => {
       const playground = await browser.newPage();
       const errors = [];
-      playground.on("pageerror", error => errors.push(error.message));
-      await playground.route("**/*", async route => {
+      playground.on("pageerror", (error) => errors.push(error.message));
+      await playground.addInitScript(() => {
+        Object.defineProperty(navigator, "clipboard", {
+          value: {
+            writeText: async (text) => {
+              window.copiedHTML = text;
+            }
+          }
+        });
+      });
+      await playground.route("**/*", async (route) => {
         const url = new URL(route.request().url());
         if (url.origin !== "https://viewer.test") return route.abort();
         const file = path.basename(url.pathname);
@@ -80,38 +89,47 @@ test("Markdown rendering", async (t) => {
         await route.fulfill({ body, contentType: file.endsWith(".html") ? "text/html" : file.endsWith(".js") ? "text/javascript" : "text/css" });
       });
       await playground.goto("https://viewer.test/index.html");
-      const markdown = '# Downloaded document\n\n**Unicode: á 👋**\n\n</script><script>window.injected=true</script>\n\n`backticks` and ${literal}';
+      const cdnCode = await playground.locator("#integration-code").inputValue();
+      const markdown = "# Downloaded document\n\n**Unicode: á 👋**\n\n</script><script>window.injected=true</script>\n\n`backticks` and ${literal}";
       await playground.locator("#markdown-source").fill(markdown);
       await playground.locator("#withLinks").uncheck();
       await playground.locator("#preview-dark").check();
+      assert.equal(await playground.locator("#integration-code").inputValue(), cdnCode);
       await playground.locator("#integration-local").check();
       const code = await playground.locator("#integration-code").inputValue();
       assert.ok(code.includes('document.addEventListener("DOMContentLoaded"'));
-      assert.ok(code.includes('"withLinks": false'));
+      assert.ok(!code.includes('"withLinks": false'));
       assert.ok(code.includes('src="md.js" defer'));
       for (const name of ["themeToggle", "fontSizeControls"]) {
-        await playground.locator(`#${name}`).evaluate(element => {
+        await playground.locator(`#${name}`).evaluate((element) => {
           element.checked = false;
           element.dispatchEvent(new Event("change", { bubbles: true }));
         });
       }
       const directory = await fs.mkdtemp(path.join(os.tmpdir(), "viewer-starter-"));
+      await Promise.all(["md.js", "md.css", "md.light.css", "md.dark.css"].map((file) => fs.copyFile(path.join(__dirname, "..", file), path.join(directory, file))));
       const exported = await browser.newPage();
-      exported.on("pageerror", error => errors.push(error.message));
-      await exported.route("https://cdn.jsdelivr.net/**", async route => {
+      exported.on("pageerror", (error) => errors.push(error.message));
+      await exported.route("https://cdn.jsdelivr.net/**", async (route) => {
         const file = path.basename(new URL(route.request().url()).pathname).replace(".min.", ".");
         const body = await fs.readFile(path.join(__dirname, "..", file));
-        if (file.endsWith(".js")) await new Promise(resolve => setTimeout(resolve, 75));
+        if (file.endsWith(".js")) await new Promise((resolve) => setTimeout(resolve, 75));
         await route.fulfill({ body, contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
       });
       try {
-        for (const editedSource of [false, true]) {
-          if (editedSource) await playground.locator("#markdown-source").fill("# Edited document\n\nThis should not change the download.");
+        for (const mode of ["cdn", "local"]) {
+          await playground.locator("#markdown-source").fill("# Edited document\n\nThis should not change the starter.");
+          await playground.locator(`#integration-${mode}`).check();
+          const displayed = await playground.locator("#integration-code").inputValue();
+          assert.equal(displayed, mode === "cdn" ? cdnCode : code);
+          await playground.locator("#copy-integration").click();
+          assert.equal(await playground.evaluate(() => window.copiedHTML), displayed);
           const [download] = await Promise.all([playground.waitForEvent("download"), playground.locator("#download-html").click()]);
           assert.equal(download.suggestedFilename(), "my-markdown-document.html");
           const file = path.join(directory, download.suggestedFilename());
           await download.saveAs(file);
           const html = await fs.readFile(file, "utf8");
+          assert.equal(html, displayed);
           assert.ok(Buffer.byteLength(html) < 2048, "Starter should stay small");
           await exported.goto(pathToFileURL(file).href);
           await exported.waitForFunction(() => document.getElementById("document").children.length > 0);
@@ -121,11 +139,17 @@ test("Markdown rendering", async (t) => {
           assert.equal(await exported.locator("#document p strong").textContent(), "easy-md-viewer");
           assert.equal(await exported.locator("head script[src][defer]").count(), 1);
           assert.equal(await exported.locator("body script[src], body link[rel='stylesheet']").count(), 0);
-          assert.equal(await exported.locator("#byVIEWtheme").getAttribute("href").then(href => href.endsWith("md.light.css")), true);
-          const background = await exported.locator("#document").evaluate(element => getComputedStyle(element).backgroundColor);
+          assert.equal(
+            await exported
+              .locator("#byVIEWtheme")
+              .getAttribute("href")
+              .then((href) => href.endsWith("md.light.css")),
+            true
+          );
+          const background = await exported.locator("#document").evaluate((element) => getComputedStyle(element).backgroundColor);
           await exported.locator(".byVIEWthemeToggle").click();
-          await exported.waitForFunction(before => getComputedStyle(document.getElementById("document")).backgroundColor !== before, background);
-          const fontSize = await exported.locator("#document").evaluate(element => parseFloat(getComputedStyle(element).fontSize));
+          await exported.waitForFunction((before) => getComputedStyle(document.getElementById("document")).backgroundColor !== before, background);
+          const fontSize = await exported.locator("#document").evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
           await exported.locator(".byVIEWfontSize").nth(2).click();
           assert.ok(await exported.locator("#document").evaluate((element, before) => parseFloat(getComputedStyle(element).fontSize) > before, fontSize));
         }
@@ -133,17 +157,20 @@ test("Markdown rendering", async (t) => {
         await exported.close();
         await fs.rm(directory, { recursive: true, force: true });
       }
-      await playground.route("**/test.md", route => route.fulfill({ status: 503, body: "Unavailable" }));
+      await playground.route("**/test.md", (route) => route.fulfill({ status: 503, body: "Unavailable" }));
       await playground.locator("#document-source").selectOption("benchmark");
       await playground.waitForFunction(() => document.getElementById("render-status").textContent === "Source unavailable");
-      assert.equal(await playground.locator("#copy-integration").isDisabled(), true);
+      assert.equal(await playground.locator("#copy-integration").isDisabled(), false);
       assert.equal(await playground.locator("#download-html").isDisabled(), false);
+      assert.equal(await playground.locator("#integration-code").inputValue(), code);
+      await playground.locator("#copy-integration").click();
+      assert.equal(await playground.evaluate(() => window.copiedHTML), code);
       assert.deepEqual(errors, []);
       await playground.close();
     });
     await t.test("legacy demo loads styles and deferred scripts from the head", async () => {
       const html = await fs.readFile(path.join(__dirname, "..", "index.old.html"), "utf8");
-      const structure = await page.evaluate(html => {
+      const structure = await page.evaluate((html) => {
         const doc = new DOMParser().parseFromString(html, "text/html");
         return { themes: doc.querySelectorAll("head #byVIEWtheme").length, libraries: doc.querySelectorAll("head script[src][defer]").length, bodyAssets: doc.querySelectorAll("body script[src], body link[rel='stylesheet']").length };
       }, html);

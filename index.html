@@ -98,48 +98,18 @@
           <button class="feature-chip" type="button" data-example="safety" aria-pressed="false">&lt;html&gt; &amp; URLs</button>
         </div>
         <div class="mobile-tabs nav nav-pills nav-fill d-md-none border-bottom p-2 gap-2" role="tablist" aria-label="Playground panels">
-          <button
-            id="config-tab"
-            class="nav-link"
-            type="button"
-            data-bs-toggle="tab"
-            data-bs-target="#config-panel"
-            data-panel="config"
-            role="tab"
-            aria-controls="config-panel"
-            aria-selected="false">
+          <button id="config-tab" class="nav-link" type="button" data-bs-toggle="tab" data-bs-target="#config-panel" data-panel="config" role="tab" aria-controls="config-panel" aria-selected="false">
             <i class="fa-solid fa-sliders me-1" aria-hidden="true"></i> Configure
           </button>
-          <button
-            id="source-tab"
-            class="nav-link"
-            type="button"
-            data-bs-toggle="tab"
-            data-bs-target="#source-panel"
-            data-panel="source"
-            role="tab"
-            aria-controls="source-panel"
-            aria-selected="false">
+          <button id="source-tab" class="nav-link" type="button" data-bs-toggle="tab" data-bs-target="#source-panel" data-panel="source" role="tab" aria-controls="source-panel" aria-selected="false">
             <i class="fa-solid fa-code me-1" aria-hidden="true"></i> Source
           </button>
-          <button
-            id="preview-tab"
-            class="nav-link active"
-            type="button"
-            data-bs-toggle="tab"
-            data-bs-target="#preview-panel"
-            data-panel="preview"
-            role="tab"
-            aria-controls="preview-panel"
-            aria-selected="true">
+          <button id="preview-tab" class="nav-link active" type="button" data-bs-toggle="tab" data-bs-target="#preview-panel" data-panel="preview" role="tab" aria-controls="preview-panel" aria-selected="true">
             <i class="fa-solid fa-eye me-1" aria-hidden="true"></i> Preview
           </button>
         </div>
         <div class="tab-content row g-0">
-          <section
-            id="config-panel"
-            class="tab-pane panel flex-column d-md-flex config-panel col-12 col-xl-3"
-            aria-labelledby="config-heading">
+          <section id="config-panel" class="tab-pane panel flex-column d-md-flex config-panel col-12 col-xl-3" aria-labelledby="config-heading">
             <div class="panel-heading border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 px-4 py-3">
               <h3 id="config-heading" class="h6 m-0 fw-semibold flex-shrink-0">
                 <span class="small font-monospace text-body-secondary me-2">01</span>Configure
@@ -148,20 +118,10 @@
             <div class="border-bottom">
               <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 px-3 py-2">
                 <div class="btn-group" role="group" aria-label="Options view">
-                  <button
-                    class="btn btn-quiet btn-sm"
-                    type="button"
-                    data-options-view="form"
-                    aria-controls="config-form"
-                    aria-pressed="true">
+                  <button class="btn btn-quiet btn-sm" type="button" data-options-view="form" aria-controls="config-form" aria-pressed="true">
                     Form
                   </button>
-                  <button
-                    class="btn btn-quiet btn-sm"
-                    type="button"
-                    data-options-view="json"
-                    aria-controls="options-json-panel"
-                    aria-pressed="false">
+                  <button class="btn btn-quiet btn-sm" type="button" data-options-view="json" aria-controls="options-json-panel" aria-pressed="false">
                     JSON
                   </button>
                 </div>
@@ -180,13 +140,7 @@
               <div class="accordion accordion-flush">
                 <div class="accordion-item">
                   <h4 class="accordion-header">
-                    <button
-                      class="accordion-button"
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#render-settings"
-                      aria-expanded="true"
-                      aria-controls="render-settings">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#render-settings" aria-expanded="true" aria-controls="render-settings">
                       Rendering
                     </button>
                   </h4>
@@ -196,13 +150,7 @@
                 </div>
                 <div class="accordion-item">
                   <h4 class="accordion-header">
-                    <button
-                      class="accordion-button"
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#viewer-settings"
-                      aria-expanded="true"
-                      aria-controls="viewer-settings">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#viewer-settings" aria-expanded="true" aria-controls="viewer-settings">
                       Viewer controls
                     </button>
                   </h4>
@@ -212,13 +160,7 @@
                 </div>
                 <div class="accordion-item">
                   <h4 class="accordion-header">
-                    <button
-                      class="accordion-button"
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#appearance-settings"
-                      aria-expanded="true"
-                      aria-controls="appearance-settings">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#appearance-settings" aria-expanded="true" aria-controls="appearance-settings">
                       Preview appearance
                     </button>
                   </h4>
@@ -250,10 +192,7 @@
             </div>
           </section>
 
-          <section
-            id="source-panel"
-            class="tab-pane panel flex-column d-md-flex source-panel col-12 col-md-6 col-xl-4"
-            aria-labelledby="source-heading">
+          <section id="source-panel" class="tab-pane panel flex-column d-md-flex source-panel col-12 col-md-6 col-xl-4" aria-labelledby="source-heading">
             <div class="panel-heading border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 px-4 py-3">
               <h3 id="source-heading" class="h6 m-0 fw-semibold flex-shrink-0">
                 <span class="small font-monospace text-body-secondary me-2">02</span>Markdown
@@ -282,10 +221,7 @@
           </section>
 
           <!-- Real library preview; Bootstrap stays outside the iframe -->
-          <section
-            id="preview-panel"
-            class="tab-pane active panel flex-column d-md-flex preview-panel col-12 col-md-6 col-xl-5"
-            aria-labelledby="preview-heading">
+          <section id="preview-panel" class="tab-pane active panel flex-column d-md-flex preview-panel col-12 col-md-6 col-xl-5" aria-labelledby="preview-heading">
             <div class="panel-heading border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 px-4 py-3">
               <h3 id="preview-heading" class="h6 m-0 fw-semibold flex-shrink-0">
                 <span class="small font-monospace text-body-secondary me-2">03</span>Live preview
@@ -293,10 +229,7 @@
               <span class="font-monospace text-body-secondary small"><span id="render-status" role="status">Loading…</span></span>
             </div>
             <div class="panel-body">
-              <iframe
-                id="preview-frame"
-                title="Live Markdown document"
-                sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+              <iframe id="preview-frame" title="Live Markdown document" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
             </div>
           </section>
         </div>
@@ -310,9 +243,7 @@
             <dd class="m-0 font-monospace" id="metric-lines">—</dd>
           </div>
           <div class="metric p-3 col-6 col-md-3">
-            <dt
-              class="small fw-normal font-monospace text-body-secondary mb-2"
-              title="Synchronous byMDviewer() call; excludes browser paint and resource loading">
+            <dt class="small fw-normal font-monospace text-body-secondary mb-2" title="Synchronous byMDviewer() call; excludes browser paint and resource loading">
               Renderer call
             </dt>
             <dd class="m-0 font-monospace" id="metric-time">—</dd>
@@ -329,11 +260,7 @@
           <i class="fa-solid fa-folder-open me-1" aria-hidden="true"></i> Open .md file
         </button>
         <input id="local-file" type="file" accept=".md,.markdown,text/markdown,text/plain" hidden />
-        <button
-          id="rerun-benchmark"
-          class="btn btn-quiet"
-          type="button"
-          title="Time the synchronous byMDviewer() call; excludes browser paint and resource loading">
+        <button id="rerun-benchmark" class="btn btn-quiet" type="button" title="Time the synchronous byMDviewer() call; excludes browser paint and resource loading">
           <i class="fa-solid fa-rotate-right me-1" aria-hidden="true"></i> <span>Rerun measurement</span>
         </button>
         <span id="document-state" class="font-monospace text-body-secondary small ms-sm-auto">Original</span>
@@ -345,9 +272,9 @@
     <section id="get-started" class="get-started py-5 row gy-4 gx-lg-5" aria-labelledby="integration-title">
       <div class="col-lg-4">
         <h2 id="integration-title" class="h2 mb-3">Get started</h2>
-        <p class="text-body-secondary">Copy your integration or download a short Markdown sample with default settings.</p>
+        <p class="text-body-secondary">Copy or download this short Markdown starter with default settings.</p>
         <p class="text-body-secondary small">
-          Downloads are compact starters with default settings and CDN links. Viewing them requires internet access.
+          CDN starters require internet access. Local starters need the viewer files beside the HTML.
         </p>
         <p class="text-body-secondary small">
           Playground powered by <a class="site-link" href="https://github.com/byuwur/spa.js" target="_blank" rel="noopener">SPA.js</a>.
@@ -1126,8 +1053,6 @@
         if (state.previewReady) frame.contentDocument.getElementById("document").textContent = "";
         for (const name of ["size", "lines", "time", "nodes"]) document.getElementById(`metric-${name}`).textContent = "—";
         document.getElementById("rerun-benchmark").disabled = true;
-        document.getElementById("copy-integration").disabled = true;
-        document.getElementById("integration-code").value = "Select an available document to generate the integration example.";
       }
 
       function renderPreview(resetScroll = false) {
@@ -1279,57 +1204,10 @@
       // =============
       // === INTEGRATION ===
       // =============
-      // Integration code generation: use the documented release, and serialize only API overrides.
       function generateIntegration() {
-        // Themes belong to the stylesheet; this is the complete viewer API configuration.
         document.getElementById("options-json").value = JSON.stringify(state.options, null, 2);
-        const markdown = state.drafts[state.source];
-        const available = markdown !== undefined && !editor.disabled;
-        document.getElementById("copy-integration").disabled = !available;
-        if (!available) {
-          document.getElementById("integration-code").value = "Select an available document to generate the integration example.";
-          return;
-        }
         const cdn = state.integrationMode === "cdn";
         const path = cdn ? "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.4.final/" : "";
-        const changedOptions = Object.fromEntries(Object.entries(state.options).filter(([key, value]) => value !== defaults[key]));
-        const options = Object.keys(changedOptions).length ? `, ${JSON.stringify(changedOptions, null, 2)}` : "";
-        const source = JSON.stringify(markdown).replace(/</g, "\\u003c");
-        const initialization = [
-          `const markdown = ${source};`,
-          `byMDviewer(document.getElementById("document"), markdown${options});`
-        ].join("\n");
-        // Interpolate script tags so escaped closing tags do not trap HTML highlighting.
-        const scripts = dedent(/* HTML */ `
-          ${"<script>"}
-            document.addEventListener("DOMContentLoaded", () => {
-              ${initialization.replaceAll("\n", "\n              ")}
-            });
-          ${"<\/script>"}
-        `);
-        document.getElementById("integration-code").value = dedent(/* HTML */ `
-          <!doctype html>
-          <html lang="en">
-            <head>
-              <meta charset="utf-8" />
-              <meta name="viewport" content="width=device-width, initial-scale=1" />
-              <title>My Markdown document</title>
-              <link rel="stylesheet" href="${path}${cdn ? "md.min.css" : "md.css"}" />
-              <link id="byVIEWtheme" rel="stylesheet" href="${path}md.${state.theme}.css" />
-              ${`<script src="${path}${cdn ? "md.min.js" : "md.js"}" defer><\/script>`}
-            </head>
-            <body>
-              <div id="document"></div>
-              ${scripts.replaceAll("\n", "\n              ")}
-            </body>
-          </html>
-        `);
-        document.getElementById("integration-note").textContent = cdn
-          ? "CDN pinned to v1.4.final. Local source may include newer fixes."
-          : "Place the HTML beside md.js, md.css, md.light.css, and md.dark.css.";
-      }
-
-      function downloadHTML() {
         const html = dedent(/* HTML */ `
           <!doctype html>
           <html lang="en">
@@ -1337,9 +1215,9 @@
               <meta charset="utf-8" />
               <meta name="viewport" content="width=device-width, initial-scale=1" />
               <title>My Markdown document</title>
-              <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.4.final/md.min.css" />
-              <link id="byVIEWtheme" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.4.final/md.light.css" />
-              ${'<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.4.final/md.min.js" defer><\/script>'}
+              <link rel="stylesheet" href="${path}${cdn ? "md.min.css" : "md.css"}" />
+              <link id="byVIEWtheme" rel="stylesheet" href="${path}md.light.css" />
+              ${`<script src="${path}${cdn ? "md.min.js" : "md.js"}" defer><\/script>`}
             </head>
             <body>
               <div id="document"></div>
@@ -1352,6 +1230,15 @@
             </body>
           </html>
         `);
+        document.getElementById("integration-code").value = html;
+        document.getElementById("integration-note").textContent = cdn
+          ? "CDN pinned to v1.4.final. Local source may include newer fixes."
+          : "Place the HTML beside md.js, md.css, md.light.css, and md.dark.css.";
+        return html;
+      }
+
+      function downloadHTML() {
+        const html = generateIntegration();
         const url = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
         const link = document.createElement("a");
         link.href = url;
@@ -1360,7 +1247,7 @@
         link.click();
         link.remove();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
-        document.getElementById("integration-feedback").textContent = "Downloaded. The starter uses default viewer settings and CDN files.";
+        document.getElementById("integration-feedback").textContent = "Downloaded. The starter uses default viewer settings.";
       }
 
       // =============
