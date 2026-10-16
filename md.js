@@ -1234,6 +1234,11 @@
     controls.className = "byVIEWcontrols";
     controls.setAttribute("role", "group");
     controls.setAttribute("aria-label", "Viewer controls");
+    const info = document.createElement("small");
+    info.className = "byVIEWinfo";
+    info.innerHTML = /* HTML */ `<a href="https://github.com/byuwur/easy-md-viewer" target="_blank" rel="noopener noreferrer">easy-md-viewer</a> · v${global.byMDviewer.VERSION} ·
+      <a href="https://byuwur.co" target="_blank" rel="noopener noreferrer">@byUwUr</a>`;
+    element.appendChild(info);
     if (options.themeToggle) appendThemeToggle(controls, filename);
     if (options.fontSizeControls) appendFontSizeControls(element, controls);
     if (controls.childNodes.length) element.appendChild(controls);
@@ -1290,4 +1295,5 @@
     const normalized = source.replace(/\r\n?/g, "\n").replace(/^\uFEFF/, "");
     renderBlocks(element, normalized.split("\n"), options);
   };
+  global.byMDviewer.VERSION = "1.5"; // 2026-10-16
 })(typeof window !== "undefined" ? window : this);

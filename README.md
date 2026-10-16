@@ -9,9 +9,9 @@ Try [GitHub Pages](https://byuwur.github.io/easy-md-viewer/) or [CodePen](https:
 ## Installation
 
 ```html
-<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.4.final/md.min.css" rel="stylesheet" />
-<link id="byVIEWtheme" href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.4.final/md.light.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.4.final/md.min.js" defer></script>
+<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.5/md.min.css" rel="stylesheet" />
+<link id="byVIEWtheme" href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.5/md.light.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.5/md.min.js" defer></script>
 ```
 
 For local use, save `md.js`, `md.css`, and `md.light.css` beside your HTML and use those paths. Omit the CDN version only when testing development changes; pinned URLs need a new release to receive fixes.
@@ -58,6 +58,8 @@ Pass options as the third argument, such as `byMDviewer(target, markdown, { brea
 | `linkTarget`        | `"_blank"` | Link target; `false` omits it. Same-document anchors stay in this tab. |
 | `themeToggle`       | `true`     | Show a toggle when a compatible stylesheet exists.                     |
 | `fontSizeControls`  | `true`     | Show A-/A+ controls.                                                   |
+
+Each viewer shows a semi-transparent GitHub link, version, and author portfolio link at the top right. Read the library version with `byMDviewer.VERSION`.
 
 ## Themes
 

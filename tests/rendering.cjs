@@ -53,12 +53,49 @@ test("Markdown rendering", async (t) => {
       return cases.map(([name, markdown, verify, options = {}]) => {
         const root = document.createElement("div");
         byMDviewer(root, markdown, { themeToggle: false, fontSizeControls: false, ...options });
+        root.querySelector(".byVIEWinfo").remove();
         return { name, passed: verify(root) };
       });
     });
     for (const { name, passed } of results) {
       await t.test(name, () => assert.ok(passed));
     }
+    await t.test("versioned attribution survives rerender with optional controls disabled", async () => {
+      await page.addStyleTag({ path: path.join(__dirname, "../md.css") });
+      const info = await page.evaluate(() => {
+        const root = document.createElement("div");
+        document.body.appendChild(root);
+        const options = { themeToggle: false, fontSizeControls: false, withLinks: false };
+        byMDviewer(root, "# Before", options);
+        byMDviewer(root, "# After", options);
+        const label = root.querySelector(".byVIEWinfo");
+        const info = {
+          version: byMDviewer.VERSION,
+          text: label.textContent,
+          opacity: getComputedStyle(label).opacity,
+          count: root.querySelectorAll(".byVIEWinfo").length,
+          independent: label.parentElement === root,
+          controls: root.querySelectorAll(".byVIEWcontrols").length,
+          buttons: root.querySelectorAll("button").length,
+          links: [...label.querySelectorAll("a")].map((link) => [link.href, link.target, link.rel])
+        };
+        root.remove();
+        return info;
+      });
+      assert.deepEqual(info, {
+        version: "1.5",
+        text: "easy-md-viewer · v1.5 · @byUwUr",
+        opacity: "0.5",
+        count: 1,
+        independent: true,
+        controls: 0,
+        buttons: 0,
+        links: [
+          ["https://github.com/byuwur/easy-md-viewer", "_blank", "noopener noreferrer"],
+          ["https://byuwur.co/", "_blank", "noopener noreferrer"]
+        ]
+      });
+    });
     const markdown = await fs.readFile(path.join(__dirname, "../test.md"), "utf8");
     await t.test("benchmark document renders", async () => {
       const heading = await page.evaluate((markdown) => {

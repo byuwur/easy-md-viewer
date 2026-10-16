@@ -174,13 +174,31 @@
 }
 .byVIEWcontrols {
   position: absolute;
-  top: 1rem;
+  top: 1.5rem;
   right: 1rem;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  flex-direction: row;
+  align-items: center;
   gap: 0.5rem;
   white-space: normal;
+}
+.byVIEWinfo {
+  position: absolute;
+  top: 0.5rem;
+  right: 1rem;
+  font-size: 0.625rem;
+  line-height: 1;
+  text-align: right;
+  white-space: nowrap;
+  opacity: 0.25;
+}
+.byVIEWinfo a {
+  color: inherit;
+  text-decoration: none;
+}
+.byVIEWinfo a:hover,
+.byVIEWinfo a:focus-visible {
+  text-decoration: underline;
 }
 .byVIEWfontSizes {
   display: flex;
@@ -207,6 +225,7 @@
   outline: 0.125rem solid currentColor;
   outline-offset: 0.125rem;
 }
+.byVIEWinfo + *,
 .byVIEWcontrols + * {
   margin-top: 0 !important;
 }

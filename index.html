@@ -238,7 +238,7 @@
           <p class="text-body-secondary">Copy or download this short Markdown starter with default settings.</p>
           <p class="text-body-secondary small">CDN starters require internet access. Local starters need the viewer files beside the HTML.</p>
           <p class="text-body-secondary small">Playground powered by <a class="site-link" href="https://github.com/byuwur/spa.js" target="_blank" rel="noopener">SPA.js</a>.</p>
-          <p id="integration-note" class="text-body-secondary small mb-2">CDN pinned to v1.4.final. Local source may include newer fixes.</p>
+          <p id="integration-note" class="text-body-secondary small mb-2">CDN pinned to v1.5. Local source may include newer fixes.</p>
           <a class="site-link small" href="https://github.com/byuwur/easy-md-viewer#usage" target="_blank" rel="noopener">Read the full API <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i></a>
         </div>
         <div class="col-lg-8">
@@ -1086,47 +1086,8 @@
                 <link rel="stylesheet" href="md.css" />
                 <link id="byVIEWtheme" rel="stylesheet" href="md.light.css" />
                 <style>
-                  html {
-                    font-size: 16px;
-                    color-scheme: light;
-                  }
-                  body {
-                    margin: 0;
-                    background: #fff;
-                  }
                   .byMDdocument {
-                    min-height: 100vh;
-                    padding: 1.8rem;
-                  }
-                  .byVIEWcontrols {
-                    position: relative;
-                    top: auto;
-                    right: auto;
-                    flex-direction: row;
-                    justify-content: flex-end;
-                    align-items: center;
-                    margin-bottom: 1.5rem;
-                  }
-                  .byMDheading {
-                    scroll-margin-top: 1rem;
-                  }
-                  #empty-document {
-                    padding: 2rem;
-                    font:
-                      1rem/1.6 system-ui,
-                      sans-serif;
-                    color: #777;
-                  }
-                  @media (max-width: 400px) {
-                    .byMDdocument {
-                      padding: 1.25rem;
-                    }
-                  }
-                  @media (prefers-reduced-motion: reduce) {
-                    *,
-                    *::after {
-                      transition: none !important;
-                    }
+                    padding-top: 4rem;
                   }
                 </style>
                 ${'<script src="md.js"><\/script>'}
@@ -1185,7 +1146,7 @@
         function generateIntegration() {
           document.getElementById("options-json").value = JSON.stringify(state.options, null, 2);
           const cdn = state.integrationMode === "cdn";
-          const path = cdn ? "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.4.final/" : "";
+          const path = cdn ? "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.5/" : "";
           const html = dedent(/* HTML */ `
             <!doctype html>
             <html lang="en">
@@ -1205,7 +1166,7 @@
             </html>
           `);
           document.getElementById("integration-code").value = html;
-          document.getElementById("integration-note").textContent = cdn ? "CDN pinned to v1.4.final. Local source may include newer fixes." : "Place the HTML beside md.js, md.css, md.light.css, and md.dark.css.";
+          document.getElementById("integration-note").textContent = cdn ? "CDN pinned to v1.5. Local source may include newer fixes." : "Place the HTML beside md.js, md.css, md.light.css, and md.dark.css.";
           return html;
         }
 
