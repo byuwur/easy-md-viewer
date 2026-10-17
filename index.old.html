@@ -1,53 +1,48 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>easy MD viewer</title>
+    <link href="md.css" rel="stylesheet" />
+    <link id="byVIEWtheme" href="https://byuwur.github.io/easy-md-viewer/md.light.css" rel="stylesheet" />
+    <script src="md.js" defer></script>
+  </head>
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>easy MD viewer</title>
-  <link href="md.css" rel="stylesheet" />
-  <link id="byVIEWtheme" href="https://byuwur.github.io/easy-md-viewer/md.light.css" rel="stylesheet" />
-  <script src="md.js" defer></script>
-</head>
-
-<body>
-  <style>
-    html {
-      font-size: 16px;
-    }
-
-    body {
-      font-size: 1rem;
-    }
-
-    body {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
-      background: #222;
-      color: #eee;
-    }
-
-    a {
-      color: #56f;
-    }
-
-    a.listed-link {
-      display: inline-block;
-      width: 20rem;
-    }
-  </style>
-  <p>easy MD viewer</p>
-  <p>This is a demo of <a href="https://github.com/byuwur/easy-md-viewer">https://github.com/byuwur/easy-md-viewer</a></p>
-  <!--
+  <body>
+    <style>
+      html {
+        font-size: 16px;
+      }
+      body {
+        font-size: 1rem;
+      }
+      body {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+        background: #222;
+        color: #eee;
+      }
+      a {
+        color: #56f;
+      }
+      a.listed-link {
+        display: inline-block;
+        width: 20rem;
+      }
+    </style>
+    <p>easy MD viewer</p>
+    <p>This is a demo of <a href="https://github.com/byuwur/easy-md-viewer">https://github.com/byuwur/easy-md-viewer</a></p>
+    <!--
   <a href="javascript:document.querySelector('#byVIEWtheme').setAttribute('href','https://byuwur.github.io/easy-md-viewer/md.light.css');">Light/Claro</a> |
   <a href="javascript:document.querySelector('#byVIEWtheme').setAttribute('href','https://byuwur.github.io/easy-md-viewer/md.dark.css');">Dark/Oscuro</a>
   <br /><br />
   -->
-  <a class="listed-link" href="javascript:render();">DEMO MARKDOWN</a>
-  <a class="listed-link" href="javascript:benchmark();">BENCHMARK MARKDOWN</a>
-  <br /><br />
-  <div id="byMDrenderer" style="max-width:64rem;"></div>
-  <script>
-    const demoMD = `
+    <a class="listed-link" href="javascript:render();">DEMO MARKDOWN</a>
+    <a class="listed-link" href="javascript:benchmark();">BENCHMARK MARKDOWN</a>
+    <br /><br />
+    <div id="byMDrenderer" style="max-width: 64rem"></div>
+    <script>
+      const demoMD = `
 # easy MD viewer
 
 A **lightweight**, dependency-free Markdown viewer that renders directly to the DOM.
@@ -101,27 +96,26 @@ Raw HTML is intentionally not executed:
 
 No npm. No CDN. No dependencies.
     `;
-    const renderEl = document.getElementById("byMDrenderer");
-    const render = () => byMDviewer(renderEl, demoMD);
-    const renderFetched = (url, options = {}) => {
-      fetch(url)
-        .then(response => {
-          if (!response.ok) console.warn(`Something went wrong`, response.statusText);
-          return response.text();
-        })
-        .then(response => {
-          console.log(response);
-          byMDviewer(renderEl, response, options);
-        })
-        .catch(e => {
-          console.warn(`Something went wrong`, e);
-        });
-    };
-    const benchmark = () => renderFetched("test.md");
-    document.addEventListener("DOMContentLoaded", () => {
-      render();
-    });
-  </script>
-</body>
-
+      const renderEl = document.getElementById("byMDrenderer");
+      const render = () => byMDviewer(renderEl, demoMD);
+      const renderFetched = (url, options = {}) => {
+        fetch(url)
+          .then((response) => {
+            if (!response.ok) console.warn(`Something went wrong`, response.statusText);
+            return response.text();
+          })
+          .then((response) => {
+            console.log(response);
+            byMDviewer(renderEl, response, options);
+          })
+          .catch((e) => {
+            console.warn(`Something went wrong`, e);
+          });
+      };
+      const benchmark = () => renderFetched("test.md");
+      document.addEventListener("DOMContentLoaded", () => {
+        render();
+      });
+    </script>
+  </body>
 </html>

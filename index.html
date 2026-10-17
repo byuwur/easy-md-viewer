@@ -61,7 +61,7 @@
         <p class="text-body-secondary mb-0">Plain JavaScript. No dependencies. Open source. Free. Forever.</p>
       </section>
 
-      <section id="playground" aria-labelledby="playground-title">
+      <section id="playground" aria-labelledby="playground-title" tabindex="-1">
         <div class="playground border">
           <div class="playground-toolbar bg-body-tertiary px-4 py-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
             <h2 id="playground-title" class="h6 m-0 fw-semibold">Playground</h2>
@@ -108,7 +108,7 @@
           <div class="tab-content row g-0">
             <section id="config-panel" class="tab-pane panel flex-column d-md-flex config-panel col-12 col-xl-3" aria-labelledby="config-heading">
               <div class="panel-heading border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 px-4 py-3">
-                <h3 id="config-heading" class="h6 m-0 fw-semibold flex-shrink-0"><span class="small font-monospace text-body-secondary me-2">01</span>Configure</h3>
+                <h3 id="config-heading" class="h6 m-0 fw-semibold flex-shrink-0"><span class="small font-monospace text-body-secondary me-2">01</span> Configure</h3>
               </div>
               <div class="border-bottom">
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 px-3 py-2">
@@ -117,20 +117,30 @@
                     <button class="btn btn-quiet btn-sm" type="button" data-options-view="json" aria-controls="options-json-panel" aria-pressed="false">JSON</button>
                   </div>
                   <div class="d-flex flex-wrap justify-content-end gap-2 ms-auto">
-                    <button class="btn btn-quiet btn-sm" id="copy-options" type="button" hidden><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> Copy</button>
+                    <button class="btn btn-quiet btn-sm copy-button" id="copy-options" type="button" hidden><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> <span aria-live="polite">Copy</span></button>
                     <button id="reset-options" class="btn btn-quiet btn-sm" type="button"><i class="fa-solid fa-rotate-left me-1" aria-hidden="true"></i> Reset</button>
                   </div>
                 </div>
-                <p class="small text-body-secondary mx-3 my-0" id="options-copy-status" role="status" aria-live="polite"></p>
               </div>
               <form id="config-form" class="panel-body" aria-label="Viewer configuration">
                 <div class="accordion accordion-flush">
                   <div class="accordion-item">
                     <h4 class="accordion-header">
-                      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#render-settings" aria-expanded="true" aria-controls="render-settings">Rendering</button>
+                      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#appearance-settings" aria-expanded="true" aria-controls="appearance-settings">Preview appearance</button>
                     </h4>
-                    <div id="render-settings" class="accordion-collapse collapse show">
-                      <div class="accordion-body" id="render-options"></div>
+                    <div id="appearance-settings" class="accordion-collapse collapse show">
+                      <div class="accordion-body">
+                        <fieldset>
+                          <legend class="option-label fs-6 mb-2">Document theme</legend>
+                          <div class="btn-group w-100" role="group" aria-label="Document theme">
+                            <input class="btn-check" type="radio" name="previewTheme" id="preview-light" value="light" checked />
+                            <label class="btn btn-quiet flex-fill" for="preview-light">Light</label>
+                            <input class="btn-check" type="radio" name="previewTheme" id="preview-dark" value="dark" />
+                            <label class="btn btn-quiet flex-fill" for="preview-dark">Dark</label>
+                          </div>
+                          <p class="option-description mt-2 mb-0">Loads md.light.css or md.dark.css.</p>
+                        </fieldset>
+                      </div>
                     </div>
                   </div>
                   <div class="accordion-item">
@@ -143,21 +153,10 @@
                   </div>
                   <div class="accordion-item">
                     <h4 class="accordion-header">
-                      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#appearance-settings" aria-expanded="true" aria-controls="appearance-settings">Preview appearance</button>
+                      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#render-settings" aria-expanded="true" aria-controls="render-settings">Rendering</button>
                     </h4>
-                    <div id="appearance-settings" class="accordion-collapse collapse show">
-                      <div class="accordion-body">
-                        <fieldset>
-                          <legend class="option-label mb-2">Document theme</legend>
-                          <div class="btn-group w-100" role="group" aria-label="Document theme">
-                            <input class="btn-check" type="radio" name="previewTheme" id="preview-light" value="light" checked />
-                            <label class="btn btn-quiet flex-fill" for="preview-light">Light</label>
-                            <input class="btn-check" type="radio" name="previewTheme" id="preview-dark" value="dark" />
-                            <label class="btn btn-quiet flex-fill" for="preview-dark">Dark</label>
-                          </div>
-                          <p class="option-description mt-2 mb-0">Loads md.light.css or md.dark.css.</p>
-                        </fieldset>
-                      </div>
+                    <div id="render-settings" class="accordion-collapse collapse show">
+                      <div class="accordion-body" id="render-options"></div>
                     </div>
                   </div>
                 </div>
@@ -169,10 +168,12 @@
 
             <section id="source-panel" class="tab-pane panel flex-column d-md-flex source-panel col-12 col-md-6 col-xl-4" aria-labelledby="source-heading">
               <div class="panel-heading border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 px-4 py-3">
-                <h3 id="source-heading" class="h6 m-0 fw-semibold flex-shrink-0"><span class="small font-monospace text-body-secondary me-2">02</span>Markdown</h3>
+                <h3 id="source-heading" class="h6 m-0 fw-semibold flex-shrink-0">
+                  <label for="markdown-source"><span class="small font-monospace text-body-secondary me-2">02</span> Markdown source</label>
+                </h3>
                 <div class="d-flex gap-1">
                   <button id="restore-source" class="btn btn-quiet btn-sm" type="button"><i class="fa-solid fa-rotate-left me-1" aria-hidden="true"></i> Restore</button>
-                  <button id="copy-markdown" class="btn btn-quiet btn-sm" type="button"><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> Copy</button>
+                  <button id="copy-markdown" class="btn btn-quiet btn-sm copy-button" type="button"><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> <span aria-live="polite">Copy</span></button>
                 </div>
               </div>
               <div class="panel-body">
@@ -192,7 +193,7 @@
             <!-- Real library preview; Bootstrap stays outside the iframe -->
             <section id="preview-panel" class="tab-pane active panel flex-column d-md-flex preview-panel col-12 col-md-6 col-xl-5" aria-labelledby="preview-heading">
               <div class="panel-heading border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 px-4 py-3">
-                <h3 id="preview-heading" class="h6 m-0 fw-semibold flex-shrink-0"><span class="small font-monospace text-body-secondary me-2">03</span>Live preview</h3>
+                <h3 id="preview-heading" class="h6 m-0 fw-semibold flex-shrink-0"><span class="small font-monospace text-body-secondary me-2">03</span> Live preview</h3>
                 <span class="font-monospace text-body-secondary small"><span id="render-status" role="status">Loading…</span></span>
               </div>
               <div class="panel-body">
@@ -200,7 +201,7 @@
               </div>
             </section>
           </div>
-          <dl class="metric-strip bg-body-tertiary m-0 border-top row g-0">
+          <dl class="metric-strip bg-body-tertiary m-0 border-top row g-0" aria-label="Measurements for the current render">
             <div class="metric p-3 col-6 col-md-3">
               <dt class="small fw-normal font-monospace text-body-secondary mb-2">Source size</dt>
               <dd class="m-0 font-monospace" id="metric-size">—</dd>
@@ -254,7 +255,7 @@
                 </div>
               </fieldset>
               <div class="d-flex flex-wrap gap-2">
-                <button id="copy-integration" class="btn btn-quiet btn-sm px-3" type="button"><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> Copy HTML</button>
+                <button id="copy-integration" class="btn btn-quiet btn-sm px-3 copy-button" type="button"><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> <span aria-live="polite">Copy HTML</span></button>
                 <button id="download-html" class="btn btn-accent btn-sm px-3" type="button"><i class="fa-solid fa-download me-1" aria-hidden="true"></i> Download HTML</button>
               </div>
             </div>
@@ -293,7 +294,6 @@
         font-weight: 100 900;
         font-display: swap;
       }
-
       :root {
         --page-bg: #141619;
         --panel-bg: #1b1e22;
@@ -320,7 +320,6 @@
         --bs-border-radius-lg: 0;
         color-scheme: dark;
       }
-
       :root[data-bs-theme="light"] {
         --page-bg: #f5f6f7;
         --panel-bg: #fff;
@@ -334,39 +333,32 @@
         --bs-tertiary-bg-rgb: 255, 255, 255;
         color-scheme: light;
       }
-
       /* =============
              === LAYOUT & NAVIGATION ===
              ============= */
       html {
         scroll-padding-top: 1rem;
       }
-
       ::selection {
         background: var(--accent);
         color: var(--accent-ink);
       }
-
       :focus-visible {
         outline: 2px solid var(--accent);
         outline-offset: 3px;
       }
-
       .site-width {
         max-width: 1480px;
         margin-inline: auto;
         padding-inline: clamp(1rem, 3vw, 3rem);
       }
-
       .site-link {
         color: var(--ink);
         text-underline-offset: 0.25em;
       }
-
       .site-link:hover {
         color: var(--accent);
       }
-
       .skip-link {
         position: fixed;
         z-index: 10;
@@ -376,21 +368,17 @@
         background: var(--accent);
         color: var(--accent-ink);
       }
-
       .skip-link:focus {
         top: 1rem;
       }
-
       .navbar {
         min-height: 76px;
       }
-
       .navbar-brand {
         color: var(--ink);
         font-size: 1rem;
         font-weight: 650;
       }
-
       .brand-mark {
         display: inline-grid;
         place-items: center;
@@ -401,30 +389,24 @@
         color: var(--accent-ink);
         font: bold 1.1rem var(--mono);
       }
-
       .navbar .nav-link {
         color: var(--muted);
         padding: 0.75rem;
       }
-
       .navbar .nav-link:hover {
         color: var(--ink);
       }
-
       .intro {
         padding-block: 3rem 2rem;
       }
-
       .intro h1 {
         font-size: clamp(2.5rem, 4.6vw, 4.5rem);
         font-weight: 650;
         line-height: 1.08;
       }
-
       .intro h1 span {
         color: var(--accent);
       }
-
       /* =============
              === CONTROLS ===
              ============= */
@@ -435,7 +417,6 @@
         min-height: 44px;
         font-weight: 600;
       }
-
       .btn-accent {
         --bs-btn-bg: var(--accent);
         --bs-btn-color: var(--accent-ink);
@@ -444,7 +425,6 @@
         --bs-btn-hover-color: var(--accent-ink);
         --bs-btn-hover-border-color: var(--ink);
       }
-
       .btn-quiet {
         --bs-btn-color: var(--ink);
         --bs-btn-border-color: var(--panel-line);
@@ -452,26 +432,22 @@
         --bs-btn-hover-bg: var(--panel-bg);
         --bs-btn-hover-border-color: var(--accent);
       }
-
       .btn i,
       .nav-link i {
         font-size: 0.85em;
       }
-
       .btn-quiet[aria-pressed="true"],
       .btn-check:checked + .btn-quiet {
         background: var(--accent);
         border-color: var(--accent);
         color: var(--accent-ink);
       }
-
       .form-select,
       .form-control {
         min-height: 44px;
         background-color: var(--editor-bg);
         color: var(--ink);
       }
-
       .form-select:focus,
       .form-control:focus {
         background-color: var(--editor-bg);
@@ -479,7 +455,6 @@
         border-color: var(--accent);
         box-shadow: 0 0 0 0.15rem color-mix(in srgb, var(--accent) 20%, transparent);
       }
-
       .form-switch {
         display: flex;
         align-items: center;
@@ -488,7 +463,6 @@
         margin: 0;
         min-height: 48px;
       }
-
       .form-switch .form-check-input {
         order: 2;
         float: none;
@@ -498,84 +472,69 @@
         margin: 0;
         cursor: pointer;
       }
-
       .form-switch .form-check-label,
       .option-label {
         flex: 1;
         cursor: pointer;
         padding-block: 0.5rem;
       }
-
       .form-check-input:checked {
         background-color: var(--accent);
         border-color: var(--accent);
       }
-
       .form-text,
       .option-description {
         font-size: 0.8125rem;
         color: var(--muted);
       }
-
       .mobile-tabs.nav.nav-pills {
         background: var(--panel-bg);
         --bs-nav-link-color: var(--muted);
         --bs-nav-pills-link-active-bg: var(--accent);
         --bs-nav-pills-link-active-color: var(--accent-ink);
       }
-
       .mobile-tabs.nav .nav-link {
         background-color: transparent;
         color: var(--muted);
       }
-
       .mobile-tabs.nav .nav-link.active {
         background-color: var(--accent);
         color: var(--accent-ink);
       }
-
       /* =============
              === PLAYGROUND & CODE ===
              ============= */
       .source-picker {
         width: min(100%, 18rem);
       }
-
       .panel {
         min-width: 0;
         height: clamp(34rem, 68dvh, 46rem);
       }
-
       .panel + .panel,
       .metric + .metric {
         border-left: 1px solid var(--panel-line);
       }
-
       .tab-content > .panel.active {
         display: flex;
       }
-
       .panel-heading {
         min-height: 68px;
       }
-
       .panel-heading .btn {
         white-space: nowrap;
         min-height: 34px;
       }
-
       .panel-body {
         flex: 1;
         min-height: 0;
         overflow: auto;
       }
-
       /* Each editor and iframe owns its scrolling; the panel must not scroll too. */
       .source-panel .panel-body,
       .preview-panel .panel-body {
         overflow: hidden;
       }
-
       .source-editor,
       .integration-code {
         display: block;
@@ -591,37 +550,31 @@
         overflow: auto;
         tab-size: 2;
       }
-
       .source-editor:focus {
         outline: 2px solid var(--accent);
         outline-offset: -2px;
       }
-
       .source-editor[aria-invalid="true"] {
         outline: 2px solid var(--danger);
         outline-offset: -2px;
       }
-
       .integration-code {
         height: 28rem;
         white-space: pre-wrap;
         overflow-wrap: anywhere;
       }
-
       .panel-footer {
         border-top: 1px solid var(--panel-line);
         padding: 0.75rem 1.5rem;
         font: 0.8125rem/1.5 var(--mono);
         color: var(--muted);
       }
-
       #preview-frame {
         display: block;
         width: 100%;
         height: 100%;
         border: 0;
       }
-
       .feature-chip {
         min-height: 34px;
         border: 1px solid transparent;
@@ -630,23 +583,19 @@
         font: 0.875rem var(--mono);
         color: var(--muted);
       }
-
       .feature-chip:hover,
       .feature-chip[aria-pressed="true"] {
         color: var(--accent);
         border-color: var(--panel-line);
       }
-
       .accordion {
         --bs-accordion-bg: var(--panel-bg);
         --bs-accordion-active-bg: var(--panel-bg);
         --bs-accordion-active-color: var(--accent);
       }
-
       .accordion-button {
         font: 0.875rem var(--mono);
       }
-
       /* =============
              === RESPONSIVE LAYOUT ===
              ============= */
@@ -655,65 +604,52 @@
           height: auto;
           border-bottom: 1px solid var(--panel-line);
         }
-
         .config-panel .panel-body {
           overflow: visible;
         }
-
         .config-panel #options-json-panel {
           height: 20rem;
           flex: none;
         }
-
         .source-panel {
           border-left: 0 !important;
         }
-
         .config-panel .accordion {
           display: flex;
         }
-
         .config-panel .accordion-item {
           flex: 1;
           min-width: 0;
           border: 0;
         }
-
         .config-panel .accordion-item + .accordion-item {
           border-left: 1px solid var(--panel-line);
         }
       }
-
       @media (min-width: 768px) and (max-width: 991px), (min-width: 1200px) and (max-width: 1399px) {
         .panel-heading {
           min-height: 7rem;
           align-content: center;
         }
       }
-
       @media (max-width: 767px) {
         .panel {
           height: 31rem;
           border-left: 0 !important;
         }
-
         .source-picker {
           width: 100%;
         }
-
         .panel-heading .btn {
           min-height: 44px;
         }
-
         .metric:nth-child(3) {
           border-left: 0;
         }
-
         .metric:nth-child(n + 3) {
           border-top: 1px solid var(--panel-line);
         }
       }
-
       @media (prefers-reduced-motion: reduce) {
         *,
         *::before,
@@ -738,15 +674,9 @@
         // === STATE & SAMPLES ===
         // =============
         const optionDefinitions = [
-          { name: "withLinks", label: "Links", description: "Links, URLs & email addresses", default: true, example: "links" },
-          { name: "withImages", label: "Images", description: "Responsive, lazy-loaded images", default: true, example: "images" },
-          { name: "withTables", label: "Tables", description: "Columns & text alignment", default: true, example: "tables" },
-          { name: "withTasks", label: "Task lists", description: "Read-only task checkboxes", default: true, example: "tasks" },
-          { name: "withStrikethrough", label: "Strikethrough", description: "Render ~~crossed-out text~~", default: true, example: "formatting" },
-          { name: "breaks", label: "Soft line breaks", description: "Keep paragraph line breaks", default: false, example: "breaks" },
           {
             name: "themeToggle",
-            label: "Theme toggle",
+            label: "Theme switch",
             description: "Native light/dark switch",
             default: true,
             group: "viewer",
@@ -767,7 +697,13 @@
             default: true,
             group: "viewer",
             example: "controls"
-          }
+          },
+          { name: "withLinks", label: "Links", description: "Links, URLs & email addresses", default: true, example: "links" },
+          { name: "withImages", label: "Images", description: "Responsive, lazy-loaded images", default: true, example: "images" },
+          { name: "withTables", label: "Tables", description: "Columns & text alignment", default: true, example: "tables" },
+          { name: "withTasks", label: "Task lists", description: "Read-only task checkboxes", default: true, example: "tasks" },
+          { name: "withStrikethrough", label: "Strikethrough", description: "Render ~~crossed-out text~~", default: true, example: "formatting" },
+          { name: "breaks", label: "Soft line breaks", description: "Keep paragraph line breaks", default: false, example: "breaks" }
         ];
         const defaults = { ...Object.fromEntries(optionDefinitions.map((option) => [option.name, option.default])), linkTarget: "_blank" };
         const editor = document.getElementById("markdown-source");
@@ -1194,16 +1130,30 @@
         // =============
         // === CLIPBOARD ===
         // =============
-        async function copyText(text, fallback, status) {
+        async function copyText(text, fallback, button) {
+          const caption = button.querySelector("span");
           try {
             await navigator.clipboard.writeText(text);
-            status.textContent = fallback.id === "options-json" ? "Viewer options copied." : "Copied!";
+            caption.textContent = "Copied!";
+            button.removeAttribute("title");
           } catch {
             fallback.focus();
             fallback.select();
-            status.textContent = "Clipboard unavailable. Press Ctrl+C or ⌘C to copy the selected text.";
+            caption.textContent = "Failed";
+            button.title = "Clipboard unavailable. Press Ctrl+C or ⌘C to copy the selected text.";
           }
         }
+
+        document.querySelectorAll(".copy-button").forEach((button) => {
+          const caption = button.querySelector("span");
+          const label = caption.textContent;
+          const reset = () => {
+            caption.textContent = label;
+            button.removeAttribute("title");
+          };
+          button.addEventListener("mouseleave", reset);
+          button.addEventListener("focusout", reset);
+        });
 
         function setMobilePanel(panel) {
           bootstrap.Tab.getOrCreateInstance(document.getElementById(`${panel}-tab`)).show();
@@ -1222,9 +1172,9 @@
             document.querySelectorAll("[data-options-view]").forEach((choice) => choice.setAttribute("aria-pressed", String(choice === button)));
           })
         );
-        document.getElementById("copy-options").addEventListener("click", () => {
+        document.getElementById("copy-options").addEventListener("click", (event) => {
           const options = document.getElementById("options-json");
-          copyText(options.value, options, document.getElementById("options-copy-status"));
+          copyText(options.value, options, event.currentTarget);
         });
         document.getElementById("config-form").addEventListener("submit", (event) => event.preventDefault());
         document.getElementById("config-form").addEventListener("change", (event) => {
@@ -1289,14 +1239,14 @@
             generateIntegration();
           })
         );
-        document.getElementById("copy-markdown").addEventListener("click", () => {
+        document.getElementById("copy-markdown").addEventListener("click", (event) => {
           setMobilePanel("source");
-          copyText(editor.value, editor, document.getElementById("feedback"));
+          copyText(editor.value, editor, event.currentTarget);
         });
-        document.getElementById("copy-integration").addEventListener("click", () => {
+        document.getElementById("copy-integration").addEventListener("click", (event) => {
           generateIntegration();
           const code = document.getElementById("integration-code");
-          copyText(code.value, code, document.getElementById("integration-feedback"));
+          copyText(code.value, code, event.currentTarget);
         });
         document.getElementById("download-html").addEventListener("click", downloadHTML);
         document.getElementById("site-theme").addEventListener("click", (event) => {

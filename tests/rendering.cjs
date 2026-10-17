@@ -84,8 +84,8 @@ test("Markdown rendering", async (t) => {
         return info;
       });
       assert.deepEqual(info, {
-        version: "1.5",
-        text: "easy-md-viewer · v1.5 · @byUwUr",
+        version: "1.6",
+        text: "easy-md-viewer · v1.6 · @byUwUr",
         semiTransparent: true,
         count: 1,
         independent: true,
