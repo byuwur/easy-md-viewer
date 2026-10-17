@@ -196,7 +196,7 @@
                 <span class="font-monospace text-body-secondary small"><span id="render-status" role="status">Loading…</span></span>
               </div>
               <div class="panel-body">
-                <iframe id="preview-frame" title="Live Markdown document" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+                <iframe id="preview-frame" title="Live Markdown document" allow="clipboard-write" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
               </div>
             </section>
           </div>
@@ -756,6 +756,14 @@
             name: "fontSizeControls",
             label: "Text size controls",
             description: "Native A− / A / A+ buttons",
+            default: true,
+            group: "viewer",
+            example: "controls"
+          },
+          {
+            name: "copyButton",
+            label: "Copy button",
+            description: "Plain text; Shift+click for Markdown",
             default: true,
             group: "viewer",
             example: "controls"

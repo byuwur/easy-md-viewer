@@ -52,7 +52,7 @@ test("Markdown rendering", async (t) => {
       ];
       return cases.map(([name, markdown, verify, options = {}]) => {
         const root = document.createElement("div");
-        byMDviewer(root, markdown, { themeToggle: false, fontSizeControls: false, ...options });
+        byMDviewer(root, markdown, { themeToggle: false, fontSizeControls: false, copyButton: false, ...options });
         root.querySelector(".byVIEWinfo").remove();
         return { name, passed: verify(root) };
       });
@@ -65,7 +65,7 @@ test("Markdown rendering", async (t) => {
       const info = await page.evaluate(() => {
         const root = document.createElement("div");
         document.body.appendChild(root);
-        const options = { themeToggle: false, fontSizeControls: false, withLinks: false };
+        const options = { themeToggle: false, fontSizeControls: false, copyButton: false, withLinks: false };
         byMDviewer(root, "# Before", options);
         byMDviewer(root, "# After", options);
         const label = root.querySelector(".byVIEWinfo");
@@ -106,6 +106,69 @@ test("Markdown rendering", async (t) => {
       }, markdown);
       assert.equal(heading, "easy MD Viewer BenchMarkDown");
     });
+    await t.test("copy supports plain text and original Markdown, including clipboard access failures", async () => {
+      const result = await page.evaluate(async () => {
+        const root = document.createElement("div");
+        document.body.appendChild(root);
+        const copies = [];
+        let native = true;
+        Object.defineProperty(navigator, "clipboard", {
+          configurable: true,
+          value: {
+            writeText: async (text) => {
+              if (!native) throw new Error("Denied");
+              copies.push(text);
+            }
+          }
+        });
+        const clipboard = navigator.clipboard;
+        const copy = async (shiftKey = false) => {
+          const button = root.querySelector(".byVIEWcopy");
+          button.dispatchEvent(new MouseEvent("click", { bubbles: true, shiftKey }));
+          await new Promise((resolve) => setTimeout(resolve, 0));
+          return button.title;
+        };
+        try {
+          const source = document.createElement("div");
+          source.textContent = "# Title\n\nA **bold** [link](https://example.com) &amp; \u0060code\u0060.\n\n~~~text\n<literal>\n\nline\n~~~";
+          byMDviewer(root, source);
+          const last = [...root.querySelectorAll(".byVIEWcontrols button")].at(-1).classList.contains("byVIEWcopy");
+          await copy();
+          const plain = copies[0];
+          const button = root.querySelector(".byVIEWcopy");
+          const copied = button.textContent === "Copied!";
+          button.dispatchEvent(new MouseEvent("mouseleave"));
+          const reset = button.textContent === "Copy" && button.title === "Copy text (Shift+click for Markdown)";
+          await copy(true);
+          const original = copies[1] === source.textContent;
+          const clones = document.querySelectorAll(".byMDdocument").length;
+          root.textContent = "# Latest";
+          byMDviewer(root, undefined, { themeToggle: false, fontSizeControls: false });
+          await copy(true);
+          const current = copies[2];
+          const currentButton = root.querySelector(".byVIEWcopy");
+          currentButton.dispatchEvent(new FocusEvent("focusout", { bubbles: true }));
+          const blur = currentButton.textContent === "Copy" && currentButton.getAttribute("aria-label") === currentButton.title;
+          native = false;
+          const copyCount = copies.length;
+          const failed = (await copy()).startsWith("Copy failed.") && root.querySelector(".byVIEWcopy").textContent === "Failed" && !root.querySelector(".byVIEWcopy").disabled && copies.length === copyCount;
+          Object.defineProperty(navigator, "clipboard", { configurable: true, value: undefined });
+          const unavailable = (await copy()).startsWith("Copy failed.") && !root.querySelector(".byVIEWcopy").disabled;
+          Object.defineProperty(navigator, "clipboard", { configurable: true, value: clipboard });
+          native = true;
+          const retried = (await copy()).startsWith("Copied!");
+          byMDviewer(root, "", { themeToggle: false, fontSizeControls: false, copyButton: false });
+          const hidden = !root.querySelector(".byVIEWcontrols");
+          return { plain, original, clones, last, current, copied, reset, blur, failed, unavailable, retried, hidden };
+        } finally {
+          root.remove();
+        }
+      });
+      const { plain, ...state } = result;
+      assert.equal(plain.replace(/\n+/g, "\n"), "Title\nA bold link & code.\n<literal>\nline");
+      assert.ok(plain.includes("<literal>\n\nline"), "Code line breaks must survive copying");
+      assert.deepEqual(state, { original: true, clones: 1, last: true, current: "# Latest", copied: true, reset: true, blur: true, failed: true, unavailable: true, retried: true, hidden: true });
+    });
     await t.test("displayed, copied, and downloaded starters match with CDN or local assets", async () => {
       const playground = await browser.newPage();
       const errors = [];
@@ -138,7 +201,7 @@ test("Markdown rendering", async (t) => {
       assert.ok(code.includes('document.addEventListener("DOMContentLoaded"'));
       assert.ok(!code.includes('"withLinks": false'));
       assert.ok(code.includes('src="md.js" defer'));
-      for (const name of ["themeToggle", "fontSizeControls"]) {
+      for (const name of ["themeToggle", "fontSizeControls", "copyButton"]) {
         await playground.locator(`#${name}`).evaluate((element) => {
           element.checked = false;
           element.dispatchEvent(new Event("change", { bubbles: true }));

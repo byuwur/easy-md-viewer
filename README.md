@@ -47,17 +47,20 @@ The landing page's **Copy HTML** and **Download HTML** use its displayed starter
 
 Pass options as the third argument, such as `byMDviewer(target, markdown, { breaks: true })`.
 
-| Option              | Default    | Meaning                                                                |
-| ------------------- | ---------- | ---------------------------------------------------------------------- |
-| `withLinks`         | `true`     | Render links, autolinks, bare URLs, and email addresses.               |
-| `withImages`        | `true`     | Render supported images.                                               |
-| `withTables`        | `true`     | Render GFM-style tables.                                               |
-| `withTasks`         | `true`     | Render task checkboxes.                                                |
-| `withStrikethrough` | `true`     | Render `~~strikethrough~~`.                                            |
-| `breaks`            | `false`    | Convert paragraph line breaks to `<br>`.                               |
-| `linkTarget`        | `"_blank"` | Link target; `false` omits it. Same-document anchors stay in this tab. |
-| `themeToggle`       | `true`     | Show a toggle when a compatible stylesheet exists.                     |
-| `fontSizeControls`  | `true`     | Show A-/A+ controls.                                                   |
+| Option              | Default    | Meaning                                                                      |
+| ------------------- | ---------- | ---------------------------------------------------------------------------- |
+| `withLinks`         | `true`     | Render links, autolinks, bare URLs, and email addresses.                     |
+| `withImages`        | `true`     | Render supported images.                                                     |
+| `withTables`        | `true`     | Render GFM-style tables.                                                     |
+| `withTasks`         | `true`     | Render task checkboxes.                                                      |
+| `withStrikethrough` | `true`     | Render `~~strikethrough~~`.                                                  |
+| `breaks`            | `false`    | Convert paragraph line breaks to `<br>`.                                     |
+| `linkTarget`        | `"_blank"` | Link target; `false` omits it. Same-document anchors stay in this tab.       |
+| `themeToggle`       | `true`     | Show a toggle when a compatible stylesheet exists.                           |
+| `fontSizeControls`  | `true`     | Show A-/A+ controls.                                                         |
+| `copyButton`        | `true`     | Show Copy: click for rendered plain text; Shift+click for original Markdown. |
+
+Plain-text copying preserves paragraph and code line breaks and excludes viewer controls and attribution. Shift+click copies the source, including Markdown markers. Copy requires browser clipboard access in a secure context; the button reports failure if access is unavailable or denied.
 
 Each viewer shows a semi-transparent GitHub link, version, and author portfolio link at the top right. Read the library version with `byMDviewer.VERSION`.
 

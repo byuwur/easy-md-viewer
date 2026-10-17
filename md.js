@@ -1229,7 +1229,55 @@
     return sizes;
   };
 
-  const appendViewerControls = (element, options, filename) => {
+  const appendCopyButton = (controls, getText, label) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "byVIEWcopy";
+    button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" aria-hidden="true" focusable="false"><!--!Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M288 64C252.7 64 224 92.7 224 128L224 384C224 419.3 252.7 448 288 448L480 448C515.3 448 544 419.3 544 384L544 183.4C544 166 536.9 149.3 524.3 137.2L466.6 81.8C454.7 70.4 438.8 64 422.3 64L288 64zM160 192C124.7 192 96 220.7 96 256L96 512C96 547.3 124.7 576 160 576L352 576C387.3 576 416 547.3 416 512L416 496L352 496L352 512L160 512L160 256L176 256L176 192L160 192z"/></svg>`;
+    const caption = document.createElement("span");
+    button.appendChild(caption);
+    const reset = () => {
+      caption.textContent = "Copy";
+      button.title = label;
+      button.setAttribute("aria-label", label);
+    };
+    reset();
+    button.addEventListener("mouseleave", reset);
+    button.addEventListener("focusout", reset);
+    controls.appendChild(button);
+    button.addEventListener("click", async (event) => {
+      button.disabled = true;
+      let message = "Copied!";
+      try {
+        await navigator.clipboard.writeText(getText(event));
+        caption.textContent = message;
+      } catch {
+        caption.textContent = "Failed";
+        message = "Copy failed. Check clipboard access.";
+      } finally {
+        button.disabled = false;
+        button.title = `${message} ${label}`;
+        button.setAttribute("aria-label", button.title);
+      }
+    });
+  };
+
+  /** innerText needs a rendered node to preserve paragraph and code line breaks. */
+  const getPlainText = (element) => {
+    const copy = element.cloneNode(true);
+    copy.querySelectorAll(".byVIEWcontrols, .byVIEWinfo").forEach((control) => control.remove());
+    copy.style.cssText += "; position: fixed; top: 0; left: -9999px; opacity: 0; pointer-events: none;";
+    copy.style.width = `${element.getBoundingClientRect().width}px`;
+    copy.setAttribute("aria-hidden", "true");
+    document.body.appendChild(copy);
+    try {
+      return copy.innerText;
+    } finally {
+      copy.remove();
+    }
+  };
+
+  const appendViewerControls = (element, options, filename, source) => {
     const controls = document.createElement("div");
     controls.className = "byVIEWcontrols";
     controls.setAttribute("role", "group");
@@ -1241,6 +1289,7 @@
     element.appendChild(info);
     if (options.themeToggle) appendThemeToggle(controls, filename);
     if (options.fontSizeControls) appendFontSizeControls(element, controls);
+    if (options.copyButton) appendCopyButton(controls, (event) => (event.shiftKey ? source : getPlainText(element)), "Copy text (Shift+click for Markdown)");
     if (controls.childNodes.length) element.appendChild(controls);
   };
 
@@ -1266,6 +1315,7 @@
    * @param {string|false} [options.linkTarget="_blank"]
    * @param {boolean} [options.themeToggle=true] - Adds the theme toggle.
    * @param {boolean} [options.fontSizeControls=true] - Adds viewer-local text size controls.
+   * @param {boolean} [options.copyButton=true] - Adds a clipboard copy button.
    */
   global.byMDviewer = function byMDviewer(element, markdown, options = {}) {
     if (!(element instanceof HTMLElement)) throw new TypeError("byMDviewer: element must be an HTMLElement.");
@@ -1284,16 +1334,17 @@
       linkTarget: "_blank",
       themeToggle: true,
       fontSizeControls: true,
+      copyButton: true,
       ...options,
       [HEADING_IDS]: Object.create(null)
     };
     // Clear the target safely.
     element.textContent = "";
     element.classList.add("byMDdocument");
-    appendViewerControls(element, options, "md");
+    appendViewerControls(element, options, "md", source);
     // Normalize line endings and remove the BOM.
     const normalized = source.replace(/\r\n?/g, "\n").replace(/^\uFEFF/, "");
     renderBlocks(element, normalized.split("\n"), options);
   };
-  global.byMDviewer.VERSION = "1.5"; // 2026-10-16
+  global.byMDviewer.VERSION = "1.6"; // 2026-10-17
 })(typeof window !== "undefined" ? window : this);
