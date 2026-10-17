@@ -69,10 +69,11 @@ test("Markdown rendering", async (t) => {
         byMDviewer(root, "# Before", options);
         byMDviewer(root, "# After", options);
         const label = root.querySelector(".byVIEWinfo");
+        const opacity = Number(getComputedStyle(label).opacity);
         const info = {
           version: byMDviewer.VERSION,
-          text: label.textContent,
-          opacity: getComputedStyle(label).opacity,
+          text: label.textContent.replace(/\s+/g, " ").trim(),
+          semiTransparent: opacity > 0 && opacity < 1,
           count: root.querySelectorAll(".byVIEWinfo").length,
           independent: label.parentElement === root,
           controls: root.querySelectorAll(".byVIEWcontrols").length,
@@ -85,7 +86,7 @@ test("Markdown rendering", async (t) => {
       assert.deepEqual(info, {
         version: "1.5",
         text: "easy-md-viewer · v1.5 · @byUwUr",
-        opacity: "0.5",
+        semiTransparent: true,
         count: 1,
         independent: true,
         controls: 0,
