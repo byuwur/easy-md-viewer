@@ -66,7 +66,7 @@ Each viewer shows a semi-transparent GitHub link, version, and author portfolio 
 
 ## Themes
 
-The toggle finds `#byVIEWtheme` or a stylesheet named `md.light.css`/`md.dark.css`, preserving its path. Switch that stylesheet manually to select a theme.
+The toggle uses a compatible `#byVIEWtheme` or finds a stylesheet named `md.light.css`/`md.dark.css`, preserving its path, query, and hash. Theme changes apply to all Markdown viewers using that stylesheet. Switch that stylesheet manually to select a theme.
 
 A-/A+ adjust only this viewer by `0.125rem`, within `0.5rem`–`3rem`. Size survives re-rendering and works without a theme stylesheet.
 

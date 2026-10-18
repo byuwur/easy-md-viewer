@@ -1157,15 +1157,14 @@
    */
   const appendThemeToggle = (element, filename) => {
     const escapedFilename = filename.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const themePattern = new RegExp(`${escapedFilename}\\.(light|dark)\\.css(?:[?#].*)?$`, "i");
-    const themeReplacePattern = new RegExp(`${escapedFilename}\\.(light|dark)\\.css`, "i");
+    const themePattern = new RegExp(`^([^?#]*/)?${escapedFilename}\\.(light|dark)\\.css([?#].*)?$`, "i");
     // Prefer the documented #byVIEWtheme link, but also support automatic detection.
-    const stylesheet = document.getElementById("byVIEWtheme") || [...document.querySelectorAll('link[rel~="stylesheet"]')].find((link) => themePattern.test(link.getAttribute("href") || ""));
+    const stylesheet = [document.getElementById("byVIEWtheme"), ...document.querySelectorAll('link[rel~="stylesheet"]')].find((link) => link && themePattern.test(link.getAttribute("href") || ""));
     if (!stylesheet) return null;
     // Read the active theme from the stylesheet filename.
     const getTheme = () => {
-      const match = (stylesheet.getAttribute("href") || "").match(themeReplacePattern);
-      return match ? match[1].toLowerCase() : null;
+      const match = (stylesheet.getAttribute("href") || "").match(themePattern);
+      return match ? match[2].toLowerCase() : null;
     };
     if (!getTheme()) return null;
     const button = document.createElement("button");
@@ -1175,8 +1174,10 @@
     // Keep accessibility text consistent with the theme actually loaded.
     const sync = () => {
       const next = getTheme() === "dark" ? "light" : "dark";
-      button.title = `Switch to ${next} theme`;
-      button.setAttribute("aria-label", button.title);
+      for (const toggle of [button, ...document.querySelectorAll(".byMDdocument > .byVIEWcontrols > .byVIEWthemeToggle")]) {
+        toggle.title = `Switch to ${next} theme`;
+        toggle.setAttribute("aria-label", toggle.title);
+      }
     };
     button.addEventListener("click", () => {
       const current = getTheme();
@@ -1184,7 +1185,10 @@
       const href = stylesheet.getAttribute("href") || "";
 
       // Replace only the theme filename while preserving paths and query strings.
-      stylesheet.setAttribute("href", href.replace(themeReplacePattern, `${filename}.${next}.css`));
+      stylesheet.setAttribute(
+        "href",
+        href.replace(themePattern, (_, path = "", theme, suffix = "") => `${path}${filename}.${next}.css${suffix}`)
+      );
       sync();
     });
     sync();

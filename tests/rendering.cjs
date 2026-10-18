@@ -176,6 +176,41 @@ test("Markdown rendering", async (t) => {
       assert.ok(plain.includes("<literal>\n\nline"), "Code line breaks must survive copying");
       assert.deepEqual(state, { original: true, clones: 1, last: true, current: "# Latest", copied: true, reset: true, blur: true, failed: true, unavailable: true, retried: true, hidden: true });
     });
+    await t.test("themes select their own stylesheet, preserve URLs, and keep other controls independent", async () => {
+      const themed = await browser.newPage();
+      try {
+        await themed.route("https://themes.test/**", async (route) => {
+          const file = path.basename(new URL(route.request().url()).pathname);
+          const body = file === "other.dark.css" ? "" : await fs.readFile(path.join(__dirname, "..", file));
+          await route.fulfill({ body, contentType: "text/css" });
+        });
+        await themed.setContent(`<!doctype html>
+          <link rel="stylesheet" href="https://themes.test/md.css">
+          <link id="byVIEWtheme" rel="stylesheet" href="https://themes.test/other.dark.css">
+          <link id="viewer-theme" rel="stylesheet" href="https://themes.test/md.light.css/archive/md.light.css?keep=md.light.css#md.light.css">
+          <button id="host-control" class="byVIEWthemeToggle">Host control</button>
+          <div id="first"></div><div id="second"></div>`);
+        await themed.addScriptTag({ path: path.join(__dirname, "../md.js") });
+        await themed.evaluate(() => {
+          for (const id of ["first", "second"]) byMDviewer(document.getElementById(id), "# Content", { fontSizeControls: false, copyButton: false });
+        });
+        const background = await themed.locator("#first").evaluate((root) => getComputedStyle(root).backgroundColor);
+        await themed.locator("#first .byVIEWthemeToggle").click();
+        await themed.waitForFunction((before) => getComputedStyle(document.getElementById("first")).backgroundColor !== before, background);
+        assert.equal(await themed.locator("#viewer-theme").getAttribute("href"), "https://themes.test/md.light.css/archive/md.dark.css?keep=md.light.css#md.light.css");
+        assert.equal(await themed.locator("#byVIEWtheme").getAttribute("href"), "https://themes.test/other.dark.css");
+        assert.deepEqual(await themed.locator("#first .byVIEWthemeToggle, #second .byVIEWthemeToggle").evaluateAll((buttons) => buttons.map((button) => [button.title, button.getAttribute("aria-label")])), [
+          ["Switch to light theme", "Switch to light theme"],
+          ["Switch to light theme", "Switch to light theme"]
+        ]);
+        assert.equal(await themed.locator("#host-control").evaluate((button) => getComputedStyle(button, "::after").content), "none");
+        await themed.locator("#viewer-theme").evaluate((link) => link.remove());
+        await themed.evaluate(() => byMDviewer(document.getElementById("first"), "# Content", { fontSizeControls: false, copyButton: false }));
+        assert.equal(await themed.locator("#first .byVIEWthemeToggle").count(), 0);
+      } finally {
+        await themed.close();
+      }
+    });
     await t.test("displayed, copied, and downloaded starters match with CDN or local assets", async () => {
       const playground = await browser.newPage();
       const errors = [];
