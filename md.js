@@ -1206,8 +1206,7 @@
     const sizes = document.createElement("div");
     sizes.className = "byVIEWfontSizes";
     controls.appendChild(sizes);
-    const rootSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-    let size = (parseFloat(getComputedStyle(element).fontSize) || rootSize) / rootSize;
+    const getSize = () => (parseFloat(getComputedStyle(element).fontSize) || 16) / (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
     const decrease = document.createElement("button");
     const increase = document.createElement("button");
     const reset = document.createElement("button");
@@ -1226,6 +1225,7 @@
       sizes.appendChild(button);
     }
     const sync = () => {
+      const size = getSize();
       decrease.disabled = size <= 0.5;
       increase.disabled = size >= 3;
     };
@@ -1234,14 +1234,13 @@
       [increase, 0.125]
     ]) {
       button.addEventListener("click", () => {
-        size = Math.max(0.5, Math.min(3, size + step));
+        const size = Math.max(0.5, Math.min(3, getSize() + step));
         element.style.fontSize = `${size}rem`;
         sync();
       });
     }
     reset.addEventListener("click", () => {
       element.style.fontSize = element.dataset.byViewDefaultFontSize;
-      size = (parseFloat(getComputedStyle(element).fontSize) || rootSize) / rootSize;
       sync();
     });
     sync();

@@ -233,6 +233,43 @@ test("Markdown rendering", async (t) => {
       });
       assert.deepEqual(layout, { width: 240, overflow: false, contained: true, aboveContent: true });
     });
+    await t.test("text controls follow root size changes, preserve host defaults, and enforce limits", async () => {
+      const sizes = await page.evaluate(() => {
+        const original = document.documentElement.style.fontSize;
+        const root = document.createElement("div");
+        document.body.appendChild(root);
+        try {
+          document.documentElement.style.fontSize = "16px";
+          root.style.fontSize = "24px";
+          const options = { themeToggle: false, copyButton: false };
+          byMDviewer(root, "# Content", options);
+          let [decrease, reset, increase] = root.querySelectorAll(".byVIEWfontSize");
+          const size = () => parseFloat(getComputedStyle(root).fontSize);
+          increase.click();
+          const initial = size();
+          document.documentElement.style.fontSize = "32px";
+          increase.click();
+          const resized = size();
+          reset.click();
+          const restored = size();
+          increase.click();
+          const next = size();
+          byMDviewer(root, "# Content", options);
+          [decrease, reset, increase] = root.querySelectorAll(".byVIEWfontSize");
+          const rerendered = size();
+          for (let index = 0; index < 30; index++) increase.click();
+          const maximum = [size(), increase.disabled];
+          for (let index = 0; index < 40; index++) decrease.click();
+          const minimum = [size(), decrease.disabled];
+          reset.click();
+          return { initial, resized, restored, next, rerendered, maximum, minimum, reset: size() };
+        } finally {
+          root.remove();
+          document.documentElement.style.fontSize = original;
+        }
+      });
+      assert.deepEqual(sizes, { initial: 26, resized: 56, restored: 24, next: 28, rerendered: 28, maximum: [96, true], minimum: [16, true], reset: 24 });
+    });
     await t.test("displayed, copied, and downloaded starters match with CDN or local assets", async () => {
       const playground = await browser.newPage();
       const errors = [];
