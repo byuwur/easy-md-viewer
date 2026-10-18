@@ -211,6 +211,28 @@ test("Markdown rendering", async (t) => {
         await themed.close();
       }
     });
+    await t.test("narrow viewers keep controls above content within host widths", async () => {
+      const layout = await page.evaluate(() => {
+        const root = document.createElement("div");
+        root.style.width = "240px";
+        document.body.appendChild(root);
+        try {
+          byMDviewer(root, "# A longer heading that wraps without covering the controls");
+          const bounds = root.getBoundingClientRect();
+          const toolbar = root.querySelector(".byVIEWcontrols").getBoundingClientRect();
+          const content = root.querySelector("h1");
+          return {
+            width: bounds.width,
+            overflow: root.scrollWidth > root.clientWidth + 1,
+            contained: toolbar.left >= bounds.left && toolbar.right <= bounds.right,
+            aboveContent: toolbar.bottom <= content.getBoundingClientRect().top
+          };
+        } finally {
+          root.remove();
+        }
+      });
+      assert.deepEqual(layout, { width: 240, overflow: false, contained: true, aboveContent: true });
+    });
     await t.test("displayed, copied, and downloaded starters match with CDN or local assets", async () => {
       const playground = await browser.newPage();
       const errors = [];
