@@ -12,6 +12,9 @@ test("Markdown rendering", async (t) => {
   });
   try {
     const page = await browser.newPage();
+    const readme = await fs.readFile(path.join(__dirname, "../README.md"), "utf8");
+    const version = readme.match(/easy-md-viewer@v([^/]+)\//)?.[1];
+    assert.ok(version, "README must pin a viewer release");
     await page.addScriptTag({ path: path.join(__dirname, "../md.js") });
     await t.test("duplicate imports preserve the installed renderer", async () => {
       await page.evaluate(() => {
@@ -91,8 +94,8 @@ test("Markdown rendering", async (t) => {
         return info;
       });
       assert.deepEqual(info, {
-        version: "1.6",
-        text: "easy-md-viewer · v1.6 · @byUwUr",
+        version,
+        text: `easy-md-viewer · v${version} · @byUwUr`,
         semiTransparent: true,
         count: 1,
         independent: true,
@@ -292,6 +295,7 @@ test("Markdown rendering", async (t) => {
       });
       await playground.goto("https://viewer.test/index.html");
       const cdnCode = await playground.locator("#integration-code").inputValue();
+      assert.ok(cdnCode.includes(`easy-md-viewer@v${version}/`));
       const markdown = "# Downloaded document\n\n**Unicode: á 👋**\n\n</script><script>window.injected=true</script>\n\n`backticks` and ${literal}";
       await playground.locator("#markdown-source").fill(markdown);
       await playground.locator("#withLinks").uncheck();

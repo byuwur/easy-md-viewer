@@ -1385,6 +1385,6 @@
     const normalized = source.replace(/\r\n?/g, "\n").replace(/^\uFEFF/, "");
     renderBlocks(element, normalized.split("\n"), options);
   };
-  global.byMDviewer.VERSION = "1.6"; // 2026-10-17
+  global.byMDviewer.VERSION = "1.7"; // 2026-10-18
   global.byMDviewer.initialized = true;
 })(typeof window !== "undefined" ? window : this);

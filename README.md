@@ -9,9 +9,9 @@ Try [GitHub Pages](https://byuwur.github.io/easy-md-viewer/) or [CodePen](https:
 ## Installation
 
 ```html
-<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.6/md.min.css" rel="stylesheet" />
-<link id="byVIEWtheme" href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.6/md.light.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.6/md.min.js" defer></script>
+<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.7/md.min.css" rel="stylesheet" />
+<link id="byVIEWtheme" href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.7/md.light.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.7/md.min.js" defer></script>
 ```
 
 For local use, save `md.js`, `md.css`, and `md.light.css` beside your HTML and use those paths. Omit the CDN version only when testing development changes; pinned URLs need a new release to receive fixes.
