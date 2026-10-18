@@ -17,6 +17,7 @@
    * Appends a text node to an element.
    * @param {Node} parent - Parent DOM node.
    * @param {string} text - Text to append.
+   * @returns {void}
    */
   const appendText = (parent, text) => {
     if (text) parent.appendChild(document.createTextNode(text));
@@ -301,6 +302,8 @@
   /**
    * Produces plain text suitable
    * for image alt text.
+   * @param {string} text Text to format or render.
+   * @returns {string}
    */
   const plainText = (text) => text.replace(/\\([\\`*{}\[\]()#+\-.!_>~|])/g, "$1").replace(/[`*_~]/g, "");
 
@@ -342,6 +345,7 @@
    *
    * @param {HTMLAnchorElement} anchor
    * @param {Object} options
+   * @returns {void}
    */
   const configureAnchor = (anchor, options) => {
     if (!options.linkTarget || anchor.getAttribute("href")?.startsWith("#")) return;
@@ -352,6 +356,8 @@
   /**
    * Trims punctuation commonly following
    * a bare URL in prose.
+   * @param {unknown} value Value supplied by the caller.
+   * @returns {string}
    */
   const trimBareUrl = (value) => {
     let url = value;
@@ -374,6 +380,10 @@
   /**
    * Renders inline Markdown without
    * ever using innerHTML.
+   * @param {HTMLElement} parent Element that receives the created content.
+   * @param {string} text Text to format or render.
+   * @param {Object} options Options that configure this operation.
+   * @returns {void}
    */
   const appendInline = (parent, text, options) => {
     let buffer = "";
@@ -684,6 +694,8 @@
 
   /**
    * Checks whether a line is a Markdown horizontal rule.
+   * @param {string} line One source line.
+   * @returns {boolean}
    */
   const isHorizontalRule = (line) => {
     const value = line.trim();
@@ -805,6 +817,7 @@
    * @param {string} line
    * @param {boolean} last
    * @param {Object} options
+   * @returns {void}
    */
   const appendInlineLine = (parent, line, last, options) => {
     let source = line;
@@ -1068,6 +1081,7 @@
    * @param {Node} parent
    * @param {string[]} lines
    * @param {Object} options
+   * @returns {void}
    */
   function renderBlocks(parent, lines, options) {
     lines = stripComments(lines, options);
@@ -1229,6 +1243,13 @@
     return sizes;
   };
 
+  /**
+   * Add a copy action for the complete source, including content outside the visible rendered chunk.
+   * @param {unknown} controls Controls.
+   * @param {Function} getText Callback that returns the text to copy.
+   * @param {string} label Human-readable label.
+   * @returns {void}
+   */
   const appendCopyButton = (controls, getText, label) => {
     const button = document.createElement("button");
     button.type = "button";
@@ -1262,7 +1283,11 @@
     });
   };
 
-  /** innerText needs a rendered node to preserve paragraph and code line breaks. */
+  /**
+   * innerText needs a rendered node to preserve paragraph and code line breaks.
+   * @param {HTMLElement} element DOM element owned by this operation.
+   * @returns {string}
+   */
   const getPlainText = (element) => {
     const copy = element.cloneNode(true);
     copy.querySelectorAll(".byVIEWcontrols, .byVIEWinfo").forEach((control) => control.remove());
@@ -1277,6 +1302,14 @@
     }
   };
 
+  /**
+   * Attach the enabled theme, size, and copy controls to this renderer instance.
+   * @param {HTMLElement} element DOM element owned by this operation.
+   * @param {Object} options Options that configure this operation.
+   * @param {string} filename File name or relative asset path.
+   * @param {unknown} source Source data consumed without taking ownership of its storage.
+   * @returns {void}
+   */
   const appendViewerControls = (element, options, filename, source) => {
     const controls = document.createElement("div");
     controls.className = "byVIEWcontrols";
@@ -1316,6 +1349,8 @@
    * @param {boolean} [options.themeToggle=true] - Adds the theme toggle.
    * @param {boolean} [options.fontSizeControls=true] - Adds viewer-local text size controls.
    * @param {boolean} [options.copyButton=true] - Adds a clipboard copy button.
+   * @returns {void}
+   * @throws {TypeError}
    */
   global.byMDviewer = function byMDviewer(element, markdown, options = {}) {
     if (!(element instanceof HTMLElement)) throw new TypeError("byMDviewer: element must be an HTMLElement.");
