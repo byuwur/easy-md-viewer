@@ -8,6 +8,7 @@
  */
 
 (function (global) {
+  if (global.byMDviewer?.initialized) return;
   const ESCAPABLE = /[\\`*{}\[\]()#+\-.!_>~|]/;
   const SAFE_LINK_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:", "ftp:", "ftps:"]);
   const SAFE_IMAGE_PROTOCOLS = new Set(["http:", "https:"]);
@@ -1382,4 +1383,5 @@
     renderBlocks(element, normalized.split("\n"), options);
   };
   global.byMDviewer.VERSION = "1.6"; // 2026-10-17
+  global.byMDviewer.initialized = true;
 })(typeof window !== "undefined" ? window : this);

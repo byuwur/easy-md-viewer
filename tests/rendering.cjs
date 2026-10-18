@@ -13,6 +13,13 @@ test("Markdown rendering", async (t) => {
   try {
     const page = await browser.newPage();
     await page.addScriptTag({ path: path.join(__dirname, "../md.js") });
+    await t.test("duplicate imports preserve the installed renderer", async () => {
+      await page.evaluate(() => {
+        window.installedRenderer = byMDviewer;
+      });
+      await page.addScriptTag({ path: path.join(__dirname, "../md.js") });
+      assert.equal(await page.evaluate(() => byMDviewer === installedRenderer), true);
+    });
     const results = await page.evaluate(() => {
       const cases = [
         ["single backticks ignore longer runs", "`a``b`", (root) => root.querySelector("code")?.textContent === "a``b"],
