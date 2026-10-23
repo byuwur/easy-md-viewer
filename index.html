@@ -240,7 +240,7 @@
           <p class="text-body-secondary">Copy or download this short Markdown starter with default settings.</p>
           <p class="text-body-secondary small">CDN starters require internet access. Local starters need the viewer files beside the HTML.</p>
           <p class="text-body-secondary small">Playground powered by <a class="site-link" href="https://github.com/byuwur/spa.js" target="_blank" rel="noopener">SPA.js</a>.</p>
-          <p id="integration-note" class="text-body-secondary small mb-2">CDN pinned @v1.7. Local source may include newer fixes.</p>
+          <p id="integration-note" class="text-body-secondary small mb-2">CDN pinned @v1.8. Local source may include newer fixes.</p>
           <a class="site-link small" href="https://github.com/byuwur/easy-md-viewer#usage" target="_blank" rel="noopener">Read the full API <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i></a>
         </div>
         <div class="col-lg-8">
@@ -1129,7 +1129,7 @@
         function generateIntegration() {
           document.getElementById("options-json").value = JSON.stringify(state.options, null, 2);
           const cdn = state.integrationMode === "cdn";
-          const path = cdn ? "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.7/" : "";
+          const path = cdn ? "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.8/" : "";
           const html = dedent(/* HTML */ `
             <!doctype html>
             <html lang="en">
@@ -1149,7 +1149,7 @@
             </html>
           `);
           document.getElementById("integration-code").value = html;
-          document.getElementById("integration-note").textContent = cdn ? "CDN pinned @v1.7. Local source may include newer fixes." : "Place the HTML beside md.js, md.css, md.light.css, and md.dark.css.";
+          document.getElementById("integration-note").textContent = cdn ? "CDN pinned @v1.8. Local source may include newer fixes." : "Place the HTML beside md.js, md.css, md.light.css, and md.dark.css.";
           return html;
         }
 
