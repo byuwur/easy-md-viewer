@@ -1166,22 +1166,20 @@
       const match = (stylesheet.getAttribute("href") || "").match(themePattern);
       return match ? match[2].toLowerCase() : null;
     };
-    if (!getTheme()) return null;
     const button = document.createElement("button");
     button.type = "button";
     button.className = "byVIEWthemeToggle";
-    button.textContent = "\u263E\uFE0E \u2600\uFE0E"; // ☾︎ ☀︎
+    button.innerHTML = '<span aria-hidden="true">\u263E\uFE0E</span> <span aria-hidden="true">\u2600\uFE0E</span>';
     // Keep accessibility text consistent with the theme actually loaded.
     const sync = () => {
       const next = getTheme() === "dark" ? "light" : "dark";
-      for (const toggle of [button, ...document.querySelectorAll(".byMDdocument > .byVIEWcontrols > .byVIEWthemeToggle")]) {
+      for (const toggle of [button, ...document.querySelectorAll(".byMDdocument > .byVIEWtoolbar > .byVIEWcontrols > .byVIEWthemeToggle")]) {
         toggle.title = `Switch to ${next} theme`;
         toggle.setAttribute("aria-label", toggle.title);
       }
     };
     button.addEventListener("click", () => {
-      const current = getTheme();
-      const next = current === "dark" ? "light" : "dark";
+      const next = getTheme() === "dark" ? "light" : "dark";
       const href = stylesheet.getAttribute("href") || "";
 
       // Replace only the theme filename while preserving paths and query strings.
@@ -1294,7 +1292,7 @@
    */
   const getPlainText = (element) => {
     const copy = element.cloneNode(true);
-    copy.querySelectorAll(".byVIEWcontrols, .byVIEWinfo").forEach((control) => control.remove());
+    copy.querySelectorAll(".byVIEWtoolbar").forEach((toolbar) => toolbar.remove());
     copy.style.cssText += "; position: fixed; top: 0; left: -9999px; opacity: 0; pointer-events: none;";
     copy.style.width = `${element.getBoundingClientRect().width}px`;
     copy.setAttribute("aria-hidden", "true");
@@ -1315,6 +1313,11 @@
    * @returns {void}
    */
   const appendViewerControls = (element, options, filename, source) => {
+    const toolbar = document.createElement("div");
+    toolbar.className = "byVIEWtoolbar";
+    toolbar.dataset.size = ["small", "regular", "large"].includes(options.controlsSize) ? options.controlsSize : "regular";
+    element.classList.toggle("byVIEWcompact", Boolean(options.controlsCompact));
+    element.classList.toggle("byVIEWbottom", options.controlsPosition === "bottom");
     const controls = document.createElement("div");
     controls.className = "byVIEWcontrols";
     controls.setAttribute("role", "group");
@@ -1323,11 +1326,13 @@
     info.className = "byVIEWinfo";
     info.innerHTML = /* HTML */ `<a href="https://github.com/byuwur/easy-md-viewer" target="_blank" rel="noopener noreferrer">easy-md-viewer</a> · v${global.byMDviewer.VERSION} ·
       <a href="https://byuwur.co" target="_blank" rel="noopener noreferrer">@byUwUr</a>`;
-    element.appendChild(info);
+    toolbar.appendChild(info);
     if (options.themeToggle) appendThemeToggle(controls, filename);
     if (options.fontSizeControls) appendFontSizeControls(element, controls);
     if (options.copyButton) appendCopyButton(controls, (event) => (event.shiftKey ? source : getPlainText(element)), "Copy text (Shift+click for Markdown)");
-    if (controls.childNodes.length) element.appendChild(controls);
+    if (controls.childNodes.length) toolbar.appendChild(controls);
+    if (options.controlsPosition === "bottom") element.appendChild(toolbar);
+    else element.prepend(toolbar);
   };
 
   /**
@@ -1353,6 +1358,9 @@
    * @param {boolean} [options.themeToggle=true] - Adds the theme toggle.
    * @param {boolean} [options.fontSizeControls=true] - Adds viewer-local text size controls.
    * @param {boolean} [options.copyButton=true] - Adds a clipboard copy button.
+   * @param {"small"|"regular"|"large"} [options.controlsSize="regular"] - Sets the control size; invalid values use regular.
+   * @param {boolean} [options.controlsCompact=false] - Places attribution beside the controls, wrapping as needed.
+   * @param {"top"|"bottom"} [options.controlsPosition="top"] - Keeps the toolbar at the scroll area's top or bottom while the viewer is visible; invalid values use top.
    * @returns {void}
    * @throws {TypeError}
    */
@@ -1374,16 +1382,22 @@
       themeToggle: true,
       fontSizeControls: true,
       copyButton: true,
+      controlsSize: "regular",
+      controlsCompact: false,
+      controlsPosition: "top",
       ...options,
       [HEADING_IDS]: Object.create(null)
     };
     // Clear the target safely.
     element.textContent = "";
     element.classList.add("byMDdocument");
-    appendViewerControls(element, options, "md", source);
     // Normalize line endings and remove the BOM.
     const normalized = source.replace(/\r\n?/g, "\n").replace(/^\uFEFF/, "");
-    renderBlocks(element, normalized.split("\n"), options);
+    const content = document.createElement("div");
+    content.className = "byMDcontent";
+    element.appendChild(content);
+    renderBlocks(content, normalized.split("\n"), options);
+    appendViewerControls(element, options, "md", source);
   };
   global.byMDviewer.VERSION = "1.7"; // 2026-10-18
   global.byMDviewer.initialized = true;

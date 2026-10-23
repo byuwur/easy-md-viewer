@@ -1,5 +1,5 @@
 .byMDdocument {
-  --by-view-toggle-position: 1.7rem;
+  --by-view-toggle-position: calc(100% - 1.625em + 2px);
   --by-view-muted: #444;
   --by-md-bg: #111;
   --by-md-text: #eee;
