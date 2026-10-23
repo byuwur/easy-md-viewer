@@ -31,6 +31,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/css/shards.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/css/fontawesome.min.css" />
+    <script src="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/js/popper.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/js/bootstrap.min.js" defer></script>
   </head>
 
@@ -698,6 +699,14 @@
             group: "viewer",
             example: "controls"
           },
+          {
+            name: "controlsCompact",
+            label: "Compact controls",
+            description: "Attribution and buttons share a row when space allows",
+            default: false,
+            group: "viewer",
+            example: "controls"
+          },
           { name: "withLinks", label: "Links", description: "Links, URLs & email addresses", default: true, example: "links" },
           { name: "withImages", label: "Images", description: "Responsive, lazy-loaded images", default: true, example: "images" },
           { name: "withTables", label: "Tables", description: "Columns & text alignment", default: true, example: "tables" },
@@ -705,7 +714,7 @@
           { name: "withStrikethrough", label: "Strikethrough", description: "Render ~~crossed-out text~~", default: true, example: "formatting" },
           { name: "breaks", label: "Soft line breaks", description: "Keep paragraph line breaks", default: false, example: "breaks" }
         ];
-        const defaults = { ...Object.fromEntries(optionDefinitions.map((option) => [option.name, option.default])), linkTarget: "_blank" };
+        const defaults = { ...Object.fromEntries(optionDefinitions.map((option) => [option.name, option.default])), controlsSize: "regular", controlsPosition: "top", linkTarget: "_blank" };
         const editor = document.getElementById("markdown-source");
         const frame = document.getElementById("preview-frame");
         const sourceSelect = document.getElementById("document-source");
@@ -842,6 +851,33 @@
             `);
             document.getElementById(option.group === "viewer" ? "viewer-options" : "render-options").append(row);
           }
+          document.getElementById("viewer-options").insertAdjacentHTML(
+            "beforeend",
+            dedent(/* HTML */ `
+              <div class="row g-2 mt-3">
+                <fieldset class="col-6" id="controlsSize">
+                  <legend class="option-label small mb-2">Controls Size</legend>
+                  <div class="btn-group w-100" role="group" aria-label="Control size">
+                    <input class="btn-check" id="controlsSize-small" name="controlsSize" type="radio" value="small" aria-label="Small controls" />
+                    <label class="btn btn-quiet btn-sm flex-fill" for="controlsSize-small" title="Small" data-bs-toggle="tooltip" data-bs-placement="bottom">a</label>
+                    <input class="btn-check" id="controlsSize-regular" name="controlsSize" type="radio" value="regular" aria-label="Regular controls" checked />
+                    <label class="btn btn-quiet btn-sm flex-fill" for="controlsSize-regular" title="Regular" data-bs-toggle="tooltip" data-bs-placement="bottom">Aa</label>
+                    <input class="btn-check" id="controlsSize-large" name="controlsSize" type="radio" value="large" aria-label="Large controls" />
+                    <label class="btn btn-quiet btn-sm flex-fill" for="controlsSize-large" title="Large" data-bs-toggle="tooltip" data-bs-placement="bottom">A</label>
+                  </div>
+                </fieldset>
+                <fieldset class="col-6" id="controlsPosition">
+                  <legend class="option-label small mb-2">Controls Position</legend>
+                  <div class="btn-group w-100" role="group" aria-label="Controls position">
+                    <input class="btn-check" id="controlsPosition-top" name="controlsPosition" type="radio" value="top" aria-label="Top controls" checked />
+                    <label class="btn btn-quiet btn-sm flex-fill" for="controlsPosition-top" title="Top" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></label>
+                    <input class="btn-check" id="controlsPosition-bottom" name="controlsPosition" type="radio" value="bottom" aria-label="Bottom controls" />
+                    <label class="btn btn-quiet btn-sm flex-fill" for="controlsPosition-bottom" title="Bottom" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></label>
+                  </div>
+                </fieldset>
+              </div>
+            `)
+          );
           document.getElementById("render-options").insertAdjacentHTML(
             "beforeend",
             dedent(/* HTML */ `
@@ -1029,6 +1065,14 @@
                 <base href="${base}" />
                 <link rel="stylesheet" href="md.css" />
                 <link id="byVIEWtheme" rel="stylesheet" href="md.light.css" />
+                <style>
+                  body {
+                    margin: 0;
+                  }
+                  #document {
+                    min-height: 100vh;
+                  }
+                </style>
                 ${'<script src="md.js"><\/script>'}
               </head>
               <body>
@@ -1158,6 +1202,17 @@
         // === EVENTS ===
         // =============
         buildConfigurator();
+        const controlTooltips = [];
+        if (window.bootstrap?.Tooltip && typeof window.Popper?.createPopper === "function") {
+          document.querySelectorAll('#viewer-options label[data-bs-toggle="tooltip"]').forEach((label) => {
+            const tooltip = bootstrap.Tooltip.getOrCreateInstance(label, { container: "body", trigger: "hover", animation: false });
+            const input = document.getElementById(label.htmlFor);
+            input.addEventListener("focus", () => tooltip.show());
+            input.addEventListener("blur", () => tooltip.hide());
+            controlTooltips.push(tooltip);
+          });
+        }
+        window.addEventListener("pagehide", () => controlTooltips.forEach((tooltip) => tooltip.hide()));
         document.querySelectorAll("[data-options-view]").forEach((button) =>
           button.addEventListener("click", () => {
             const jsonView = button.dataset.optionsView === "json";
