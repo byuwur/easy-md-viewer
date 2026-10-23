@@ -225,7 +225,7 @@ test("Markdown rendering", async (t) => {
         await themed.close();
       }
     });
-    await t.test("control sizes and toolbar positions stay responsive through rerenders", async () => {
+    await t.test("control sizes and toolbar positions stay responsive across fonts and rerenders", async () => {
       const preview = await browser.newPage();
       try {
         await preview.addStyleTag({ path: path.join(__dirname, "../md.css") });
@@ -240,13 +240,21 @@ test("Markdown rendering", async (t) => {
           document.body.appendChild(root);
           const sizes = {};
           const failures = [];
-          for (const width of [200, 320, 360, 640]) {
+          for (const [width, fontFamily] of [
+            [200, ""],
+            [320, ""],
+            [360, ""],
+            [360, "monospace"],
+            [640, "monospace"],
+            [640, ""]
+          ]) {
             root.style.width = `${width}px`;
             for (const controlsSize of ["small", "regular", "large"]) {
               for (const controlsCompact of [false, true]) {
                 for (const controlsPosition of ["top", "bottom"]) {
                   byMDviewer(root, "# Sample\n\nA paragraph that stays clear of the toolbar.", { controlsSize, controlsCompact, controlsPosition });
                   const toolbar = root.querySelector(".byVIEWtoolbar");
+                  toolbar.style.fontFamily = fontFamily;
                   const bounds = toolbar.getBoundingClientRect();
                   const info = root.querySelector(".byVIEWinfo").getBoundingClientRect();
                   const controls = root.querySelector(".byVIEWcontrols").getBoundingClientRect();
@@ -269,9 +277,12 @@ test("Markdown rendering", async (t) => {
                       return rect.left >= bounds.left - 1 && rect.right <= bounds.right + 1;
                     });
                   const separated = controlsPosition === "top" ? bounds.bottom <= first.top + 1 : bounds.top >= last.bottom - 1;
-                  const checkAlignment = width === 640 || (width === 360 && controlsSize === "small" && controlsCompact);
-                  const aligned = !checkAlignment || (controlsCompact ? info.top < controls.bottom && info.bottom > controls.top : controlsPosition === "bottom" ? controls.bottom <= info.top : info.bottom <= controls.top);
-                  if (!fits || !separated || !aligned || !equalHeight || !themeFits) failures.push({ width, controlsSize, controlsCompact, controlsPosition, fits, separated, aligned, equalHeight, themeFits });
+                  const sameRow = info.top < controls.bottom && info.bottom > controls.top;
+                  const ordered = controlsPosition === "bottom" ? controls.bottom <= info.top : info.bottom <= controls.top;
+                  const aligned = controlsCompact && sameRow ? info.right <= controls.left + 1 : ordered;
+                  const compactWhenWide = !controlsCompact || width < 640 || sameRow;
+                  if (!fits || !separated || !aligned || !compactWhenWide || !equalHeight || !themeFits)
+                    failures.push({ width, fontFamily, controlsSize, controlsCompact, controlsPosition, fits, separated, aligned, compactWhenWide, equalHeight, themeFits });
                   sizes[controlsSize] = buttons[1].getBoundingClientRect().width;
                 }
               }
