@@ -1,13 +1,15 @@
 /* byuwur was here */
 .byMDdocument {
   position: relative;
-  --by-md-bg: transparent;
-  --by-md-text: inherit;
+  --by-view-toggle-position: 0.2rem;
+  --by-view-muted: #bbb;
+  --by-md-bg: #eee;
+  --by-md-text: #111;
   --by-md-muted: #666;
   --by-md-border: #ddd;
   --by-md-link: #56f;
   --by-md-code-bg: #ddd;
-  --by-md-quote: #556;
+  --by-md-quote: #566;
   --by-md-table-alt: #eef;
   box-sizing: border-box;
   color: var(--by-md-text);
@@ -68,12 +70,15 @@
 .byMDlink:hover {
   text-decoration: underline;
 }
+.byMDinlineCode,
+.byMDcodeBlock code {
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.85em;
+}
 .byMDinlineCode {
   padding: 0.2em 0.4em;
   border-radius: 0.375rem;
   background: var(--by-md-code-bg);
-  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
-  font-size: 0.85em;
 }
 .byMDcodeBlock {
   margin: 0 0 1em;
@@ -86,8 +91,6 @@
 .byMDcodeBlock code {
   padding: 0;
   background: transparent;
-  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
-  font-size: 0.85em;
   white-space: pre;
 }
 .byMDblockquote {
@@ -269,6 +272,7 @@
   content: "";
   position: absolute;
   top: 0.2rem;
+  left: var(--by-view-toggle-position);
   width: 1rem;
   height: 1rem;
   border-radius: 50%;

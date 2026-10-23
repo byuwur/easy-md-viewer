@@ -1,5 +1,7 @@
 .byMDdocument {
-  --by-md-bg: #fff;
+  --by-view-toggle-position: 0.2rem;
+  --by-view-muted: #bbb;
+  --by-md-bg: #eee;
   --by-md-text: #111;
   --by-md-muted: #666;
   --by-md-border: #ddd;
@@ -7,10 +9,4 @@
   --by-md-code-bg: #ddd;
   --by-md-quote: #566;
   --by-md-table-alt: #eef;
-}
-.byMDdocument > .byVIEWcontrols .byVIEWthemeToggle {
-  color: #111;
-}
-.byMDdocument > .byVIEWcontrols .byVIEWthemeToggle::after {
-  left: 0.2rem;
 }
