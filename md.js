@@ -1416,6 +1416,6 @@
     renderBlocks(content, normalized.split("\n"), options);
     appendViewerControls(element, options, "md", source);
   };
-  global.byMDviewer.VERSION = "1.8"; // 2026-10-23
+  global.byMDviewer.VERSION = "2"; // 2026-11-01
   global.byMDviewer.initialized = true;
 })(typeof window !== "undefined" ? window : this);
