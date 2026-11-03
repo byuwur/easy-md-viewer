@@ -918,16 +918,21 @@
       code.dataset.language = language;
     }
     code.textContent = body.join("\n");
-    if (options.codeHighlighting && typeof global.byCODEviewer?.highlight !== "function") {
-      console.warn("easy-md-viewer: Code highlighting requires easy-code-viewer. https://byuwur.github.io/easy-code-viewer/");
-      // These options belong to this render; avoid repeating the warning for each fence.
-      options.codeHighlighting = false;
-    }
-    if (options.codeHighlighting) {
-      try {
-        code.replaceChildren(global.byCODEviewer.highlight(code.textContent, language || "plain"));
-      } catch {
-        // Optional highlighting must not interrupt Markdown or discard the original code.
+    if (options.codeHighlighting || options.codeLineNumbers || options.codeStatusBar) {
+      if (typeof global.byCODEviewer?.highlight !== "function") {
+        console.warn("easy-md-viewer: Code highlighting and code-block details require easy-code-viewer. https://byuwur.github.io/easy-code-viewer/");
+        // These options belong to this render; avoid repeating the warning for each fence.
+        options.codeHighlighting = options.codeLineNumbers = options.codeStatusBar = false;
+      } else {
+        try {
+          code.replaceChildren(global.byCODEviewer.highlight(code.textContent, language || "plain", {
+            highlighting: options.codeHighlighting,
+            lineNumbers: options.codeLineNumbers,
+            statusBar: options.codeStatusBar
+          }));
+        } catch {
+          // Optional code presentation must not interrupt Markdown or discard the source.
+        }
       }
     }
     pre.appendChild(code);
@@ -1327,6 +1332,8 @@
   const getPlainText = (element) => {
     const copy = element.cloneNode(true);
     copy.querySelectorAll(".byVIEWtoolbar").forEach((toolbar) => toolbar.remove());
+    // Flatten code presentation so visual rows cannot add line breaks to copied source.
+    copy.querySelectorAll(".byMDcodeBlock code").forEach((code) => code.replaceChildren(code.textContent));
     copy.style.cssText += "; position: fixed; top: 0; left: -10000rem; opacity: 0; pointer-events: none;";
     copy.style.width = `${element.getBoundingClientRect().width / parseFloat(getComputedStyle(document.documentElement).fontSize)}rem`;
     copy.setAttribute("aria-hidden", "true");
@@ -1393,6 +1400,8 @@
    * @param {boolean} [options.withTasks=true]
    * @param {boolean} [options.withStrikethrough=true]
    * @param {boolean} [options.codeHighlighting=true] - Highlights fences when easy-code-viewer is loaded.
+   * @param {boolean} [options.codeLineNumbers=false] - Adds non-copying line-number gutters to fences.
+   * @param {boolean} [options.codeStatusBar=false] - Shows the language and line count above fences.
    * @param {boolean} [options.breaks=false]
    * @param {string|false} [options.linkTarget="_blank"]
    * @param {boolean} [options.toolbar=true] - Show the viewer header.
@@ -1420,6 +1429,8 @@
       withTasks: true,
       withStrikethrough: true,
       codeHighlighting: true,
+      codeLineNumbers: false,
+      codeStatusBar: false,
       breaks: false,
       linkTarget: "_blank",
       toolbar: true,

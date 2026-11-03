@@ -263,6 +263,15 @@
   background: transparent;
   white-space: pre;
 }
+.byMDcodeBlock:has(.byCODEblock) {
+  --by-view-border: var(--by-md-border);
+  --by-view-bg: var(--by-md-code-bg);
+  --by-view-text: var(--by-md-text);
+  --by-view-alt: var(--by-md-table-alt);
+  --by-view-secondary: var(--by-md-muted);
+  padding: 0;
+  background: transparent;
+}
 .byMDblockquote {
   margin: 0 0 1em;
   padding: 0 1em;

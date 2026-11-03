@@ -698,6 +698,8 @@ Write Markdown here…"></textarea>
           { name: "withTasks", label: "Task lists", description: "Read-only task checkboxes", default: true, example: "tasks" },
           { name: "withStrikethrough", label: "Strikethrough", description: "Render ~~crossed-out text~~", default: true, example: "formatting" },
           { name: "codeHighlighting", label: "Syntax highlighting", default: true, example: "code" },
+          { name: "codeLineNumbers", label: "Code line numbers", default: false, example: "code" },
+          { name: "codeStatusBar", label: "Code status info", default: false, example: "code" },
           { name: "breaks", label: "Soft line breaks", description: "Keep paragraph line breaks", default: false, example: "breaks" }
         ];
         const defaults = { ...Object.fromEntries(optionDefinitions.map((option) => [option.name, option.default])), controlsSize: "regular", controlsPosition: "top", linkTarget: "_blank" };

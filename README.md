@@ -67,6 +67,8 @@ Pass options as the third argument, such as `byMDviewer(target, markdown, { brea
 | `withTasks`         | `true`      | Render task checkboxes.                                                      |
 | `withStrikethrough` | `true`      | Render `~~strikethrough~~`.                                                  |
 | `codeHighlighting` | `true` | Highlight fenced code when easy-code-viewer is loaded; `false` keeps plain code. |
+| `codeLineNumbers` | `false` | Show a framed code block with a line-number gutter. |
+| `codeStatusBar` | `false` | Show a framed code block with its language and line count. |
 | `breaks`            | `false`     | Convert paragraph line breaks to `<br>`.                                     |
 | `linkTarget`        | `"_blank"`  | Link target; `false` omits it. Same-document anchors stay in this tab.       |
 | `toolbar` | `true` | Show the viewer header; secondary tools are configured separately. |
@@ -170,9 +172,18 @@ Keep the Markdown files too. For offline use, save all four files beside your HT
 
 Label fences with `js`, `javascript`, or another language supported by the code viewer; aliases work too. Blocks inherit the document's palette, mode, and text size, including High Contrast. Custom palettes can override `--by-code-comment`, `--by-code-keyword`, `--by-code-string`, `--by-code-number`, `--by-code-property`, and `--by-code-tag` on `.byMDdocument`.
 
-Only fenced blocks are enhanced, without extra controls or line numbers. Inline code stays plain. Unknown languages stay uncolored; missing libraries or highlighting limits/errors leave the original code readable. No assets are fetched by the renderer. Loading the library later takes effect on the next render. Set `codeHighlighting: false` to opt out.
+Only fenced blocks are enhanced, without extra toolbars. Inline code stays plain. Unknown languages stay uncolored; missing libraries or highlighting limits/errors leave the original code readable. No assets are fetched by the renderer. Loading the library later takes effect on the next render. Set `codeHighlighting: false` to opt out.
 
-If highlighting is enabled but the library is missing, the first fence logs a console warning with the easy-code-viewer landing link, once per render.
+Set `codeLineNumbers: true` and `codeStatusBar: true` for the code viewer's compact frame, gutter, and status row. Both are off by default and can be switched independently. They also work with `codeHighlighting: false` for uncolored source. These options use the code viewer's fragment API, without mounting a nested viewer; copy excludes the presentation labels.
+
+```javascript
+byMDviewer(document.getElementById("document"), markdown, {
+  codeLineNumbers: true,
+  codeStatusBar: true
+});
+```
+
+If highlighting or code-block details are enabled but the library is missing, the first fence logs a console warning with the easy-code-viewer landing link, once per render.
 
 The playground includes this integration; exported starters keep the standalone Markdown setup. Add the two code-viewer files to enable highlighting in a starter.
 

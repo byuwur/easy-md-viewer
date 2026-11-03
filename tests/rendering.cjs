@@ -1330,7 +1330,7 @@ test("optional code highlighting preserves Markdown and follows document themes"
     }, markdown);
     await t.test("missing libraries stay plain and late loading takes effect on rerender", async () => {
       assert.equal(warnings.length, 1, "Multiple and nested fences warn once per render");
-      assert.match(warnings[0], /Code highlighting requires easy-code-viewer/);
+      assert.match(warnings[0], /Code highlighting and code-block details require easy-code-viewer/);
       assert.ok(warnings[0].includes("https://byuwur.github.io/easy-code-viewer/"));
       await page.evaluate(() => {
         renderMarkdown({ codeHighlighting: false });
@@ -1383,13 +1383,37 @@ test("optional code highlighting preserves Markdown and follows document themes"
       assert.deepEqual(result, { first: source, highlighted: 4 });
       const limit = await page.evaluate(() => {
         const source = "x".repeat(2000001);
-        byMDviewer(document.getElementById("viewer"), "~~~js\n" + source + "\n~~~\n\n# Still readable");
+        byMDviewer(document.getElementById("viewer"), "~~~js\n" + source + "\n~~~\n\n# Still readable", { codeLineNumbers: true, codeStatusBar: true });
         return { preserved: document.querySelector("#viewer pre code").textContent === source, highlighted: document.querySelectorAll("#viewer .byCODEhighlight").length, heading: document.querySelector("#viewer h1").textContent };
       });
       assert.deepEqual(limit, { preserved: true, highlighted: 0, heading: "Still readable" });
       await page.evaluate(() => renderMarkdown());
     });
+    await t.test("code-block details are optional and copy excludes their presentation", async () => {
+      await page.evaluate(() => renderMarkdown());
+      await page.locator("#viewer .byVIEWcopy").click();
+      const plain = await page.evaluate(() => copies.at(-1));
+      assert.equal(await page.locator("#viewer .byCODEblock").count(), 0);
+      for (const options of [{ codeLineNumbers: true }, { codeStatusBar: true }, { codeLineNumbers: true, codeStatusBar: true }]) {
+        await page.evaluate((options) => renderMarkdown(options), options);
+        assert.equal(await page.locator("#viewer .byCODEblock").count(), 5);
+        assert.equal(await page.locator("#viewer .byCODEstatus").count(), options.codeStatusBar ? 5 : 0);
+        assert.equal(await page.locator("#viewer .byCODElineNumber").count(), options.codeLineNumbers ? 8 : 0);
+        assert.equal(await page.locator("#viewer pre code").first().textContent(), source);
+        assert.equal(await page.locator("#viewer .byCODEdocument, #viewer pre :is(button, input, select)").count(), 0);
+        assert.equal(await page.locator("#viewer .byVIEWtoolbar").count(), 1);
+        await page.locator("#viewer .byVIEWcopy").click();
+        assert.equal(await page.evaluate(() => copies.at(-1)), plain);
+        await page.locator("#viewer .byVIEWcopy").click({ modifiers: ["Shift"] });
+        assert.equal(await page.evaluate(() => copies.at(-1)), markdown);
+      }
+      await page.evaluate(() => renderMarkdown({ codeHighlighting: false, codeLineNumbers: true, codeStatusBar: true }));
+      assert.equal(await page.locator("#viewer .byCODEtoken").count(), 0);
+      assert.equal(await page.locator("#viewer .byCODEstatus").first().getAttribute("data-label"), "javascript · 4 lines");
+      assert.equal(await page.locator("#viewer pre code").first().textContent(), source);
+    });
     await t.test("all palettes, mode switches, and text sizing follow the Markdown container", async () => {
+      await page.evaluate(() => renderMarkdown({ codeLineNumbers: true, codeStatusBar: true }));
       for (const palette of ["monokai", "github", "solarized", "high-contrast"]) {
         await page.locator("#viewer").evaluate((root, palette) => {
           root.dataset.theme = palette;
@@ -1450,7 +1474,7 @@ test("optional code highlighting preserves Markdown and follows document themes"
   }
 });
 
-test("playground code examples can switch highlighting without changing the Markdown", async () => {
+test("playground code examples can switch presentation without changing Markdown", async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined, channel: process.env.BROWSER_CHANNEL || undefined });
   try {
     const page = await browser.newPage();
@@ -1475,6 +1499,17 @@ test("playground code examples can switch highlighting without changing the Mark
     await page.locator("#codeHighlighting").evaluate((input) => input.click());
     await frame.locator(".byCODEkeyword").first().waitFor();
     assert.equal(JSON.parse(await page.locator("#options-json").inputValue()).codeHighlighting, true);
+    for (const name of ["codeLineNumbers", "codeStatusBar"]) {
+      assert.equal(await page.locator(`#${name}`).isChecked(), false);
+      await page.locator(`#${name}`).evaluate((input) => input.click());
+      await page.waitForFunction((name) => document.getElementById("preview-frame").contentDocument.querySelector(name === "codeLineNumbers" ? ".byCODElineNumber" : ".byCODEstatus"), name);
+      assert.equal(JSON.parse(await page.locator("#options-json").inputValue())[name], true);
+    }
+    assert.equal(await page.locator("#markdown-source").inputValue(), markdown);
+    assert.equal(await frame.locator(".byCODEblock").count(), 2);
+    await page.locator("#reset-options").click();
+    await page.waitForFunction(() => !document.getElementById("preview-frame").contentDocument.querySelector(".byCODEblock"));
+    for (const name of ["codeLineNumbers", "codeStatusBar"]) assert.equal(await page.locator(`#${name}`).isChecked(), false);
   } finally {
     await browser.close();
   }
