@@ -1180,6 +1180,8 @@ Write Markdown here…"></textarea>
           const caption = button.querySelector("span");
           const label = caption.textContent;
           const reset = () => {
+            // Keep the manual-copy hint visible until the next successful copy.
+            if (caption.textContent === "Failed") return;
             caption.textContent = label;
             button.removeAttribute("title");
           };
