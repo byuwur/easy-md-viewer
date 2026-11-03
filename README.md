@@ -68,6 +68,8 @@ Pass options as the third argument, such as `byMDviewer(target, markdown, { brea
 | `withStrikethrough` | `true`      | Render `~~strikethrough~~`.                                                  |
 | `breaks`            | `false`     | Convert paragraph line breaks to `<br>`.                                     |
 | `linkTarget`        | `"_blank"`  | Link target; `false` omits it. Same-document anchors stay in this tab.       |
+| `toolbar` | `true` | Show the viewer header; secondary tools are configured separately. |
+| `credits` | `true` | Show attribution in the header. |
 | `themeToggle`       | `true`      | Show the theme toggle.                                                       |
 | `fontSizeControls`  | `true`      | Show text-size controls.                                                     |
 | `copyButton`        | `true`      | Show Copy: click for rendered plain text; Shift+click for original Markdown. |
@@ -80,6 +82,8 @@ Plain-text copying preserves paragraph and code line breaks, excluding controls 
 Read the library version with `byMDviewer.VERSION`.
 
 Controls stick to the selected edge of the page or nearest scrolling container.
+
+The default header shows Theme, text-size controls, and Copy. Secondary tools are opt-in. Use `toolbar: false` to hide the header, or switch individual controls off as needed.
 
 Controls use monospace by default; override `--by-view-controls-font` to change it.
 

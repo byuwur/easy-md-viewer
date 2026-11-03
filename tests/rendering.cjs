@@ -759,7 +759,7 @@ test("family customization, navigation and monospace controls", async () => {
         .then((labels) => labels.map((label) => label.trim()).slice(0, 3)),
       ["Preview appearance", "Viewer controls", "Rendering"]
     );
-    assert.deepEqual(await page.locator("#options-json").evaluate((editor) => Object.keys(JSON.parse(editor.value)).slice(0, 15)), [
+    assert.deepEqual(await page.locator("#options-json").evaluate((editor) => Object.keys(JSON.parse(editor.value)).slice(0, 17)), [
       "theme",
       "palette",
       "fontFamily",
@@ -769,7 +769,7 @@ test("family customization, navigation and monospace controls", async () => {
       "backgroundColor",
       "textColor",
       "customThemeCSS",
-      "themeToggle",
+      "toolbar", "credits", "themeToggle",
       "fontSizeControls",
       "copyButton",
       "controlsCompact",
@@ -1183,6 +1183,47 @@ test("playground palettes and editable two-mode custom themes stay synchronized"
     assert.equal(await background(), initialBackground);
     assert.equal(await page.evaluate(() => getComputedStyle(document.body).backgroundColor), hostBackground);
     assert.deepEqual(errors, []);
+  } finally {
+    await browser.close();
+  }
+});
+
+test("headers, credits, and individual controls can be hidden", async () => {
+  const browser = await chromium.launch({ channel: process.env.BROWSER_CHANNEL || undefined, executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined });
+  try {
+    const page = await browser.newPage({ viewport: { width: 320, height: 720 }, reducedMotion: "reduce" });
+    await page.setContent('<div id="viewer"></div>');
+    await page.addStyleTag({ path: path.join(__dirname, "../md.css") });
+    await page.addScriptTag({ path: path.join(__dirname, "../md.js") });
+    await page.evaluate((args) => {
+      window.renderUI = async (options = {}) => {
+        const result = byMDviewer(document.getElementById("viewer"), ...args, options);
+        await result?.ready;
+      };
+    }, ["# Example\n\nneedle"]);
+    await page.evaluate(() => renderUI());
+    assert.equal(await page.locator(".byVIEWcontrols button").count(), 5);
+    assert.equal(await page.locator(".byVIEWfontSizes").count(), 1);
+    assert.equal(await page.locator(".byVIEWactions :is(input, select, button):visible").count(), 0);
+    assert.equal(await page.locator(".byVIEWstatus:visible").count(), 0);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+    await page.evaluate(() => renderUI({ fontSizeControls: false, statusBar: false }));
+    assert.equal(await page.locator(".byVIEWfontSizes").count(), 0);
+    assert.equal(await page.locator(".byVIEWstatus:visible").count(), 0);
+    await page.evaluate(() => renderUI());
+    for (const mode of ["light", "dark"]) {
+      await page.locator("#viewer").evaluate((element, mode) => { element.dataset.theme = mode; }, mode);
+      await page.evaluate(() => renderUI({ toolbar: false, controlsPosition: "bottom", sorting: false, pagination: false, collapsible: false, details: false, lineNumbers: false, loadMore: false }));
+      assert.equal(await page.locator("#viewer :is(button, input, select, summary):visible").count(), 0);
+      assert.equal(await page.locator(".byVIEWtoolbar").count(), 0);
+      assert.equal(await page.locator("#viewer").evaluate((element) => element.classList.contains("byVIEWbottom")), false);
+      assert.match(await page.locator("#viewer").textContent(), /needle/);
+    }
+    await page.evaluate(() => renderUI({ credits: false }));
+    assert.equal(await page.locator(".byVIEWinfo").count(), 0);
+    assert.equal(await page.locator(".byVIEWcontrols button").count(), 5);
+    await page.evaluate(() => renderUI({ credits: false, themeToggle: false, fontSizeControls: false, copyButton: false }));
+    assert.equal(await page.locator(".byVIEWtoolbar").count(), 0);
   } finally {
     await browser.close();
   }

@@ -653,6 +653,8 @@ Write Markdown here…"></textarea>
 
         // --- STATE & SAMPLES ---
         const optionDefinitions = [
+          { name: "toolbar", label: "Viewer header", default: true, group: "viewer", example: "controls" },
+          { name: "credits", label: "Credits", default: true, group: "viewer", example: "controls" },
           {
             name: "themeToggle",
             label: "Theme switch",
@@ -1096,7 +1098,7 @@ Write Markdown here…"></textarea>
         // --- INTEGRATION ---
         function settingsJSON(options) {
           const field = (id) => document.getElementById(id)?.value || null;
-          const { forceMonospace, themeToggle, fontSizeControls, copyButton, controlsCompact, controlsSize, controlsPosition, ...rendering } = options;
+          const { forceMonospace, toolbar, credits, themeToggle, fontSizeControls, copyButton, controlsCompact, controlsSize, controlsPosition, ...rendering } = options;
           return JSON.stringify(
             {
               theme: document.querySelector('[name="previewTheme"]:checked').value,
@@ -1109,6 +1111,8 @@ Write Markdown here…"></textarea>
               textColor: field("preview-ink"),
               customThemeCSS: field("preview-palette") === "custom" ? field("custom-theme-css") : null,
               forceMonospace,
+              toolbar,
+              credits,
               themeToggle,
               fontSizeControls,
               copyButton,

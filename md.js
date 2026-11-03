@@ -1342,11 +1342,15 @@
     info.className = "byVIEWinfo";
     info.innerHTML = /* HTML */ `<a href="https://github.com/byuwur/easy-md-viewer" target="_blank" rel="noopener noreferrer">easy-md-viewer</a> · v${global.byMDviewer.VERSION} ·
       <a href="https://byuwur.co" target="_blank" rel="noopener noreferrer">@byUwUr</a>`;
-    toolbar.appendChild(info);
+    if (options.credits !== false) toolbar.appendChild(info);
     if (options.themeToggle) appendThemeToggle(element, controls, filename);
     if (options.fontSizeControls) appendFontSizeControls(element, controls);
     if (options.copyButton) appendCopyButton(controls, (event) => (event.shiftKey ? source : getPlainText(element)), "Copy text (Shift+click for Markdown)");
     if (controls.childNodes.length) toolbar.appendChild(controls);
+    if (options.toolbar === false || !toolbar.childNodes.length) {
+      element.classList.remove("byVIEWbottom");
+      return;
+    }
     if (options.controlsPosition === "bottom") element.appendChild(toolbar);
     else element.prepend(toolbar);
   };
@@ -1372,6 +1376,8 @@
    * @param {boolean} [options.withStrikethrough=true]
    * @param {boolean} [options.breaks=false]
    * @param {string|false} [options.linkTarget="_blank"]
+   * @param {boolean} [options.toolbar=true] - Show the viewer header.
+   * @param {boolean} [options.credits=true] - Show attribution in the header.
    * @param {boolean} [options.themeToggle=true] - Adds the theme toggle.
    * @param {boolean} [options.fontSizeControls=true] - Adds viewer-local text size controls.
    * @param {boolean} [options.copyButton=true] - Adds a clipboard copy button.
@@ -1396,6 +1402,8 @@
       withStrikethrough: true,
       breaks: false,
       linkTarget: "_blank",
+      toolbar: true,
+      credits: true,
       themeToggle: true,
       fontSizeControls: true,
       copyButton: true,
