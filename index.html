@@ -1245,6 +1245,7 @@ Write Markdown here…"></textarea>
         });
         document.getElementById("retry-source").addEventListener("click", () => selectSource(state.source));
         editor.addEventListener("input", () => {
+          ++state.sourceRequest;
           state.drafts[state.source] = editor.value;
           updateSourceState();
           scheduleRender();
@@ -1257,6 +1258,7 @@ Write Markdown here…"></textarea>
           }
         });
         document.getElementById("restore-source").addEventListener("click", () => {
+          ++state.sourceRequest;
           state.drafts[state.source] = state.originals[state.source];
           editor.value = state.drafts[state.source];
           updateSourceState();

@@ -856,6 +856,35 @@ test("family customization, navigation and monospace controls", async () => {
     await page.locator("#reset-options").evaluate((button) => button.click());
     assert.deepEqual(await root.evaluate((element) => ({ font: element.style.fontFamily, size: element.style.fontSize, bg: element.style.getPropertyValue("--by-md-bg") })), initial);
     assert.match(await frame.locator(".byVIEWtoolbar").evaluate((element) => getComputedStyle(element).fontFamily), /monospace/);
+    const sourceEditor = page.locator("#markdown-source");
+    const fileSource = await sourceEditor.inputValue();
+    await page.evaluate(() => {
+      window.originalFileText = File.prototype.text;
+      File.prototype.text = function () {
+        return new Promise((resolve) => {
+          window.finishFileRead = resolve;
+        });
+      };
+    });
+    try {
+      for (const action of ["edit", "restore", "sample"]) {
+        await sourceEditor.fill(`${fileSource}\n`);
+        await page.locator("#local-file").setInputFiles({ name: "pending.md", mimeType: "text/plain", buffer: Buffer.from(fileSource) });
+        if (action === "edit") await sourceEditor.fill(`${fileSource}\n\n`);
+        else if (action === "restore") await page.locator("#restore-source").click();
+        else await page.locator("#document-source").selectOption("features");
+        const expected = await sourceEditor.inputValue();
+        await page.evaluate((text) => window.finishFileRead(text), "An obsolete file read");
+        await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+        assert.equal(await sourceEditor.inputValue(), expected, "Late file reads preserve the newer source");
+      }
+    } finally {
+      await page.evaluate(() => {
+        File.prototype.text = window.originalFileText;
+        delete window.finishFileRead;
+        delete window.originalFileText;
+      });
+    }
     assert.deepEqual(errors, []);
   } finally {
     await browser.close();
