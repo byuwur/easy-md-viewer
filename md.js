@@ -1332,7 +1332,7 @@
     const toolbar = document.createElement("div");
     toolbar.className = "byVIEWtoolbar";
     toolbar.dataset.size = ["small", "regular", "large"].includes(options.controlsSize) ? options.controlsSize : "regular";
-    element.classList.toggle("byVIEWcompact", Boolean(options.controlsCompact));
+    element.classList.toggle("byVIEWcompact", options.controlsCompact !== false);
     element.classList.toggle("byVIEWbottom", options.controlsPosition === "bottom");
     const controls = document.createElement("div");
     controls.className = "byVIEWcontrols";
@@ -1376,7 +1376,7 @@
    * @param {boolean} [options.fontSizeControls=true] - Adds viewer-local text size controls.
    * @param {boolean} [options.copyButton=true] - Adds a clipboard copy button.
    * @param {"small"|"regular"|"large"} [options.controlsSize="regular"] - Sets the control size; invalid values use regular.
-   * @param {boolean} [options.controlsCompact=false] - Places attribution beside the controls, wrapping as needed.
+   * @param {boolean} [options.controlsCompact=true] - Places attribution beside the controls, wrapping as needed.
    * @param {"top"|"bottom"} [options.controlsPosition="top"] - Keeps the toolbar at the scroll area's top or bottom while the viewer is visible; invalid values use top.
    * @returns {void}
    * @throws {TypeError}
@@ -1400,7 +1400,7 @@
       fontSizeControls: true,
       copyButton: true,
       controlsSize: "regular",
-      controlsCompact: false,
+      controlsCompact: true,
       controlsPosition: "top",
       ...options,
       [HEADING_IDS]: Object.create(null)

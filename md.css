@@ -304,9 +304,7 @@
   margin: 0.25rem 0;
   padding: 0.5rem 0;
   background: var(--by-md-bg);
-  font:
-    0.875rem/1.25 system-ui,
-    sans-serif;
+  font: 0.875rem/1.25 var(--by-view-controls-font, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace);
   white-space: normal;
 }
 .byMDdocument > .byVIEWtoolbar[data-size="small"] {
@@ -336,9 +334,15 @@
 .byMDdocument > .byVIEWtoolbar .byVIEWinfo {
   max-width: 100%;
   color: var(--by-view-muted);
-  font-size: 0.8em;
+  opacity: 0.25;
+  font-size: 0.75em;
   text-align: right;
   overflow-wrap: anywhere;
+}
+.byMDdocument > .byVIEWtoolbar .byVIEWinfo:hover,
+.byMDdocument > .byVIEWtoolbar .byVIEWinfo:focus-within,
+.byMDdocument[data-theme="high-contrast"] > .byVIEWtoolbar .byVIEWinfo {
+  opacity: 1;
 }
 .byMDdocument.byVIEWcompact > .byVIEWtoolbar .byVIEWinfo {
   flex: 1 1 auto;
