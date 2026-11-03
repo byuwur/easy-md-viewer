@@ -231,9 +231,9 @@ test("Markdown rendering", async (t) => {
         assert.deepEqual(await palette(), { matched: true, opaque: true, color: "rgb(117, 113, 94)", opacity: "0.25" });
         assert.equal(await themed.locator("#viewer-theme").getAttribute("href"), "https://themes.test/md.light.css/archive/md.dark.css?keep=md.light.css#md.light.css");
         assert.equal(await themed.locator("#byVIEWtheme").getAttribute("href"), "https://themes.test/other.dark.css");
-        assert.deepEqual(await themed.locator("#first .byVIEWthemeToggle, #second .byVIEWthemeToggle").evaluateAll((buttons) => buttons.map((button) => [button.textContent, button.title, button.getAttribute("aria-label")])), [
-          ["\u263E\uFE0E \u2600\uFE0E", "Switch to light theme", "Switch to light theme"],
-          ["\u263E\uFE0E \u2600\uFE0E", "Switch to light theme", "Switch to light theme"]
+        assert.deepEqual(await themed.locator("#first .byVIEWthemeToggle, #second .byVIEWthemeToggle").evaluateAll((buttons) => buttons.map((button) => [button.querySelectorAll("svg").length, button.title, button.getAttribute("aria-label")])), [
+          [2, "Switch to light theme", "Switch to light theme"],
+          [2, "Switch to light theme", "Switch to light theme"]
         ]);
         assert.equal(await themed.locator("#host-control").evaluate((button) => getComputedStyle(button, "::after").content), "none");
         await themed.locator("#viewer-theme").evaluate((link) => link.remove());
@@ -265,7 +265,7 @@ test("Markdown rendering", async (t) => {
             for (const controlsSize of ["small", "regular", "large"]) {
               for (const controlsCompact of [false, true]) {
                 for (const controlsPosition of ["top", "bottom"]) {
-                  byMDviewer(root, "# Sample\n\nA paragraph that stays clear of the toolbar.", { controlsSize, controlsCompact, controlsPosition });
+                  byMDviewer(root, "# Sample\n\nA paragraph that stays clear of the toolbar.", { fontSizeControls: true, controlsSize, controlsCompact, controlsPosition });
                   const toolbar = root.querySelector(".byVIEWtoolbar");
                   toolbar.style.fontFamily = fontFamily;
                   const bounds = toolbar.getBoundingClientRect();
@@ -274,7 +274,7 @@ test("Markdown rendering", async (t) => {
                   const first = root.querySelector(".byMDheading").getBoundingClientRect();
                   const last = root.querySelector(".byMDparagraph").getBoundingClientRect();
                   const buttons = [...root.querySelectorAll("button")];
-                  const heights = buttons.map((button) => button.getBoundingClientRect().height);
+                  const heights = buttons.filter((button) => !button.classList.contains("byVIEWthemeToggle")).map((button) => button.getBoundingClientRect().height);
                   const equalHeight = Math.max(...heights) - Math.min(...heights) < 0.1;
                   const toggle = root.querySelector(".byVIEWthemeToggle");
                   const track = toggle.getBoundingClientRect();
@@ -312,13 +312,13 @@ test("Markdown rendering", async (t) => {
             copyButton: false
           });
           const hidden = !root.querySelector(".byVIEWcontrols") && root.lastElementChild.classList.contains("byVIEWtoolbar") && root.querySelectorAll(".byVIEWinfo").length === 1;
-          byMDviewer(root, "# Sample\n\nA paragraph that stays clear of the toolbar.", { controlsSize: "invalid", controlsPosition: "invalid" });
+          byMDviewer(root, "# Sample\n\nA paragraph that stays clear of the toolbar.", { fontSizeControls: true, controlsSize: "invalid", controlsPosition: "invalid" });
           const fallback = root.firstElementChild.dataset.size === "regular" && !root.classList.contains("byVIEWbottom");
-          byMDviewer(root, "# Sample\n\nA paragraph that stays clear of the toolbar.");
+          byMDviewer(root, "# Sample\n\nA paragraph that stays clear of the toolbar.", { fontSizeControls: true });
           const reset = root.classList.contains("byVIEWcompact") && !root.classList.contains("byVIEWbottom") && root.querySelectorAll(".byVIEWtoolbar").length === 1;
           root.style.fontSize = "";
           root.style.width = "640px";
-          byMDviewer(root, "# Sample\n\nA paragraph that stays clear of the toolbar.", { controlsSize: "large", controlsCompact: true });
+          byMDviewer(root, "# Sample\n\nA paragraph that stays clear of the toolbar.", { fontSizeControls: true, controlsSize: "large", controlsCompact: true });
           const toolbar = root.querySelector(".byVIEWtoolbar");
           const wideHeight = toolbar.offsetHeight;
           root.style.width = "200px";
@@ -396,6 +396,7 @@ test("Markdown rendering", async (t) => {
                   host.appendChild(root);
                   document.body.appendChild(host);
                   byMDviewer(root, Array.from({ length: 70 }, (_, index) => `## Section ${index}\n\nA paragraph that makes this viewer scroll.`).join("\n\n"), {
+                    fontSizeControls: true,
                     controlsPosition,
                     controlsCompact,
                     chunkLatency: 0
@@ -448,7 +449,7 @@ test("Markdown rendering", async (t) => {
         root.style.width = "240px";
         document.body.appendChild(root);
         try {
-          byMDviewer(root, "# A longer heading that wraps without covering the controls");
+          byMDviewer(root, "# A longer heading that wraps without covering the controls", { fontSizeControls: true });
           const bounds = root.getBoundingClientRect();
           const toolbar = root.querySelector(".byVIEWcontrols").getBoundingClientRect();
           const content = root.querySelector("h1");
@@ -472,7 +473,7 @@ test("Markdown rendering", async (t) => {
         try {
           document.documentElement.style.fontSize = "16px";
           root.style.fontSize = "24px";
-          const options = { themeToggle: false, copyButton: false };
+          const options = { themeToggle: false, fontSizeControls: true, copyButton: false };
           byMDviewer(root, "# Content", options);
           let [decrease, reset, increase] = root.querySelectorAll(".byVIEWfontSize");
           const size = () => parseFloat(getComputedStyle(root).fontSize);
@@ -588,7 +589,7 @@ test("Markdown rendering", async (t) => {
       await playground.locator("#markdown-source").fill(markdown);
       await playground.locator("#withLinks").uncheck();
       await playground.locator('label[for="preview-dark"]').click();
-      assert.equal(await renderer.locator(".byVIEWthemeToggle").textContent(), "\u263E\uFE0E \u2600\uFE0E");
+      assert.equal(await renderer.locator(".byVIEWthemeToggle svg").count(), 2);
       assert.equal(await playground.locator("#integration-code").inputValue(), cdnCode);
       await playground.locator('label[for="integration-local"]').click();
       const code = await playground.locator("#integration-code").inputValue();
@@ -1188,7 +1189,7 @@ test("playground palettes and editable two-mode custom themes stay synchronized"
   }
 });
 
-test("headers, credits, and individual controls can be hidden", async () => {
+test("viewer defaults, optional tools, and copy feedback", async () => {
   const browser = await chromium.launch({ channel: process.env.BROWSER_CHANNEL || undefined, executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined });
   try {
     const page = await browser.newPage({ viewport: { width: 320, height: 720 }, reducedMotion: "reduce" });
@@ -1211,6 +1212,38 @@ test("headers, credits, and individual controls can be hidden", async () => {
     assert.equal(await page.locator(".byVIEWfontSizes").count(), 0);
     assert.equal(await page.locator(".byVIEWstatus:visible").count(), 0);
     await page.evaluate(() => renderUI());
+    for (const scale of [1, 1.5]) {
+      for (const controlsSize of ["small", "regular", "large"]) {
+        for (const font of ["ui-monospace, monospace", "Georgia, serif"]) {
+          for (const mode of ["light", "dark"]) {
+            const errors = await page.evaluate(async ({ scale, controlsSize, font, mode }) => {
+              document.documentElement.style.fontSize = `${scale}rem`;
+              const host = document.getElementById("viewer");
+              host.dataset.theme = mode;
+              host.style.setProperty("--by-view-controls-font", font);
+              await renderUI({ controlsSize });
+              const button = host.querySelector(".byVIEWthemeToggle");
+              const rect = button.getBoundingClientRect();
+              const style = getComputedStyle(button), thumb = getComputedStyle(button, "::after");
+              const innerWidth = rect.width - parseFloat(style.borderLeftWidth) - parseFloat(style.borderRightWidth);
+              const innerHeight = rect.height - parseFloat(style.borderTopWidth) - parseFloat(style.borderBottomWidth);
+              const position = (value, extent) => value.endsWith("%") ? parseFloat(value) * extent / 100 : parseFloat(value);
+              const centerX = rect.left + parseFloat(style.borderLeftWidth) + position(thumb.left, innerWidth);
+              const centerY = rect.top + parseFloat(style.borderTopWidth) + position(thumb.top, innerHeight);
+              const icons = [...button.querySelectorAll("svg")];
+              const icon = icons[mode === "dark" ? 1 : 0].getBoundingClientRect();
+              return [Math.abs(centerX - icon.x - icon.width / 2), Math.abs(centerY - icon.y - icon.height / 2), Math.abs(centerY - rect.y - rect.height / 2)];
+            }, { scale, controlsSize, font, mode });
+            assert.ok(errors.every((error) => error < 0.06), `${scale} ${controlsSize} ${font} ${mode}: ${errors}`);
+          }
+        }
+      }
+    }
+    await page.evaluate(async () => {
+      document.documentElement.style.fontSize = "";
+      document.getElementById("viewer").style.removeProperty("--by-view-controls-font");
+      await renderUI();
+    });
     for (const mode of ["light", "dark"]) {
       await page.locator("#viewer").evaluate((element, mode) => { element.dataset.theme = mode; }, mode);
       await page.evaluate(() => renderUI({ toolbar: false, controlsPosition: "bottom", sorting: false, pagination: false, collapsible: false, details: false, lineNumbers: false, loadMore: false }));
@@ -1224,6 +1257,21 @@ test("headers, credits, and individual controls can be hidden", async () => {
     assert.equal(await page.locator(".byVIEWcontrols button").count(), 5);
     await page.evaluate(() => renderUI({ credits: false, themeToggle: false, fontSizeControls: false, copyButton: false }));
     assert.equal(await page.locator(".byVIEWtoolbar").count(), 0);
+    await page.evaluate((options) => renderUI({ fontSizeControls: true, ...options }), {});
+    assert.equal(await page.locator(".byVIEWfontSize").count(), 3);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+    await page.evaluate(() => {
+      Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: async () => { throw new Error("Denied"); } } });
+    });
+    await page.locator(".byVIEWcopy").click();
+    await page.mouse.move(0, 0);
+    await page.locator(".byVIEWcopy").evaluate((element) => element.blur());
+    assert.equal(await page.locator(".byVIEWcopy").getAttribute("data-state"), "error");
+    assert.equal(await page.locator(".byVIEWcopy").textContent(), "Failed");
+    await page.evaluate(() => { navigator.clipboard.writeText = async (value) => { window.copiedSource = value; }; });
+    await page.locator(".byVIEWcopy").click();
+    assert.equal(await page.locator(".byVIEWcopy").getAttribute("data-state"), "success");
+    assert.match(await page.evaluate(() => copiedSource), /needle/);
   } finally {
     await browser.close();
   }

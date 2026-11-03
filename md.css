@@ -8,7 +8,7 @@
 .byMDdocument.light:not([data-theme="dark"]),
 .byMDdocument[data-theme="light"] {
   color-scheme: light;
-  --by-view-toggle-position: 0.125em;
+  --by-view-toggle-position: 25%;
   --by-view-muted: #8a8875;
   --by-md-bg: #fafaf5;
   --by-md-text: #272822;
@@ -24,7 +24,7 @@
 .byMDdocument.dark:not([data-theme="light"]),
 .byMDdocument[data-theme="dark"] {
   color-scheme: dark;
-  --by-view-toggle-position: calc(100% - 1.625em + 2px);
+  --by-view-toggle-position: 75%;
   --by-view-muted: #75715e;
   --by-md-bg: #272822;
   --by-md-text: #f8f8f2;
@@ -300,7 +300,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 0.5em;
+  gap: 0.25em;
   margin: 0.25rem 0;
   padding: 0.5rem 0;
   background: var(--by-md-bg);
@@ -361,18 +361,18 @@
   flex-wrap: wrap;
   justify-content: flex-end;
   align-items: center;
-  gap: 0.5em;
+  gap: 0.375em;
   margin-left: auto;
   max-width: 100%;
 }
 .byMDdocument > .byVIEWtoolbar button {
   flex-shrink: 0;
   min-width: 2em;
-  height: 1.75em;
+  height: 2em;
   margin: 0;
   padding: 0.25em 0.5em;
-  border: 1px solid currentColor;
-  border-radius: 0.25em;
+  border: 0.0625rem solid var(--by-md-border);
+  border-radius: var(--by-view-radius, 0.65em);
   background: transparent;
   color: inherit;
   font: inherit;
@@ -390,25 +390,21 @@
 }
 .byMDdocument > .byVIEWtoolbar .byVIEWfontSizes {
   display: flex;
+  padding: 0.0625em;
+  gap: 0.0625em;
+  border: 0.0625rem solid var(--by-md-border);
+  border-radius: var(--by-view-radius, 0.65em);
 }
 .byMDdocument > .byVIEWtoolbar .byVIEWfontSize {
-  width: 2em;
-  padding: 0.25em;
-  border-radius: 0;
-}
-.byMDdocument > .byVIEWtoolbar .byVIEWfontSize + .byVIEWfontSize {
-  margin-left: -1px;
-}
-.byMDdocument > .byVIEWtoolbar .byVIEWfontSize:first-child {
-  border-radius: 0.25em 0 0 0.25em;
-}
-.byMDdocument > .byVIEWtoolbar .byVIEWfontSize:last-child {
-  border-radius: 0 0.25em 0.25em 0;
+  width: 1.875em;
+  padding: 0.125em;
+  border: 0;
+  border-radius: 0.4em;
 }
 .byMDdocument > .byVIEWtoolbar .byVIEWcopy {
   display: inline-flex;
   align-items: center;
-  gap: 0.375em;
+  gap: 0.25em;
 }
 .byMDdocument > .byVIEWtoolbar .byVIEWcopy svg {
   width: 1em;
@@ -420,23 +416,68 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   place-items: center;
-  width: 3.25em;
-  padding: 0.125em;
+  width: calc(3.5em - 0.125rem);
+  height: 1.75em;
+  padding: 0;
   border-radius: 2em;
   font-family: ui-monospace, monospace;
   font-variant-emoji: text;
 }
-.byMDdocument > .byVIEWtoolbar .byVIEWthemeToggle span {
-  font-size: 1.25em;
+.byMDdocument > .byVIEWtoolbar .byVIEWthemeToggle svg {
+  width: 1.25em;
+  height: 1.25em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .byMDdocument > .byVIEWtoolbar .byVIEWthemeToggle::after {
   content: "";
   position: absolute;
-  top: 0.125em;
+  top: 50%;
   left: var(--by-view-toggle-position);
-  width: calc(1.5em - 2px);
-  height: calc(1.5em - 2px);
+  width: calc(1.5em - 0.125rem);
+  height: calc(1.5em - 0.125rem);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
   border-radius: 50%;
   background: currentColor;
   transition: left 0.2s;
+}
+
+/* --- INTERACTION --- */
+.byMDdocument button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition:
+    background-color 0.15s,
+    box-shadow 0.15s;
+}
+.byMDdocument button:not(:disabled):hover {
+  background: color-mix(in srgb, currentColor 7%, var(--by-md-bg));
+}
+.byMDdocument button:not(:disabled):active {
+  background: color-mix(in srgb, currentColor 13%, var(--by-md-bg));
+}
+.byMDdocument button:focus-visible {
+  outline: 0.125rem solid var(--by-md-link);
+  outline-offset: 0.125rem;
+}
+.byMDdocument button[data-state="success"] {
+  border-color: var(--by-md-link);
+  box-shadow: inset 0 0 0 0.0625rem var(--by-md-link);
+}
+.byMDdocument button[data-state="error"] {
+  border-color: currentColor;
+  border-style: dashed;
+}
+.byMDdocument .byVIEWactions:empty {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .byMDdocument button,
+  .byMDdocument .byVIEWthemeToggle::after {
+    transition: none;
+  }
 }
