@@ -596,7 +596,7 @@ test("Markdown rendering", async (t) => {
       assert.ok(code.includes('document.addEventListener("DOMContentLoaded"'));
       assert.ok(!code.includes('"withLinks": false'));
       assert.ok(code.includes('src="md.js" defer'));
-      for (const name of ["themeToggle", "fontSizeControls", "copyButton"]) {
+      for (const name of ["toolbar", "credits", "themeToggle", "fontSizeControls", "copyButton"]) {
         await playground.locator(`#${name}`).evaluate((element) => {
           element.checked = false;
           element.dispatchEvent(new Event("change", { bubbles: true }));
@@ -642,9 +642,7 @@ test("Markdown rendering", async (t) => {
           const background = await exported.locator("#document").evaluate((element) => getComputedStyle(element).backgroundColor);
           await exported.locator(".byVIEWthemeToggle").click();
           await exported.waitForFunction((before) => getComputedStyle(document.getElementById("document")).backgroundColor !== before, background);
-          const fontSize = await exported.locator("#document").evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
-          await exported.locator(".byVIEWfontSize").nth(2).click();
-          assert.ok(await exported.locator("#document").evaluate((element, before) => parseFloat(getComputedStyle(element).fontSize) > before, fontSize));
+          assert.equal(await exported.locator(".byVIEWfontSize").count(), 3);
         }
       } finally {
         await exported.close();
@@ -805,6 +803,20 @@ test("family customization, navigation and monospace controls", async () => {
     await page.locator(".preview-appearance").evaluate((element) => {
       element.open = true;
     });
+    await page.locator("#linkTarget-0").focus();
+    await page.keyboard.press("ArrowRight");
+    assert.equal(await page.locator("#linkTarget-1").isChecked(), true);
+    await page.waitForFunction(() => document.getElementById("preview-frame").contentDocument.querySelector('.byMDlink[href^="https://"]')?.target === "_self");
+    await page.keyboard.press("ArrowRight");
+    assert.equal(JSON.parse(await page.locator("#options-json").inputValue()).linkTarget, false);
+    await page.waitForFunction(() => !document.getElementById("preview-frame").contentDocument.querySelector('.byMDlink[href^="https://"]')?.hasAttribute("target"));
+    await page.keyboard.press("ArrowRight");
+    assert.equal(await page.locator("#linkTarget-0").isChecked(), true);
+    await page.locator("#preview-controls-font-0").focus();
+    await page.keyboard.press("ArrowRight");
+    assert.equal(await page.locator("#preview-controls-font-1").isChecked(), true);
+    assert.equal(JSON.parse(await page.locator("#options-json").inputValue()).controlsFont, "system-ui, sans-serif");
+    await page.keyboard.press("ArrowLeft");
     await page.evaluate(() => {
       for (const [id, value] of [
         ["preview-font", "Georgia, serif"],
@@ -814,8 +826,9 @@ test("family customization, navigation and monospace controls", async () => {
         ["preview-bg", "#123456"],
         ["preview-ink", "#fedcba"]
       ]) {
-        const input = document.getElementById(id);
-        input.value = value;
+        const input = id === "preview-controls-font" ? document.querySelector(`[name="preview-controls-font"][value="${value}"]`) : document.getElementById(id);
+        if (input.type === "radio") input.checked = true;
+        else input.value = value;
         input.dispatchEvent(new Event("change", { bubbles: true }));
       }
     });

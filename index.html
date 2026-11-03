@@ -160,12 +160,17 @@
                           </select>
                           <label class="d-block form-label" for="preview-size">Text size (rem)</label><input id="preview-size" class="form-control mb-2" type="number" min="0.5" max="3" step="0.125" placeholder="Viewer default" />
                           <label class="d-block form-label" for="preview-leading">Line height</label><input id="preview-leading" class="form-control mb-2" type="number" min="1" max="3" step="0.1" placeholder="Viewer default" />
-                          <label class="d-block form-label" for="preview-controls-font">Controls font</label
-                          ><select id="preview-controls-font" class="form-select mb-2">
-                            <option value="">Monospace (default)</option>
-                            <option value="system-ui, sans-serif">System sans</option>
-                            <option value="Georgia, serif">Serif</option>
-                          </select>
+                          <fieldset id="preview-controls-font" class="mb-3">
+                            <legend class="small mb-2 form-label">Controls font</legend>
+                            <div class="btn-group w-100" role="group" aria-label="Controls font">
+                              <input class="btn-check" id="preview-controls-font-0" name="preview-controls-font" type="radio" value="" aria-label="Monospace" checked="" />
+                              <label class="btn btn-sm flex-fill btn-outline-secondary fw-semibold" for="preview-controls-font-0" title="Monospace (default)">Mono</label>
+                              <input class="btn-check" id="preview-controls-font-1" name="preview-controls-font" type="radio" value="system-ui, sans-serif" aria-label="System sans" />
+                              <label class="btn btn-sm flex-fill btn-outline-secondary fw-semibold" for="preview-controls-font-1" title="System sans">Sans</label>
+                              <input class="btn-check" id="preview-controls-font-2" name="preview-controls-font" type="radio" value="Georgia, serif" aria-label="Serif" />
+                              <label class="btn btn-sm flex-fill btn-outline-secondary fw-semibold" for="preview-controls-font-2" title="Serif">Serif</label>
+                            </div>
+                          </fieldset>
                           <label class="d-block form-label" for="preview-bg">Background color</label
                           ><input id="preview-bg" class="form-control mb-2" type="text" placeholder="Theme default" pattern="#[0-9a-fA-F]{6}" title="Six-digit hex color, for example #222222" maxlength="7" />
                           <label class="d-block form-label" for="preview-ink">Text color</label
@@ -409,19 +414,19 @@ Write Markdown here…"></textarea>
         color: var(--accent-ink);
       }
       :focus-visible {
-        outline: 2px solid var(--accent-text);
-        outline-offset: 3px;
+        outline: 0.125rem solid var(--accent-text);
+        outline-offset: 0.1875rem;
       }
       .site-width {
-        max-width: 1480px;
+        max-width: 92.5rem;
         padding-inline: clamp(1rem, 3vw, 3rem);
       }
       .navbar {
-        min-height: 76px;
+        min-height: 4.75rem;
       }
       .brand-mark {
-        width: 34px;
-        height: 34px;
+        width: 2.125rem;
+        height: 2.125rem;
         background: var(--accent);
         color: var(--accent-ink);
       }
@@ -449,7 +454,7 @@ Write Markdown here…"></textarea>
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-height: 44px;
+        min-height: 2.75rem;
         font-weight: 600;
       }
       .btn i,
@@ -483,10 +488,10 @@ Write Markdown here…"></textarea>
       }
       .form-select,
       .form-control {
-        min-height: 44px;
+        min-height: 2.75rem;
       }
       .form-switch {
-        min-height: 48px;
+        min-height: 3rem;
       }
       .form-switch .form-check-input {
         width: 2.75rem;
@@ -523,13 +528,13 @@ Write Markdown here…"></textarea>
       }
       .panel + .panel,
       .metric + .metric {
-        border-left: 1px solid var(--bs-border-color);
+        border-left: 0.0625rem solid var(--bs-border-color);
       }
       .tab-content > .panel.active {
         display: flex;
       }
       .panel-heading {
-        min-height: 68px;
+        min-height: 4.25rem;
         flex-shrink: 0;
       }
       .panel-heading h3 {
@@ -537,7 +542,7 @@ Write Markdown here…"></textarea>
       }
       .panel-heading .btn,
       .feature-chip {
-        min-height: 34px;
+        min-height: 2.125rem;
       }
       .feature-chip {
         --bs-btn-color: var(--bs-secondary-color);
@@ -561,8 +566,8 @@ Write Markdown here…"></textarea>
         tab-size: 2;
       }
       .source-editor[aria-invalid="true"] {
-        outline: 2px solid var(--bs-danger);
-        outline-offset: -2px;
+        outline: 0.125rem solid var(--bs-danger);
+        outline-offset: -0.125rem;
       }
       .integration-code {
         height: 28rem;
@@ -585,10 +590,10 @@ Write Markdown here…"></textarea>
       .form-text {
         font-size: 0.8125rem;
       }
-      @media (min-width: 768px) and (max-width: 1199px) {
+      @media (min-width: 48rem) and (max-width: 74.9375rem) {
         .config-panel {
           height: auto;
-          border-bottom: 1px solid var(--bs-border-color);
+          border-bottom: 0.0625rem solid var(--bs-border-color);
         }
         .config-panel .panel-body {
           overflow: visible;
@@ -601,7 +606,7 @@ Write Markdown here…"></textarea>
           border-left: 0 !important;
         }
       }
-      @media (min-width: 992px) and (max-width: 1199px) {
+      @media (min-width: 62rem) and (max-width: 74.9375rem) {
         .config-panel .accordion {
           display: flex;
         }
@@ -611,16 +616,16 @@ Write Markdown here…"></textarea>
           border: 0;
         }
         .config-panel .accordion-item + .accordion-item {
-          border-left: 1px solid var(--bs-border-color);
+          border-left: 0.0625rem solid var(--bs-border-color);
         }
       }
-      @media (min-width: 768px) and (max-width: 991px), (min-width: 1200px) and (max-width: 1399px) {
+      @media (min-width: 48rem) and (max-width: 61.9375rem), (min-width: 75rem) and (max-width: 87.4375rem) {
         .panel-heading {
-          min-height: 88px;
+          min-height: 5.5rem;
           align-content: center;
         }
       }
-      @media (max-width: 767px) {
+      @media (max-width: 47.9375rem) {
         .panel {
           height: 31rem;
           border-left: 0 !important;
@@ -630,13 +635,13 @@ Write Markdown here…"></textarea>
         }
         .panel-heading .btn,
         .feature-chip {
-          min-height: 44px;
+          min-height: 2.75rem;
         }
         .metric:nth-child(3) {
           border-left: 0;
         }
         .metric:nth-child(n + 3) {
-          border-top: 1px solid var(--bs-border-color);
+          border-top: 0.0625rem solid var(--bs-border-color);
         }
       }
     </style>
@@ -864,12 +869,17 @@ Write Markdown here…"></textarea>
             "beforeend",
             dedent(/* HTML */ `
               <div class="mt-3">
-                <label class="mb-1 form-label" for="linkTarget">Open links in</label>
-                <select class="form-select form-select-sm config-select" name="linkTarget" id="linkTarget">
-                  <option value="_blank">New tab (_blank)</option>
-                  <option value="_self">Current frame (_self)</option>
-                  <option value="false">Browser default (no target)</option>
-                </select>
+                <fieldset id="linkTarget" class="mb-3">
+                  <legend class="small mb-2 form-label">Open links in</legend>
+                  <div class="btn-group w-100" role="group" aria-label="Open links in">
+                    <input class="btn-check" id="linkTarget-0" name="linkTarget" type="radio" value="_blank" aria-label="New tab" checked="" />
+                    <label class="btn btn-sm flex-fill btn-outline-secondary fw-semibold" for="linkTarget-0" title="New tab (_blank)">New tab</label>
+                    <input class="btn-check" id="linkTarget-1" name="linkTarget" type="radio" value="_self" aria-label="This frame" />
+                    <label class="btn btn-sm flex-fill btn-outline-secondary fw-semibold" for="linkTarget-1" title="Current frame (_self)">This frame</label>
+                    <input class="btn-check" id="linkTarget-2" name="linkTarget" type="radio" value="false" aria-label="Default" />
+                    <label class="btn btn-sm flex-fill btn-outline-secondary fw-semibold" for="linkTarget-2" title="Browser default (no target)">Default</label>
+                  </div>
+                </fieldset>
               </div>
             `)
           );
@@ -1097,7 +1107,7 @@ Write Markdown here…"></textarea>
 
         // --- INTEGRATION ---
         function settingsJSON(options) {
-          const field = (id) => document.getElementById(id)?.value || null;
+          const field = (id) => (id === "preview-controls-font" ? document.querySelector('[name="preview-controls-font"]:checked')?.value : document.getElementById(id)?.value) || null;
           const { forceMonospace, toolbar, credits, themeToggle, fontSizeControls, copyButton, controlsCompact, controlsSize, controlsPosition, ...rendering } = options;
           return JSON.stringify(
             {
@@ -1335,7 +1345,7 @@ Write Markdown here…"></textarea>
       (function appearance(name) {
         document.addEventListener("DOMContentLoaded", () => {
           const frame = document.getElementById("preview-frame");
-          const fields = [...document.querySelectorAll(".preview-appearance input, .preview-appearance select")];
+          const fields = [...document.querySelectorAll(".preview-appearance input:not([type=radio]), .preview-appearance select, #preview-controls-font")];
           const palette = document.getElementById("preview-palette");
           const editor = document.getElementById("custom-theme-css");
           const themeStatus = document.getElementById("theme-status");
@@ -1344,7 +1354,10 @@ Write Markdown here…"></textarea>
           const ink = name === "md" ? "--by-md-text" : name === "json" ? "--by-json-text" : "--by-view-text";
           const properties = ["font-family", "font-size", "line-height", "--by-view-controls-font", bg, ink];
           const declarations = () => {
-            const rules = fields.map((field, index) => [properties[index], field.checkValidity() ? field.value + (field.id === "preview-size" && field.value ? "rem" : "") : ""]);
+            const rules = fields.map((field, index) => {
+              const value = field.id === "preview-controls-font" ? field.querySelector("input:checked").value : field.value;
+              return [properties[index], field.checkValidity() ? value + (field.id === "preview-size" && value ? "rem" : "") : ""];
+            });
             if (!["md", "json"].includes(name)) rules.push(["--by-view-content-font", rules[0][1]], ["--by-view-line-height", rules[2][1]]);
             return rules;
           };
@@ -1430,7 +1443,8 @@ Write Markdown here…"></textarea>
               clearTimeout(themeTimer);
               customDraft = null;
               fields.forEach((field) => {
-                field.value = "";
+                if (field.id === "preview-controls-font") field.querySelector('input[value=""]').checked = true;
+                else field.value = "";
               });
               palette.value = "monokai";
               palette.dispatchEvent(new Event("change", { bubbles: true }));
