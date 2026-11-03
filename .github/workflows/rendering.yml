@@ -19,6 +19,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: byuwur/easy-code-viewer
+          ref: main
           path: easy-code-viewer
       - uses: actions/setup-node@v4
         with:
