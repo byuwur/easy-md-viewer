@@ -8,7 +8,9 @@
  */
 
 (function (global) {
+  /* --- SETUP --- */
   if (global.byMDviewer?.initialized) return;
+  /* --- CONTENT --- */
   const ESCAPABLE = /[\\`*{}\[\]()#+\-.!_>~|]/;
   const SAFE_LINK_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:", "ftp:", "ftps:"]);
   const SAFE_IMAGE_PROTOCOLS = new Set(["http:", "https:"]);
@@ -1146,51 +1148,65 @@
     }
   }
 
+  /* --- CONTROLS --- */
   /**
-   * Adds a light/dark theme toggle to a renderer.
-   * Expected theme filenames:
-   * - {filename}.light.css
-   * - {filename}.dark.css
-   * @param {HTMLElement} element - Renderer that receives the toggle.
-   * @param {string} filename - Theme stylesheet base filename.
-   * @return {HTMLButtonElement|null} The toggle button, or null when no valid theme stylesheet is loaded.
+   * Adds container light/dark controls, retaining legacy stylesheet links as a fallback.
+   * @param {HTMLElement} element Viewer container and theme owner.
+   * @param {HTMLElement} controls Toolbar control group.
+   * @param {string} filename Legacy theme stylesheet basename.
+   * @returns {HTMLButtonElement} Theme toggle button.
    */
-  const appendThemeToggle = (element, filename) => {
+  const appendThemeToggle = (element, controls, filename) => {
     const escapedFilename = filename.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const themePattern = new RegExp(`^([^?#]*/)?${escapedFilename}\\.(light|dark)\\.css([?#].*)?$`, "i");
-    // Prefer the documented #byVIEWtheme link, but also support automatic detection.
     const stylesheet = [document.getElementById("byVIEWtheme"), ...document.querySelectorAll('link[rel~="stylesheet"]')].find((link) => link && themePattern.test(link.getAttribute("href") || ""));
-    if (!stylesheet) return null;
-    // Read the active theme from the stylesheet filename.
-    const getTheme = () => {
-      const match = (stylesheet.getAttribute("href") || "").match(themePattern);
-      return match ? match[2].toLowerCase() : null;
+    // Explicit container state takes precedence over a shared legacy stylesheet.
+    const localTheme = (target) => {
+      if (["light", "dark"].includes(target.dataset.theme)) return target.dataset.theme;
+      if (target.classList.contains("dark")) return "dark";
+      if (target.classList.contains("light")) return "light";
+      return target.dataset.theme ? "light" : null;
     };
+    const legacyTheme = () => (stylesheet?.isConnected ? (stylesheet.getAttribute("href") || "").match(themePattern) : null);
+    const getTheme = () => localTheme(element) || legacyTheme()?.[2].toLowerCase() || "light";
     const button = document.createElement("button");
     button.type = "button";
     button.className = "byVIEWthemeToggle";
     button.innerHTML = '<span aria-hidden="true">\u263E\uFE0E</span> <span aria-hidden="true">\u2600\uFE0E</span>';
-    // Keep accessibility text consistent with the theme actually loaded.
     const sync = () => {
       const next = getTheme() === "dark" ? "light" : "dark";
-      for (const toggle of [button, ...document.querySelectorAll(".byMDdocument > .byVIEWtoolbar > .byVIEWcontrols > .byVIEWthemeToggle")]) {
+      const toggles = !localTheme(element) && legacyTheme() ? [button, ...document.querySelectorAll(".byMDdocument > .byVIEWtoolbar > .byVIEWcontrols > .byVIEWthemeToggle")] : [button];
+      for (const toggle of toggles) {
+        // A legacy link must not change the controls of independently themed viewers.
+        if (toggle !== button && localTheme(toggle.closest(".byMDdocument"))) continue;
         toggle.title = `Switch to ${next} theme`;
         toggle.setAttribute("aria-label", toggle.title);
       }
     };
     button.addEventListener("click", () => {
       const next = getTheme() === "dark" ? "light" : "dark";
-      const href = stylesheet.getAttribute("href") || "";
-
-      // Replace only the theme filename while preserving paths and query strings.
-      stylesheet.setAttribute(
-        "href",
-        href.replace(themePattern, (_, path = "", theme, suffix = "") => `${path}${filename}.${next}.css${suffix}`)
-      );
+      if (!localTheme(element) && legacyTheme()) {
+        const href = stylesheet.getAttribute("href");
+        stylesheet.setAttribute(
+          "href",
+          href.replace(themePattern, (_, path = "", theme, suffix = "") => `${path}${filename}.${next}.css${suffix}`)
+        );
+      } else if (element.dataset.theme && !["light", "dark"].includes(element.dataset.theme)) {
+        // Named palettes stay selected while only the mode changes.
+        element.classList.toggle("light", next === "light");
+        element.classList.toggle("dark", next === "dark");
+      } else if (element.hasAttribute("data-theme") || (!element.classList.contains("light") && !element.classList.contains("dark"))) {
+        element.dataset.theme = next;
+      } else {
+        element.classList.toggle("light", next === "light");
+        element.classList.toggle("dark", next === "dark");
+      }
       sync();
     });
+    button.addEventListener("focus", sync);
+    button.addEventListener("pointerenter", sync);
     sync();
-    return element.appendChild(button);
+    return controls.appendChild(button);
   };
 
   /**
@@ -1247,7 +1263,7 @@
 
   /**
    * Add a copy action for the complete source, including content outside the visible rendered chunk.
-   * @param {unknown} controls Controls.
+   * @param {HTMLElement} controls Toolbar control group.
    * @param {Function} getText Callback that returns the text to copy.
    * @param {string} label Human-readable label.
    * @returns {void}
@@ -1327,7 +1343,7 @@
     info.innerHTML = /* HTML */ `<a href="https://github.com/byuwur/easy-md-viewer" target="_blank" rel="noopener noreferrer">easy-md-viewer</a> · v${global.byMDviewer.VERSION} ·
       <a href="https://byuwur.co" target="_blank" rel="noopener noreferrer">@byUwUr</a>`;
     toolbar.appendChild(info);
-    if (options.themeToggle) appendThemeToggle(controls, filename);
+    if (options.themeToggle) appendThemeToggle(element, controls, filename);
     if (options.fontSizeControls) appendFontSizeControls(element, controls);
     if (options.copyButton) appendCopyButton(controls, (event) => (event.shiftKey ? source : getPlainText(element)), "Copy text (Shift+click for Markdown)");
     if (controls.childNodes.length) toolbar.appendChild(controls);
@@ -1335,6 +1351,7 @@
     else element.prepend(toolbar);
   };
 
+  /* --- PUBLIC API --- */
   /**
    * Main API.
    * Renders Markdown into an HTMLElement.

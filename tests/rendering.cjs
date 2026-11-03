@@ -6,16 +6,22 @@ const test = require("node:test");
 const { pathToFileURL } = require("node:url");
 const { chromium } = require("playwright");
 
+// Caller-provided legacy stylesheets reuse the canonical palettes without distribution files.
+const legacyThemeCSS = (theme) => {
+  const css = require("node:fs").readFileSync(path.join(__dirname, "../md.css"), "utf8");
+  const section = css.split(`/* --- ${theme.toUpperCase()} --- */`)[1];
+  return `.byMDdocument {${section.match(/\{([\s\S]*?)\}/)[1]}}`;
+};
+
 test("Markdown rendering", async (t) => {
   const browser = await chromium.launch({
     executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined
   });
   try {
     const page = await browser.newPage();
-    const readme = await fs.readFile(path.join(__dirname, "../README.md"), "utf8");
-    const version = readme.match(/easy-md-viewer@v([^/]+)\//)?.[1];
-    assert.ok(version, "README must pin a viewer release");
     await page.addScriptTag({ path: path.join(__dirname, "../md.js") });
+    const version = await page.evaluate(() => byMDviewer.VERSION);
+    assert.match(version, /^\d+(?:\.\d+)*$/);
     await t.test("duplicate imports preserve the installed renderer", async () => {
       await page.evaluate(() => {
         window.installedRenderer = byMDviewer;
@@ -220,7 +226,7 @@ test("Markdown rendering", async (t) => {
         assert.equal(await themed.locator("#host-control").evaluate((button) => getComputedStyle(button, "::after").content), "none");
         await themed.locator("#viewer-theme").evaluate((link) => link.remove());
         await themed.evaluate(() => byMDviewer(document.getElementById("first"), "# Content", { fontSizeControls: false, copyButton: false }));
-        assert.equal(await themed.locator("#first .byVIEWthemeToggle").count(), 0);
+        assert.equal(await themed.locator("#first .byVIEWthemeToggle").count(), 1);
       } finally {
         await themed.close();
       }
@@ -643,6 +649,210 @@ test("Markdown rendering", async (t) => {
       }, html);
       assert.deepEqual(structure, { themes: 1, libraries: 1, bodyAssets: 0 });
     });
+  } finally {
+    await browser.close();
+  }
+});
+
+test("container themes are scoped, independent, and compatible with legacy links", async () => {
+  const browser = await chromium.launch({ channel: process.env.BROWSER_CHANNEL || undefined, executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined });
+  try {
+    const page = await browser.newPage();
+    const requests = [];
+    page.on("request", (request) => requests.push(request.url()));
+    await page.setContent('<div id="outside" class="dark">Host</div><div id="first" data-theme="dark"></div><div id="second" class="light"></div><div id="third"></div>');
+    await page.addStyleTag({ path: path.join(__dirname, "../md.css") });
+    await page.addScriptTag({ path: path.join(__dirname, "../md.js") });
+    await page.evaluate(
+      async (args) => {
+        window.renderTheme = async (element) => {
+          const controller = window.byMDviewer(element, ...args);
+          if (controller?.ready) await controller.ready;
+        };
+        for (const id of ["first", "second", "third"]) await renderTheme(document.getElementById(id));
+      },
+      ["# Local theme"]
+    );
+    const color = (id) => page.locator("#" + id).evaluate((element) => getComputedStyle(element).backgroundColor);
+    assert.equal(await color("first"), "rgb(39, 40, 34)");
+    assert.equal(await color("second"), "rgb(250, 250, 245)");
+    assert.equal(await page.locator("#outside").evaluate((element) => getComputedStyle(element).getPropertyValue("--by-view-muted")), "");
+    assert.equal(await page.locator("#first .byVIEWtoolbar").evaluate((element) => getComputedStyle(element).getPropertyValue("--by-view-muted").trim()), "#75715e");
+    await page.locator("#first .byVIEWthemeToggle").click();
+    assert.equal(await page.locator("#first").getAttribute("data-theme"), "light");
+    assert.equal(await color("second"), "rgb(250, 250, 245)");
+    await page.locator("#second .byVIEWthemeToggle").click();
+    assert.equal(
+      await page
+        .locator("#second")
+        .getAttribute("class")
+        .then((classes) => classes.split(/\s+/).includes("dark")),
+      true
+    );
+    assert.equal(await page.locator("#second").getAttribute("data-theme"), null);
+    assert.equal(await color("second"), "rgb(39, 40, 34)");
+    await page.evaluate(async () => {
+      const second = document.getElementById("second");
+      second.dataset.theme = "light";
+      await renderTheme(second);
+    });
+    assert.equal(await color("second"), "rgb(250, 250, 245)");
+    await page.evaluate(() => {
+      const first = document.getElementById("first");
+      first.style.setProperty("--by-md-bg", "#123456");
+    });
+    assert.equal(await color("first"), "rgb(18, 52, 86)");
+    assert.equal(await color("second"), "rgb(250, 250, 245)");
+    await page.evaluate(() => document.getElementById("first").style.removeProperty("--by-md-bg"));
+    assert.equal(requests.length, 0, "Container theme changes must not fetch stylesheets");
+
+    await page.route("https://legacy.test/**", (route) => route.fulfill({ body: legacyThemeCSS(route.request().url().includes(".dark.css") ? "dark" : "light"), contentType: "text/css" }));
+    await page.evaluate(async () => {
+      const second = document.getElementById("second");
+      second.removeAttribute("data-theme");
+      second.classList.remove("light", "dark");
+      await new Promise((resolve, reject) => {
+        const link = document.createElement("link");
+        link.id = "byVIEWtheme";
+        link.rel = "stylesheet";
+        link.href = "https://legacy.test/md.light.css?cache=1#theme";
+        link.onload = resolve;
+        link.onerror = reject;
+        document.head.appendChild(link);
+      });
+      await renderTheme(second);
+      await renderTheme(document.getElementById("third"));
+    });
+    await page.locator("#second .byVIEWthemeToggle").click();
+    await page.waitForFunction(() => getComputedStyle(document.getElementById("second")).backgroundColor === "rgb(39, 40, 34)");
+    assert.equal(await color("third"), "rgb(39, 40, 34)");
+    assert.equal(await color("first"), "rgb(250, 250, 245)");
+    assert.equal(await page.locator("#first .byVIEWthemeToggle").getAttribute("aria-label"), "Switch to dark theme");
+    assert.equal(await page.locator("#byVIEWtheme").getAttribute("href"), "https://legacy.test/md.dark.css?cache=1#theme");
+    await page.evaluate(async () => {
+      document.getElementById("byVIEWtheme").remove();
+      await renderTheme(document.getElementById("second"));
+    });
+    await page.locator("#second .byVIEWthemeToggle").click();
+    assert.equal(await page.locator("#second").getAttribute("data-theme"), "dark");
+    assert.equal(await color("third"), "rgb(250, 250, 245)");
+  } finally {
+    await browser.close();
+  }
+});
+
+test("named palettes retain mode, isolate custom CSS, and meet High Contrast targets", async () => {
+  const browser = await chromium.launch({ channel: process.env.BROWSER_CHANNEL || undefined, executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined });
+  try {
+    const page = await browser.newPage();
+    await page.setContent('<div id="outside">Host</div><div id="viewer"></div><div id="other" data-theme="dark"></div>');
+    await page.addStyleTag({ path: path.join(__dirname, "../md.css") });
+    await page.addScriptTag({ path: path.join(__dirname, "../md.js") });
+    await page.evaluate(
+      async (args) => {
+        window.renderPalette = async (id) => {
+          const controller = window.byMDviewer(document.getElementById(id), ...args);
+          if (controller?.ready) await controller.ready;
+        };
+        await renderPalette("viewer");
+        await renderPalette("other");
+      },
+      ["# Theme\n\n[Link](https://example.com)\n\n`code`"]
+    );
+    const root = page.locator("#viewer");
+    const background = () => root.evaluate((element) => getComputedStyle(element).backgroundColor);
+    assert.equal(await background(), "rgb(250, 250, 245)", "Default remains Monokai Light");
+    for (const [palette, colors] of Object.entries({
+      monokai: ["rgb(250, 250, 245)", "rgb(39, 40, 34)"],
+      github: ["rgb(255, 255, 255)", "rgb(13, 17, 23)"],
+      solarized: ["rgb(253, 246, 227)", "rgb(0, 43, 54)"],
+      "high-contrast": ["rgb(255, 255, 255)", "rgb(0, 0, 0)"]
+    })) {
+      await root.evaluate((element, palette) => {
+        element.dataset.theme = palette;
+        element.classList.remove("light", "dark");
+      }, palette);
+      assert.equal(await background(), colors[0], palette);
+      await root.locator(".byVIEWthemeToggle").click();
+      assert.equal(await root.getAttribute("data-theme"), palette);
+      assert.equal(await background(), colors[1], palette);
+      await page.evaluate(() => renderPalette("viewer"));
+      assert.equal(await background(), colors[1], "Rendering preserves the palette and mode");
+      await root.locator(".byVIEWthemeToggle").click();
+      assert.equal(await background(), colors[0]);
+    }
+    for (const mode of ["light", "dark"]) {
+      await root.evaluate((element, mode) => {
+        element.classList.toggle("dark", mode === "dark");
+        element.classList.toggle("light", mode === "light");
+      }, mode);
+      await root.locator(".byVIEWcopy").focus();
+      const measurements = await root.evaluate((element) => {
+        const style = getComputedStyle(element);
+        const luminance = (color) => {
+          const channels = color.startsWith("#")
+            ? color
+                .slice(1)
+                .match(/../g)
+                .map((part) => parseInt(part, 16))
+            : color
+                .match(/[\d.]+/g)
+                .slice(0, 3)
+                .map(Number);
+          const values = channels.map((channel) => channel / 255).map((value) => (value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4));
+          return values[0] * 0.2126 + values[1] * 0.7152 + values[2] * 0.0722;
+        };
+        const contrast = (a, b) => (Math.max(luminance(a), luminance(b)) + 0.05) / (Math.min(luminance(a), luminance(b)) + 0.05);
+        const variables = [...style].filter((property) => property.startsWith("--by-")).map((property) => [property, style.getPropertyValue(property).trim()]);
+        const backgrounds = [style.backgroundColor, ...variables.filter(([property]) => /-(?:alt|code-bg|add|remove)$/.test(property)).map(([, value]) => value)];
+        const text = variables.filter(([property, value]) => /^#[0-9a-f]{6}$/i.test(value) && !/-(?:bg|border|alt|add|remove)$/.test(property));
+        const button = getComputedStyle(element.querySelector(".byVIEWcopy"));
+        return {
+          text: text.flatMap(([property, value]) => backgrounds.map((bg) => ({ property, ratio: contrast(value, bg) }))),
+          border: contrast(button.borderTopColor, style.backgroundColor),
+          focus: contrast(button.outlineColor, style.backgroundColor),
+          outline: parseFloat(button.outlineWidth)
+        };
+      });
+      assert.ok(measurements.text.length >= 5);
+      for (const { property, ratio } of measurements.text) assert.ok(ratio >= 7, mode + " " + property + ": " + ratio.toFixed(2));
+      assert.ok(measurements.border >= 3);
+      assert.ok(measurements.focus >= 3 && measurements.outline >= 2);
+    }
+    await root.evaluate((element) => {
+      element.classList.add("light", "dark");
+      element.dataset.theme = "github";
+    });
+    assert.equal(await background(), "rgb(13, 17, 23)", "Dark wins when both classes exist");
+    await root.evaluate((element) => {
+      element.dataset.theme = "light";
+    });
+    assert.equal(await background(), "rgb(250, 250, 245)", "Legacy mode aliases override classes");
+    await page.addStyleTag({ content: '.byMDdocument.light[data-theme="ocean"] { --by-md-bg: #f3f8fc; } .byMDdocument.dark[data-theme="ocean"] { --by-md-bg: #102a43; }' });
+    await root.evaluate((element) => {
+      element.dataset.theme = "ocean";
+      element.classList.remove("light", "dark");
+    });
+    await page.route("https://legacy.test/**", (route) => route.fulfill({ body: "", contentType: "text/css" }));
+    await page.evaluate(
+      () =>
+        new Promise((resolve) => {
+          const link = document.createElement("link");
+          link.id = "byVIEWtheme";
+          link.rel = "stylesheet";
+          link.href = "https://legacy.test/md.dark.css?cache=1#theme";
+          link.onload = resolve;
+          document.head.appendChild(link);
+        })
+    );
+    await page.evaluate(() => renderPalette("viewer"));
+    assert.equal(await background(), "rgb(250, 250, 245)", "An unclassified custom palette starts in Light");
+    await root.locator(".byVIEWthemeToggle").click();
+    assert.equal(await background(), "rgb(16, 42, 67)");
+    assert.equal(await root.getAttribute("data-theme"), "ocean");
+    assert.equal(await page.locator("#byVIEWtheme").getAttribute("href"), "https://legacy.test/md.dark.css?cache=1#theme");
+    assert.equal(await page.locator("#other").evaluate((element) => getComputedStyle(element).backgroundColor), "rgb(39, 40, 34)");
+    assert.equal(await page.locator("#outside").evaluate((element) => getComputedStyle(element).getPropertyValue("--by-view-muted")), "");
   } finally {
     await browser.close();
   }

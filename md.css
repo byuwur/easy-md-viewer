@@ -1,18 +1,124 @@
 /* byuwur was here */
+
+/* Monokai is the default. Classes select mode; named data-theme values select a palette.
+   data-theme="light" / "dark" remain mode aliases and override mode classes. */
+
+/* --- LIGHT --- */
+.byMDdocument,
+.byMDdocument.light:not([data-theme="dark"]),
+.byMDdocument[data-theme="light"] {
+  color-scheme: light;
+  --by-view-toggle-position: 0.125em;
+  --by-view-muted: #8a8875;
+  --by-md-bg: #fafaf5;
+  --by-md-text: #272822;
+  --by-md-muted: #686856;
+  --by-md-border: #d8d8c8;
+  --by-md-link: #087f8c;
+  --by-md-code-bg: #eeeee4;
+  --by-md-quote: #747461;
+  --by-md-table-alt: #eeeee4;
+}
+
+/* --- DARK --- */
+.byMDdocument.dark:not([data-theme="light"]),
+.byMDdocument[data-theme="dark"] {
+  color-scheme: dark;
+  --by-view-toggle-position: calc(100% - 1.625em + 2px);
+  --by-view-muted: #75715e;
+  --by-md-bg: #272822;
+  --by-md-text: #f8f8f2;
+  --by-md-muted: #a6a28c;
+  --by-md-border: #49483e;
+  --by-md-link: #66d9ef;
+  --by-md-code-bg: #20211c;
+  --by-md-quote: #a6a28c;
+  --by-md-table-alt: #34352f;
+}
+
+/* --- GITHUB --- */
+/* Light */
+.byMDdocument[data-theme="github"]:not(.dark) {
+  --by-view-muted: #59636e;
+  --by-md-bg: #ffffff;
+  --by-md-text: #1f2328;
+  --by-md-muted: #59636e;
+  --by-md-border: #8c959f;
+  --by-md-link: #0969da;
+  --by-md-code-bg: #f6f8fa;
+  --by-md-quote: #59636e;
+  --by-md-table-alt: #f6f8fa;
+}
+/* Dark */
+.byMDdocument.dark[data-theme="github"] {
+  --by-view-muted: #9198a1;
+  --by-md-bg: #0d1117;
+  --by-md-text: #f0f6fc;
+  --by-md-muted: #9198a1;
+  --by-md-border: #6e7681;
+  --by-md-link: #58a6ff;
+  --by-md-code-bg: #161b22;
+  --by-md-quote: #9198a1;
+  --by-md-table-alt: #161b22;
+}
+
+/* --- SOLARIZED --- */
+/* Light */
+.byMDdocument[data-theme="solarized"]:not(.dark) {
+  --by-view-muted: #657b83;
+  --by-md-bg: #fdf6e3;
+  --by-md-text: #586e75;
+  --by-md-muted: #657b83;
+  --by-md-border: #93a1a1;
+  --by-md-link: #268bd2;
+  --by-md-code-bg: #eee8d5;
+  --by-md-quote: #657b83;
+  --by-md-table-alt: #eee8d5;
+}
+/* Dark */
+.byMDdocument.dark[data-theme="solarized"] {
+  --by-view-muted: #839496;
+  --by-md-bg: #002b36;
+  --by-md-text: #93a1a1;
+  --by-md-muted: #839496;
+  --by-md-border: #586e75;
+  --by-md-link: #268bd2;
+  --by-md-code-bg: #073642;
+  --by-md-quote: #839496;
+  --by-md-table-alt: #073642;
+}
+
+/* --- HIGH CONTRAST --- */
+/* Light */
+.byMDdocument[data-theme="high-contrast"]:not(.dark) {
+  --by-view-muted: #333333;
+  --by-md-bg: #ffffff;
+  --by-md-text: #000000;
+  --by-md-muted: #333333;
+  --by-md-border: #333333;
+  --by-md-link: #0038a8;
+  --by-md-code-bg: #f0f0f0;
+  --by-md-quote: #333333;
+  --by-md-table-alt: #f0f0f0;
+}
+/* Dark */
+.byMDdocument.dark[data-theme="high-contrast"] {
+  --by-view-muted: #dddddd;
+  --by-md-bg: #000000;
+  --by-md-text: #ffffff;
+  --by-md-muted: #dddddd;
+  --by-md-border: #ffffff;
+  --by-md-link: #00ffff;
+  --by-md-code-bg: #171717;
+  --by-md-quote: #dddddd;
+  --by-md-table-alt: #171717;
+}
+
+/* --- VIEWER --- */
 .byMDdocument {
   position: relative;
   display: flex;
   flex-direction: column;
-  --by-view-toggle-position: 0.125em;
-  --by-view-muted: #bbb;
-  --by-md-bg: #eee;
-  --by-md-text: #111;
-  --by-md-muted: #666;
-  --by-md-border: #ddd;
-  --by-md-link: #56f;
-  --by-md-code-bg: #ddd;
-  --by-md-quote: #566;
-  --by-md-table-alt: #eef;
   box-sizing: border-box;
   color: var(--by-md-text);
   background: var(--by-md-bg);
@@ -22,6 +128,8 @@
   padding: 0 1rem 0.75rem;
   min-height: 4rem;
 }
+
+/* --- CONTENT --- */
 .byMDdocument *,
 .byMDdocument *::before,
 .byMDdocument *::after {
@@ -183,6 +291,7 @@
 .byMDdocument del {
   text-decoration-thickness: 0.0625rem;
 }
+/* --- CONTROLS --- */
 .byMDdocument > .byVIEWtoolbar {
   position: sticky;
   flex-shrink: 0;

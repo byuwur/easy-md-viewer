@@ -8,20 +8,26 @@ Try [GitHub Pages](https://byuwur.github.io/easy-md-viewer/) or [CodePen](https:
 
 ## Installation
 
+**Recommended: CDN.** No downloads or package manager.
+
 ```html
-<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.8/md.min.css" rel="stylesheet" />
-<link id="byVIEWtheme" href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.8/md.light.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.8/md.min.js" defer></script>
+<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@main/md.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@main/md.js" defer></script>
 ```
 
-For local use, save `md.js`, `md.css`, and `md.light.css` beside your HTML and use those paths. Omit the CDN version only when testing development changes; pinned URLs need a new release to receive fixes.
+The CDN example tracks `@main` and requires internet access. Use a published tag or commit to pin a version.
+
+**Local files:** For offline use, save `md.js` and `md.css` beside your HTML:
+
+```html
+<link href="md.css" rel="stylesheet" />
+<script src="md.js" defer></script>
+```
 
 ## Usage
 
-After the installation above:
-
 ```html
-<div id="byMDrenderer"></div>
+<div id="byMDrenderer" data-theme="light"></div>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const markdown = "# My project\n\nRender **Markdown** directly in your page.";
@@ -29,8 +35,6 @@ After the installation above:
   });
 </script>
 ```
-
-The target and library must exist before calling the viewer; `DOMContentLoaded` waits for the deferred library.
 
 The second argument also accepts an `HTMLElement` whose text contains Markdown:
 
@@ -41,7 +45,7 @@ byMDviewer(target, document.getElementById("markdownSource"));
 
 Use `byMDviewer(target)` instead when the target itself contains Markdown.
 
-The landing page's **Copy HTML** and **Download HTML** use its displayed starter and default settings, independently of the playground. CDN/local tabs also control those exports; CDN files need internet, local files must stay beside the saved HTML.
+Exported HTML starters use default settings, independently of playground changes.
 
 ## Options
 
@@ -56,7 +60,7 @@ Pass options as the third argument, such as `byMDviewer(target, markdown, { brea
 | `withStrikethrough` | `true`      | Render `~~strikethrough~~`.                                                        |
 | `breaks`            | `false`     | Convert paragraph line breaks to `<br>`.                                           |
 | `linkTarget`        | `"_blank"`  | Link target; `false` omits it. Same-document anchors stay in this tab.             |
-| `themeToggle`       | `true`      | Show a toggle when a compatible stylesheet exists.                                 |
+| `themeToggle`       | `true`      | Show the theme toggle.                                                       |
 | `fontSizeControls`  | `true`      | Show A-/A+ controls.                                                               |
 | `copyButton`        | `true`      | Show Copy: click for rendered plain text; Shift+click for original Markdown.       |
 | `controlsSize`      | `"regular"` | Button size: `"small"`, `"regular"`, or `"large"`; invalid values use `"regular"`. |
@@ -71,11 +75,62 @@ Controls stay visible at the selected edge of the page or nearest scrolling cont
 
 ## Themes
 
-`md.css` contains the styling rules and light defaults. Theme files only override CSS variables on `.byMDdocument`.
+`md.css` includes all palettes in Light and Dark. Monokai is the default.
 
-The toggle uses a compatible `#byVIEWtheme` or finds a stylesheet named `md.light.css`/`md.dark.css`, preserving its path, query, and hash. Theme changes apply to all Markdown viewers using that stylesheet. Switch that stylesheet manually to select a theme.
+| Palette           | `data-theme`    | What it looks like                                                |
+| ----------------- | --------------- | ----------------------------------------------------------------- |
+| Monokai (default) | `monokai`       | Warm light and dark colors.                                       |
+| GitHub            | `github`        | Familiar neutral surfaces and syntax colors.                      |
+| Solarized         | `solarized`     | Warm light or deep blue-green dark surfaces.                      |
+| High Contrast     | `high-contrast` | Black/white surfaces, strong text, borders, and focus indicators. |
 
-A-/A+ adjust only this viewer by `0.125rem`, within `0.5rem`–`3rem`. Size survives re-rendering and works without a theme stylesheet.
+Use a mode class and a palette name together:
+
+```html
+<div id="viewer" class="dark" data-theme="github"></div>
+<!-- High Contrast Light: class="light" data-theme="high-contrast" -->
+<!-- High Contrast Dark: class="dark" data-theme="high-contrast" -->
+```
+
+Rendering adds `.byMDdocument`; its variables affect only that container and its children. The theme switch changes mode while keeping the palette; re-rendering preserves both. A named palette without a mode class starts in Light; if both mode classes are present, Dark wins.
+
+`data-theme="light"` and `data-theme="dark"` select Monokai and override mode classes. A mode class alone, or no explicit theme, also uses Monokai.
+
+### High Contrast
+
+High Contrast text colors target at least [7:1 contrast](https://www.w3.org/WAI/WCAG22/Understanding/contrast-enhanced.html), with [3:1 contrast for control boundaries and focus cues](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html). Check contrast again when you override colors.
+
+### Make it yours
+
+Define a named palette after the viewer stylesheet. Unspecified colors inherit Monokai:
+
+```css
+.byMDdocument.light[data-theme="ocean"] {
+  --by-md-bg: #f3f8fc;
+  --by-md-text: #102a43;
+  --by-md-border: #486581;
+  --by-md-link: #005a9c;
+}
+
+.byMDdocument.dark[data-theme="ocean"] {
+  --by-md-bg: #102a43;
+  --by-md-text: #f0f6fc;
+  --by-md-border: #9fb3c8;
+  --by-md-link: #8cd3ff;
+}
+```
+
+```html
+<div id="viewer" class="dark" data-theme="ocean"></div>
+```
+
+Named palettes need no JavaScript registration or extra theme files.
+
+Text-size controls change only this viewer, in `0.125rem` steps from `0.5rem` to `3rem`, independently of button size. **A** restores its initial size; re-rendering preserves the selected size.
+
+### Legacy theme links
+
+Legacy integrations can use `#byVIEWtheme` or a detected `md.light.css` / `md.dark.css` link. The toggle keeps its path, query, and hash and updates viewers sharing the link. Explicit container themes stay independent. The separate theme files remain available for legacy integrations.
 
 ## Supported Markdown
 
