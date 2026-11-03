@@ -3,18 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>easy-md-viewer | Markdown, with no overhead.</title>
+    <title>easy-md-viewer | Markdown, made to be read.</title>
     <meta name="description" content="A free, dependency-free Markdown viewer by BONYUR. Edit Markdown, try the options, and copy a working integration. Plain JavaScript, MIT." />
     <meta name="author" content="Andrés Trujillo [Mateus] byUwUr" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
-    <meta name="theme-color" content="#141619" />
+    <meta name="theme-color" content="#141618" />
     <link rel="canonical" href="https://byuwur.github.io/easy-md-viewer/" />
     <link rel="icon" href="https://byuwur.github.io/img/logo.png" />
     <!-- SEO -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="easy-md-viewer" />
     <meta property="og:locale" content="en_US" />
-    <meta property="og:title" content="easy-md-viewer | Markdown, with no overhead." />
+    <meta property="og:title" content="easy-md-viewer | Markdown, made to be read." />
     <meta property="og:description" content="A free, dependency-free Markdown viewer by BONYUR. Edit Markdown, try the options, and copy a working integration. Plain JavaScript, MIT." />
     <meta property="og:url" content="https://byuwur.github.io/easy-md-viewer/" />
     <meta property="og:image" content="https://byuwur.github.io/easy-md-viewer/prev.jpg" />
@@ -24,22 +24,22 @@
     <meta property="og:image:alt" content="easy-md-viewer by BONYUR: Markdown playground, options, source editor, and live preview." />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@byUwUr" />
-    <meta name="twitter:title" content="easy-md-viewer | Markdown, with no overhead." />
+    <meta name="twitter:title" content="easy-md-viewer | Markdown, made to be read." />
     <meta name="twitter:description" content="A free, dependency-free Markdown viewer by BONYUR. Edit Markdown, try the options, and copy a working integration. Plain JavaScript, MIT." />
     <meta name="twitter:image" content="https://byuwur.github.io/easy-md-viewer/prev.jpg" />
     <meta name="twitter:image:alt" content="easy-md-viewer by BONYUR: Markdown playground, options, source editor, and live preview." />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/css/shards.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/css/fontawesome.min.css" />
-    <script src="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/js/popper.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/js/bootstrap.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/js/popper.min.js" defer=""></script>
+    <script src="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/js/bootstrap.min.js" defer=""></script>
   </head>
 
   <body>
-    <a class="skip-link" href="#playground">Skip to playground</a>
+    <a class="visually-hidden-focusable position-absolute top-0 start-0 p-3 z-3 bg-body-tertiary link-body-emphasis" href="#playground">Skip to playground</a>
     <header class="border-bottom">
-      <nav class="navbar navbar-expand-md site-width" aria-label="Main navigation">
-        <a class="navbar-brand" href="#"><span class="brand-mark" aria-hidden="true">md↓</span>easy-md-viewer</a>
+      <nav class="navbar navbar-expand-md site-width container-fluid" aria-label="Main navigation">
+        <a class="navbar-brand fs-6 fw-semibold" href="#"><span class="brand-mark d-inline-flex align-items-center justify-content-center me-2 font-monospace fs-6 fw-bold" aria-hidden="true">md↓</span>easy-md-viewer</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#site-menu" aria-controls="site-menu" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -48,17 +48,17 @@
             <a class="nav-link" href="#playground">Playground</a>
             <a class="nav-link" href="#get-started">Get started</a>
             <a class="nav-link" href="https://github.com/byuwur/easy-md-viewer#readme">Docs <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i></a>
-            <a class="btn btn-quiet px-3" href="https://github.com/byuwur/easy-md-viewer"><i class="fa-brands fa-github me-1" aria-hidden="true"></i> GitHub</a>
-            <button id="site-theme" class="btn btn-quiet px-3" type="button" aria-label="Switch website to light theme"><i class="fa-solid fa-sun me-1" aria-hidden="true"></i> <span>Light</span></button>
+            <a class="btn px-3 btn-outline-secondary fw-semibold" href="https://github.com/byuwur/easy-md-viewer"><i class="fa-brands fa-github me-1" aria-hidden="true"></i> GitHub</a>
+            <button id="site-theme" class="btn px-3 btn-outline-secondary fw-semibold" type="button" aria-label="Switch website to light theme"><i class="fa-solid fa-sun me-1" aria-hidden="true"></i> <span>Light</span></button>
           </div>
         </div>
       </nav>
     </header>
 
-    <main class="site-width">
+    <main class="site-width container-fluid">
       <section class="intro" aria-labelledby="site-title">
-        <p class="small font-monospace text-body-secondary mb-3">A small tool by BONYUR @byUwUr</p>
-        <h1 id="site-title" class="mb-3">Markdown, <span>with no overhead.</span></h1>
+        <p class="small font-monospace text-body-secondary mb-2">A small tool by <a class="link-body-emphasis link-offset-2" href="https://byuwur.co" target="_blank" rel="noopener">BONYUR @byUwUr</a></p>
+        <h1 id="site-title" class="mb-2">Markdown, <span>made to be read.</span></h1>
         <p class="text-body-secondary mb-0">Plain JavaScript. No dependencies. Open source. Free. Forever.</p>
       </section>
 
@@ -67,35 +67,35 @@
           <div class="playground-toolbar bg-body-tertiary px-4 py-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
             <h2 id="playground-title" class="h6 m-0 fw-semibold">Playground</h2>
             <div class="source-picker">
-              <label class="small font-monospace text-body-secondary d-block mb-1" for="document-source">Document</label>
+              <label class="small font-monospace text-body-secondary d-block mb-1" for="document-source">Sample</label>
               <select id="document-source" class="form-select">
                 <option value="showcase">Default showcase</option>
                 <option value="features">Full feature showcase</option>
                 <option value="benchmark">Benchmark = test.md</option>
                 <option value="custom">Custom Markdown</option>
                 <option value="local">Local file…</option>
-                <option value="example" hidden>Feature example</option>
+                <option value="example" hidden="">Feature example</option>
               </select>
             </div>
           </div>
-          <div id="source-error" class="alert alert-danger small m-0" role="alert" hidden>
+          <div id="source-error" class="alert alert-danger small m-0" role="alert" hidden="">
             <span id="source-error-text"></span>
-            <button id="retry-source" class="btn btn-quiet btn-sm ms-2" type="button" hidden>Retry</button>
+            <button id="retry-source" class="btn btn-sm ms-2 btn-outline-secondary fw-semibold" type="button" hidden="">Retry</button>
           </div>
           <div id="features" class="discovery border-bottom px-3 py-2 d-flex flex-wrap align-items-center gap-1" aria-label="Markdown examples">
             <span class="small font-monospace text-body-secondary me-2">Try it!</span>
-            <button class="feature-chip" type="button" data-example="headings" aria-pressed="false"># headings</button>
-            <button class="feature-chip" type="button" data-example="formatting" aria-pressed="false">**formatting**</button>
-            <button class="feature-chip" type="button" data-example="code" aria-pressed="false">`code`</button>
-            <button class="feature-chip" type="button" data-example="lists" aria-pressed="false">↳ nesting</button>
-            <button class="feature-chip" type="button" data-example="tasks" aria-pressed="false">[x] tasks</button>
-            <button class="feature-chip" type="button" data-example="tables" aria-pressed="false">| tables |</button>
-            <button class="feature-chip" type="button" data-example="links" aria-pressed="false">↗ links</button>
-            <button class="feature-chip" type="button" data-example="images" aria-pressed="false">![images]</button>
-            <button class="feature-chip" type="button" data-example="escapes" aria-pressed="false">\ escapes</button>
-            <button class="feature-chip" type="button" data-example="safety" aria-pressed="false">&lt;html&gt; &amp; URLs</button>
+            <button class="feature-chip btn btn-sm font-monospace" type="button" data-example="headings" aria-pressed="false"># headings</button>
+            <button class="feature-chip btn btn-sm font-monospace" type="button" data-example="formatting" aria-pressed="false">**formatting**</button>
+            <button class="feature-chip btn btn-sm font-monospace" type="button" data-example="code" aria-pressed="false">`code`</button>
+            <button class="feature-chip btn btn-sm font-monospace" type="button" data-example="lists" aria-pressed="false">↳ nesting</button>
+            <button class="feature-chip btn btn-sm font-monospace" type="button" data-example="tasks" aria-pressed="false">[x] tasks</button>
+            <button class="feature-chip btn btn-sm font-monospace" type="button" data-example="tables" aria-pressed="false">| tables |</button>
+            <button class="feature-chip btn btn-sm font-monospace" type="button" data-example="links" aria-pressed="false">↗ links</button>
+            <button class="feature-chip btn btn-sm font-monospace" type="button" data-example="images" aria-pressed="false">![images]</button>
+            <button class="feature-chip btn btn-sm font-monospace" type="button" data-example="escapes" aria-pressed="false">\ escapes</button>
+            <button class="feature-chip btn btn-sm font-monospace" type="button" data-example="safety" aria-pressed="false">&lt;html&gt; &amp; URLs</button>
           </div>
-          <div class="mobile-tabs nav nav-pills nav-fill d-md-none border-bottom p-2 gap-2" role="tablist" aria-label="Playground panels">
+          <div class="mobile-tabs nav nav-pills d-md-none border-bottom p-2 gap-2 nav-justified bg-body-tertiary small" role="tablist" aria-label="Playground panels">
             <button id="config-tab" class="nav-link" type="button" data-bs-toggle="tab" data-bs-target="#config-panel" data-panel="config" role="tab" aria-controls="config-panel" aria-selected="false">
               <i class="fa-solid fa-sliders me-1" aria-hidden="true"></i> Configure
             </button>
@@ -108,45 +108,85 @@
           </div>
           <div class="tab-content row g-0">
             <section id="config-panel" class="tab-pane panel flex-column d-md-flex config-panel col-12 col-xl-3" aria-labelledby="config-heading">
-              <div class="panel-heading border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 px-4 py-3">
+              <div class="panel-heading border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 px-3 px-xxl-4 py-3">
                 <h3 id="config-heading" class="h6 m-0 fw-semibold flex-shrink-0"><span class="small font-monospace text-body-secondary me-2">01</span> Configure</h3>
               </div>
               <div class="border-bottom">
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 px-3 py-2">
                   <div class="btn-group" role="group" aria-label="Options view">
-                    <button class="btn btn-quiet btn-sm" type="button" data-options-view="form" aria-controls="config-form" aria-pressed="true">Form</button>
-                    <button class="btn btn-quiet btn-sm" type="button" data-options-view="json" aria-controls="options-json-panel" aria-pressed="false">JSON</button>
+                    <button class="btn btn-sm btn-outline-secondary fw-semibold" type="button" data-options-view="form" aria-controls="config-form" aria-pressed="true">Form</button>
+                    <button class="btn btn-sm btn-outline-secondary fw-semibold" type="button" data-options-view="json" aria-controls="options-json-panel" aria-pressed="false">JSON</button>
                   </div>
                   <div class="d-flex flex-wrap justify-content-end gap-2 ms-auto">
-                    <button class="btn btn-quiet btn-sm copy-button" id="copy-options" type="button" hidden><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> <span aria-live="polite">Copy</span></button>
-                    <button id="reset-options" class="btn btn-quiet btn-sm" type="button"><i class="fa-solid fa-rotate-left me-1" aria-hidden="true"></i> Reset</button>
+                    <button class="btn btn-sm copy-button btn-outline-secondary fw-semibold" id="copy-options" type="button" hidden=""><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> <span aria-live="polite">Copy</span></button>
+                    <button id="reset-options" class="btn btn-sm btn-outline-secondary fw-semibold" type="button"><i class="fa-solid fa-rotate-left me-1" aria-hidden="true"></i> Reset</button>
                   </div>
                 </div>
               </div>
-              <form id="config-form" class="panel-body" aria-label="Viewer configuration">
+              <form id="config-form" class="panel-body overflow-auto flex-grow-1" aria-label="Viewer configuration">
                 <div class="accordion accordion-flush">
                   <div class="accordion-item">
                     <h4 class="accordion-header">
-                      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#appearance-settings" aria-expanded="true" aria-controls="appearance-settings">Preview appearance</button>
+                      <button class="accordion-button font-monospace" type="button" data-bs-toggle="collapse" data-bs-target="#appearance-settings" aria-expanded="true" aria-controls="appearance-settings">Preview appearance</button>
                     </h4>
                     <div id="appearance-settings" class="accordion-collapse collapse show">
                       <div class="accordion-body">
                         <fieldset>
-                          <legend class="option-label fs-6 mb-2">Document theme</legend>
+                          <legend class="fs-6 mb-2 form-label">Document theme</legend>
                           <div class="btn-group w-100" role="group" aria-label="Document theme">
-                            <input class="btn-check" type="radio" name="previewTheme" id="preview-light" value="light" checked />
-                            <label class="btn btn-quiet flex-fill" for="preview-light">Light</label>
+                            <input class="btn-check" type="radio" name="previewTheme" id="preview-light" value="light" checked="" />
+                            <label class="btn flex-fill btn-outline-secondary fw-semibold" for="preview-light"><span class="me-1" aria-hidden="true">&#x2600;&#xFE0E;</span>Light</label>
                             <input class="btn-check" type="radio" name="previewTheme" id="preview-dark" value="dark" />
-                            <label class="btn btn-quiet flex-fill" for="preview-dark">Dark</label>
+                            <label class="btn flex-fill btn-outline-secondary fw-semibold" for="preview-dark"><span class="me-1" aria-hidden="true">&#x263E;&#xFE0E;</span>Dark</label>
                           </div>
-                          <p class="option-description mt-2 mb-0">Loads md.light.css or md.dark.css.</p>
+                          <p class="mt-2 mb-0 form-text">Every palette includes Light and Dark.</p>
                         </fieldset>
+                        <label class="form-label mt-3" for="preview-palette">Color palette</label>
+                        <select id="preview-palette" class="form-select">
+                          <option value="monokai">Monokai (default)</option>
+                          <option value="github">GitHub</option>
+                          <option value="solarized">Solarized</option>
+                          <option value="high-contrast">High Contrast</option>
+                          <option value="custom">Custom</option>
+                        </select>
+                        <details class="preview-appearance mt-3">
+                          <summary class="form-label">Typography &amp; colors</summary>
+                          <label class="d-block form-label" for="preview-font">Document font</label
+                          ><select id="preview-font" class="form-select mb-2">
+                            <option value="">Viewer default</option>
+                            <option value="ui-monospace, monospace">Monospace</option>
+                            <option value="system-ui, sans-serif">System sans</option>
+                            <option value="Georgia, serif">Serif</option>
+                          </select>
+                          <label class="d-block form-label" for="preview-size">Text size (rem)</label><input id="preview-size" class="form-control mb-2" type="number" min="0.5" max="3" step="0.125" placeholder="Viewer default" />
+                          <label class="d-block form-label" for="preview-leading">Line height</label><input id="preview-leading" class="form-control mb-2" type="number" min="1" max="3" step="0.1" placeholder="Viewer default" />
+                          <label class="d-block form-label" for="preview-controls-font">Controls font</label
+                          ><select id="preview-controls-font" class="form-select mb-2">
+                            <option value="">Monospace (default)</option>
+                            <option value="system-ui, sans-serif">System sans</option>
+                            <option value="Georgia, serif">Serif</option>
+                          </select>
+                          <label class="d-block form-label" for="preview-bg">Background color</label
+                          ><input id="preview-bg" class="form-control mb-2" type="text" placeholder="Theme default" pattern="#[0-9a-fA-F]{6}" title="Six-digit hex color, for example #222222" maxlength="7" />
+                          <label class="d-block form-label" for="preview-ink">Text color</label
+                          ><input id="preview-ink" class="form-control mb-2" type="text" placeholder="Theme default" pattern="#[0-9a-fA-F]{6}" title="Six-digit hex color, for example #eeeeee" maxlength="7" />
+                          <p class="form-text">Appearance is CSS, separate from API options. Blank fields use viewer or theme defaults.</p>
+                          <button id="copy-appearance" class="btn btn-sm btn-outline-secondary fw-semibold" type="button"><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> Copy CSS</button>
+                          <p id="appearance-status" class="mt-2 form-text" role="status"></p>
+                          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3">
+                            <label class="form-label mb-0" for="custom-theme-css">Custom theme CSS</label>
+                            <button id="copy-theme" type="button" class="btn btn-sm btn-outline-secondary fw-semibold">Copy theme CSS</button>
+                          </div>
+                          <p class="form-text">Start with the selected palette's Light/Dark defaults. Editing selects Custom.</p>
+                          <textarea id="custom-theme-css" class="form-control font-monospace" rows="10" wrap="off" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+                          <p id="theme-status" class="form-text mb-0" role="status" aria-live="polite"></p>
+                        </details>
                       </div>
                     </div>
                   </div>
                   <div class="accordion-item">
                     <h4 class="accordion-header">
-                      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#viewer-settings" aria-expanded="true" aria-controls="viewer-settings">Viewer controls</button>
+                      <button class="accordion-button font-monospace" type="button" data-bs-toggle="collapse" data-bs-target="#viewer-settings" aria-expanded="true" aria-controls="viewer-settings">Viewer controls</button>
                     </h4>
                     <div id="viewer-settings" class="accordion-collapse collapse show">
                       <div class="accordion-body" id="viewer-options"></div>
@@ -154,7 +194,7 @@
                   </div>
                   <div class="accordion-item">
                     <h4 class="accordion-header">
-                      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#render-settings" aria-expanded="true" aria-controls="render-settings">Rendering</button>
+                      <button class="accordion-button font-monospace" type="button" data-bs-toggle="collapse" data-bs-target="#render-settings" aria-expanded="true" aria-controls="render-settings">Rendering</button>
                     </h4>
                     <div id="render-settings" class="accordion-collapse collapse show">
                       <div class="accordion-body" id="render-options"></div>
@@ -162,43 +202,51 @@
                   </div>
                 </div>
               </form>
-              <div class="panel-body overflow-hidden" id="options-json-panel" hidden>
-                <textarea class="source-editor" id="options-json" readonly spellcheck="false" wrap="off" aria-label="Viewer options as JSON"></textarea>
+              <div class="panel-body overflow-hidden flex-grow-1" id="options-json-panel" hidden="">
+                <textarea
+                  class="source-editor form-control font-monospace d-block w-100 border-0 px-4 py-3 overflow-auto bg-body h-100"
+                  id="options-json"
+                  readonly=""
+                  spellcheck="false"
+                  wrap="off"
+                  aria-label="Complete viewer configuration as JSON"></textarea>
               </div>
             </section>
 
             <section id="source-panel" class="tab-pane panel flex-column d-md-flex source-panel col-12 col-md-6 col-xl-4" aria-labelledby="source-heading">
-              <div class="panel-heading border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 px-4 py-3">
-                <h3 id="source-heading" class="h6 m-0 fw-semibold flex-shrink-0">
+              <div class="panel-heading border-bottom d-flex flex-wrap flex-md-nowrap align-items-center justify-content-between gap-2 px-3 px-xxl-4 py-3">
+                <h3 id="source-heading" class="h6 m-0 fw-semibold">
                   <label for="markdown-source"><span class="small font-monospace text-body-secondary me-2">02</span> Markdown source</label>
                 </h3>
-                <div class="d-flex gap-1">
-                  <button id="restore-source" class="btn btn-quiet btn-sm" type="button"><i class="fa-solid fa-rotate-left me-1" aria-hidden="true"></i> Restore</button>
-                  <button id="copy-markdown" class="btn btn-quiet btn-sm copy-button" type="button"><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> <span aria-live="polite">Copy</span></button>
+                <div class="d-flex gap-1 flex-shrink-0">
+                  <button id="restore-source" class="btn btn-sm text-nowrap btn-outline-secondary fw-semibold" type="button"><i class="fa-solid fa-rotate-left me-1" aria-hidden="true"></i> Restore</button>
+                  <button id="copy-markdown" class="btn btn-sm copy-button text-nowrap btn-outline-secondary fw-semibold" type="button"><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> <span aria-live="polite">Copy</span></button>
                 </div>
               </div>
-              <div class="panel-body">
+              <div class="panel-body overflow-hidden flex-grow-1">
                 <textarea
                   id="markdown-source"
-                  class="source-editor"
+                  class="source-editor form-control font-monospace d-block w-100 border-0 px-4 py-3 overflow-auto bg-body h-100"
                   aria-label="Editable Markdown source"
                   spellcheck="false"
                   autocapitalize="off"
                   autocomplete="off"
                   wrap="off"
                   title="Ctrl / ⌘ + Enter to render. Tab moves focus."
-                  placeholder="# Your document&#10;&#10;Write Markdown here…"></textarea>
+                  placeholder="# Your document
+
+Write Markdown here…"></textarea>
               </div>
             </section>
 
             <!-- Real library preview; Bootstrap stays outside the iframe -->
             <section id="preview-panel" class="tab-pane active panel flex-column d-md-flex preview-panel col-12 col-md-6 col-xl-5" aria-labelledby="preview-heading">
-              <div class="panel-heading border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 px-4 py-3">
+              <div class="panel-heading border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 px-3 px-xxl-4 py-3">
                 <h3 id="preview-heading" class="h6 m-0 fw-semibold flex-shrink-0"><span class="small font-monospace text-body-secondary me-2">03</span> Live preview</h3>
                 <span class="font-monospace text-body-secondary small"><span id="render-status" role="status">Loading…</span></span>
               </div>
-              <div class="panel-body">
-                <iframe id="preview-frame" title="Live Markdown document" allow="clipboard-write" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+              <div class="panel-body overflow-hidden flex-grow-1">
+                <iframe id="preview-frame" title="Live Markdown document" allow="clipboard-write" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" class="d-block w-100 h-100 border-0"></iframe>
               </div>
             </section>
           </div>
@@ -223,9 +271,9 @@
         </div>
         <div class="discovery py-4 border-bottom d-flex flex-wrap align-items-center gap-2">
           <span class="small font-monospace text-body-secondary me-2">Try it!</span>
-          <button id="open-file" class="btn btn-quiet" type="button"><i class="fa-solid fa-folder-open me-1" aria-hidden="true"></i> Open .md file</button>
-          <input id="local-file" type="file" accept=".md,.markdown,text/markdown,text/plain" hidden />
-          <button id="rerun-benchmark" class="btn btn-quiet" type="button" title="Time the synchronous byMDviewer() call; excludes browser paint and resource loading">
+          <button id="open-file" class="btn btn-outline-secondary fw-semibold" type="button"><i class="fa-solid fa-folder-open me-1" aria-hidden="true"></i> Open .md file</button>
+          <input id="local-file" type="file" accept=".md,.markdown,text/markdown,text/plain" hidden="" />
+          <button id="rerun-benchmark" class="btn btn-outline-secondary fw-semibold" type="button" title="Time the synchronous byMDviewer() call; excludes browser paint and resource loading">
             <i class="fa-solid fa-rotate-right me-1" aria-hidden="true"></i> <span>Rerun measurement</span>
           </button>
           <span id="document-state" class="font-monospace text-body-secondary small ms-sm-auto">Original</span>
@@ -234,61 +282,102 @@
         <div id="feedback" class="small text-body-secondary mt-2" role="status" aria-live="polite"></div>
       </section>
 
-      <section id="get-started" class="get-started py-5 row gy-4 gx-lg-5" aria-labelledby="integration-title">
-        <div class="col-lg-4">
-          <h2 id="integration-title" class="h2 mb-3">Get started</h2>
-          <p class="text-body-secondary">Copy or download this short Markdown starter with default settings.</p>
+      <section id="get-started" class="get-started py-5 row gy-4 gx-lg-5" aria-labelledby="get-started-title">
+        <div class="col-lg-3">
+          <h2 id="get-started-title" class="h2 mb-3">Get started</h2>
+          <p class="text-body-secondary">Copy or download this Markdown starter with default settings.</p>
           <p class="text-body-secondary small">CDN starters require internet access. Local starters need the viewer files beside the HTML.</p>
-          <p class="text-body-secondary small">Playground powered by <a class="site-link" href="https://github.com/byuwur/spa.js" target="_blank" rel="noopener">SPA.js</a>.</p>
-          <p id="integration-note" class="text-body-secondary small mb-2">CDN pinned @v1.8. Local source may include newer fixes.</p>
-          <a class="site-link small" href="https://github.com/byuwur/easy-md-viewer#usage" target="_blank" rel="noopener">Read the full API <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i></a>
+          <p class="text-body-secondary small">Playground powered by <a class="link-body-emphasis link-offset-2" href="https://github.com/byuwur/spa.js" target="_blank" rel="noopener">SPA.js</a>.</p>
+          <p id="integration-note" class="text-body-secondary small mb-2">CDN follows main and requires the updated files to be published there.</p>
+          <a class="small link-body-emphasis link-offset-2" href="https://github.com/byuwur/easy-md-viewer#readme" target="_blank" rel="noopener"
+            >Read the full API <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i
+          ></a>
         </div>
-        <div class="col-lg-8">
+        <div class="col-lg-9">
           <div class="code-box bg-body-tertiary border">
             <div class="code-toolbar px-4 py-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2">
               <fieldset class="m-0">
                 <legend class="visually-hidden">Integration assets</legend>
                 <div class="btn-group" role="group" aria-label="Integration assets">
-                  <input class="btn-check" type="radio" name="integrationMode" id="integration-cdn" value="cdn" checked />
-                  <label class="btn btn-quiet" for="integration-cdn">CDN</label>
+                  <input class="btn-check" type="radio" name="integrationMode" id="integration-cdn" value="cdn" checked="" />
+                  <label class="btn btn-outline-secondary fw-semibold" for="integration-cdn">CDN</label>
                   <input class="btn-check" type="radio" name="integrationMode" id="integration-local" value="local" />
-                  <label class="btn btn-quiet" for="integration-local">Local files</label>
+                  <label class="btn btn-outline-secondary fw-semibold" for="integration-local">Local files</label>
                 </div>
               </fieldset>
               <div class="d-flex flex-wrap gap-2">
-                <button id="copy-integration" class="btn btn-quiet btn-sm px-3 copy-button" type="button"><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> <span aria-live="polite">Copy HTML</span></button>
-                <button id="download-html" class="btn btn-accent btn-sm px-3" type="button"><i class="fa-solid fa-download me-1" aria-hidden="true"></i> Download HTML</button>
+                <button id="copy-integration" class="btn btn-sm px-3 copy-button btn-outline-secondary fw-semibold" type="button"><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> <span aria-live="polite">Copy HTML</span></button>
+                <button id="download-html" class="btn btn-accent btn-sm px-3 fw-semibold" type="button"><i class="fa-solid fa-download me-1" aria-hidden="true"></i> Download HTML</button>
               </div>
             </div>
-            <label class="visually-hidden" for="integration-code">Complete HTML integration example</label>
-            <textarea id="integration-code" class="integration-code" readonly spellcheck="false" wrap="soft"></textarea>
+            <textarea
+              id="integration-code"
+              class="integration-code m-0 form-control font-monospace d-block w-100 border-0 px-4 py-3 overflow-auto bg-body"
+              readonly=""
+              spellcheck="false"
+              wrap="soft"
+              aria-label="Complete HTML integration"></textarea>
             <p id="integration-feedback" class="small text-body-secondary mx-4 my-0" role="status" aria-live="polite"></p>
           </div>
         </div>
       </section>
     </main>
 
+    <nav class="viewer-suite site-width py-4 container-fluid" aria-label="Viewer suite">
+      <p class="small text-body-secondary mb-3">Need a viewer for another format?</p>
+      <div class="d-flex flex-wrap align-items-center gap-3">
+        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-md-viewer/" aria-current="page">
+          <span class="brand-mark d-inline-flex align-items-center justify-content-center fw-bold" style="--logo-light: #d8cdf5; --logo-dark: #c4b5fd" aria-hidden="true">md↓</span>
+          <span class="text-decoration-underline">MD</span>
+        </a>
+        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-json-viewer/">
+          <span class="brand-mark d-inline-flex align-items-center justify-content-center fw-bold" style="--logo-light: #f3e4b4; --logo-dark: #f2d98d" aria-hidden="true">{ }</span>
+          <span class="text-decoration-underline">JSON</span>
+        </a>
+        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-csv-viewer/">
+          <span class="brand-mark d-inline-flex align-items-center justify-content-center fw-bold" style="--logo-light: #c0dfca; --logo-dark: #a9d6b8" aria-hidden="true">csv</span>
+          <span class="text-decoration-underline">CSV</span>
+        </a>
+        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-log-viewer/">
+          <span class="brand-mark d-inline-flex align-items-center justify-content-center fw-bold" style="--logo-light: #f6d2bd; --logo-dark: #f3bfa0" aria-hidden="true">log</span>
+          <span class="text-decoration-underline">LOG</span>
+        </a>
+        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-diff-viewer/">
+          <span class="brand-mark d-inline-flex align-items-center justify-content-center fw-bold" style="--logo-light: #f4c7cf; --logo-dark: #eeadb8" aria-hidden="true">±</span>
+          <span class="text-decoration-underline">DIFF</span>
+        </a>
+        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-xml-viewer/">
+          <span class="brand-mark d-inline-flex align-items-center justify-content-center fw-bold" style="--logo-light: #c0e2ee; --logo-dark: #a3d5e8" aria-hidden="true">&lt;/&gt;</span>
+          <span class="text-decoration-underline">XML</span>
+        </a>
+        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-yaml-viewer/">
+          <span class="brand-mark d-inline-flex align-items-center justify-content-center fw-bold" style="--logo-light: #e5cce3; --logo-dark: #dab6d7" aria-hidden="true">yml</span>
+          <span class="text-decoration-underline">YAML</span>
+        </a>
+        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-code-viewer/">
+          <span class="brand-mark d-inline-flex align-items-center justify-content-center fw-bold" style="--logo-light: #cad8f4; --logo-dark: #aec5ef" aria-hidden="true">{ }</span>
+          <span class="text-decoration-underline">CODE</span>
+        </a>
+      </div>
+    </nav>
     <footer class="site-footer border-top py-4 small">
-      <div class="site-width d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <div class="site-width d-flex flex-wrap justify-content-between align-items-center gap-3 container-fluid">
         <p class="m-0">
-          &copy; <span id="year-txt"></span>, Made with <i class="fa-solid fa-heart" role="img" aria-label="love"></i> by
-          <a class="site-link" href="https://byuwur.co" target="_blank" rel="noopener">BONYUR @byUwUr</a>
+          © <span id="year-txt"></span>, Made with <i class="fa-solid fa-heart" role="img" aria-label="love"></i> by
+          <a class="link-body-emphasis link-offset-2" href="https://byuwur.co" target="_blank" rel="noopener">BONYUR @byUwUr</a>
         </p>
         <div class="d-flex flex-wrap gap-3">
-          <a class="site-link" href="https://github.com/byuwur/easy-md-viewer/blob/main/LICENSE.md">MIT license</a>
-          <a class="site-link" href="https://github.com/byuwur/easy-md-viewer">Source &amp; contributions <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i></a>
-          <a class="site-link" href="https://ko-fi.com/byuwur">Buy me a Pandebono <i class="fa-brands fa-ko-fi ms-1" aria-hidden="true"></i></a>
+          <a class="link-body-emphasis link-offset-2" href="https://github.com/byuwur/easy-md-viewer/blob/main/LICENSE.md">MIT license</a>
+          <a class="link-body-emphasis link-offset-2" href="https://github.com/byuwur/easy-md-viewer">Source &amp; contributions <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i></a>
+          <a class="link-body-emphasis link-offset-2" href="https://ko-fi.com/byuwur">Buy me a Pandebono <i class="fa-brands fa-ko-fi ms-1" aria-hidden="true"></i></a>
         </div>
       </div>
     </footer>
     <noscript>
-      <p class="site-width">Enable JavaScript to use the playground. The <a href="https://github.com/byuwur/easy-md-viewer#readme">README</a> includes integration examples.</p>
+      <p class="site-width container-fluid">Enable JavaScript to use the playground. The <a href="https://github.com/byuwur/easy-md-viewer#readme">README</a> includes integration examples.</p>
     </noscript>
 
     <style>
-      /* =============
-             === FONT & THEMES ===
-             ============= */
       @font-face {
         font-family: Archivo;
         src: url("https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/css/webfonts/archivo.ttf") format("truetype");
@@ -296,47 +385,22 @@
         font-display: swap;
       }
       :root {
-        --page-bg: #141619;
-        --panel-bg: #1b1e22;
-        --editor-bg: #171a1e;
-        --panel-line: #393e44;
-        --ink: #efeee8;
-        --muted: #a5abb2;
-        --accent: #91bcff;
-        --accent-ink: #102849;
-        --danger: #ffb0a5;
-        --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-        --bs-body-font-family: Archivo, system-ui, sans-serif;
-        --bs-font-monospace: var(--mono);
-        --bs-body-bg: var(--page-bg);
-        --bs-body-color: var(--ink);
-        --bs-secondary-color: var(--muted);
-        --bs-border-color: var(--panel-line);
-        --bs-tertiary-bg: var(--panel-bg);
-        --bs-tertiary-bg-rgb: 27, 30, 34;
-        --bs-link-color: var(--accent);
-        --bs-link-hover-color: var(--ink);
+        --accent: #c4b5fd;
+        --accent-text: var(--accent);
+        --accent-ink: #212529;
+        --bs-body-font-family: Archivo, var(--bs-font-sans-serif);
         --bs-border-radius: 0;
         --bs-border-radius-sm: 0;
         --bs-border-radius-lg: 0;
-        color-scheme: dark;
+      }
+      :root[data-bs-theme="dark"] {
+        --bs-body-bg: #141618;
+        --bs-body-bg-rgb: 20, 22, 24;
       }
       :root[data-bs-theme="light"] {
-        --page-bg: #f5f6f7;
-        --panel-bg: #fff;
-        --editor-bg: #f0f2f4;
-        --panel-line: #cdd2d7;
-        --ink: #20252b;
-        --muted: #59636e;
-        --accent: #215fba;
-        --accent-ink: #fff;
-        --danger: #b42318;
-        --bs-tertiary-bg-rgb: 255, 255, 255;
-        color-scheme: light;
+        --accent: #d8cdf5;
+        --accent-text: #6b4f9a;
       }
-      /* =============
-             === LAYOUT & NAVIGATION ===
-             ============= */
       html {
         scroll-padding-top: 1rem;
       }
@@ -345,57 +409,30 @@
         color: var(--accent-ink);
       }
       :focus-visible {
-        outline: 2px solid var(--accent);
+        outline: 2px solid var(--accent-text);
         outline-offset: 3px;
       }
       .site-width {
         max-width: 1480px;
-        margin-inline: auto;
         padding-inline: clamp(1rem, 3vw, 3rem);
-      }
-      .site-link {
-        color: var(--ink);
-        text-underline-offset: 0.25em;
-      }
-      .site-link:hover {
-        color: var(--accent);
-      }
-      .skip-link {
-        position: fixed;
-        z-index: 10;
-        left: 1rem;
-        top: -5rem;
-        padding: 0.75rem;
-        background: var(--accent);
-        color: var(--accent-ink);
-      }
-      .skip-link:focus {
-        top: 1rem;
       }
       .navbar {
         min-height: 76px;
       }
-      .navbar-brand {
-        color: var(--ink);
-        font-size: 1rem;
-        font-weight: 650;
-      }
       .brand-mark {
-        display: inline-grid;
-        place-items: center;
         width: 34px;
         height: 34px;
-        margin-right: 0.5rem;
         background: var(--accent);
         color: var(--accent-ink);
-        font: bold 1.1rem var(--mono);
       }
-      .navbar .nav-link {
-        color: var(--muted);
-        padding: 0.75rem;
+      .viewer-suite .brand-mark {
+        width: 1.5rem;
+        height: 1.5rem;
+        background: var(--logo-dark);
+        font-size: 0.625rem;
       }
-      .navbar .nav-link:hover {
-        color: var(--ink);
+      [data-bs-theme="light"] .viewer-suite .brand-mark {
+        background: var(--logo-light);
       }
       .intro {
         padding-block: 3rem 2rem;
@@ -406,11 +443,8 @@
         line-height: 1.08;
       }
       .intro h1 span {
-        color: var(--accent);
+        color: var(--accent-text);
       }
-      /* =============
-             === CONTROLS ===
-             ============= */
       .btn {
         display: inline-flex;
         align-items: center;
@@ -418,27 +452,31 @@
         min-height: 44px;
         font-weight: 600;
       }
+      .btn i,
+      .nav-link i {
+        font-size: 0.85em;
+      }
       .btn-accent {
         --bs-btn-bg: var(--accent);
         --bs-btn-color: var(--accent-ink);
         --bs-btn-border-color: var(--accent);
         --bs-btn-hover-bg: var(--accent);
         --bs-btn-hover-color: var(--accent-ink);
-        --bs-btn-hover-border-color: var(--ink);
+        --bs-btn-hover-border-color: var(--bs-body-color);
       }
-      .btn-quiet {
-        --bs-btn-color: var(--ink);
-        --bs-btn-border-color: var(--panel-line);
-        --bs-btn-hover-color: var(--ink);
-        --bs-btn-hover-bg: var(--panel-bg);
-        --bs-btn-hover-border-color: var(--accent);
+      .btn-link {
+        --bs-btn-color: var(--accent-text);
+        --bs-btn-hover-color: var(--bs-body-color);
       }
-      .btn i,
-      .nav-link i {
-        font-size: 0.85em;
+      .btn-outline-secondary {
+        --bs-btn-color: var(--bs-body-color);
+        --bs-btn-border-color: var(--bs-border-color);
+        --bs-btn-hover-color: var(--bs-body-color);
+        --bs-btn-hover-bg: var(--bs-tertiary-bg);
+        --bs-btn-hover-border-color: var(--accent-text);
       }
-      .btn-quiet[aria-pressed="true"],
-      .btn-check:checked + .btn-quiet {
+      .btn-outline-secondary[aria-pressed="true"],
+      .btn-check:checked + .btn-outline-secondary {
         background: var(--accent);
         border-color: var(--accent);
         color: var(--accent-ink);
@@ -446,65 +484,36 @@
       .form-select,
       .form-control {
         min-height: 44px;
-        background-color: var(--editor-bg);
-        color: var(--ink);
-      }
-      .form-select:focus,
-      .form-control:focus {
-        background-color: var(--editor-bg);
-        color: var(--ink);
-        border-color: var(--accent);
-        box-shadow: 0 0 0 0.15rem color-mix(in srgb, var(--accent) 20%, transparent);
       }
       .form-switch {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding-left: 0;
-        margin: 0;
         min-height: 48px;
       }
       .form-switch .form-check-input {
-        order: 2;
-        float: none;
-        flex-shrink: 0;
         width: 2.75rem;
         height: 1.5rem;
-        margin: 0;
-        cursor: pointer;
-      }
-      .form-switch .form-check-label,
-      .option-label {
-        flex: 1;
-        cursor: pointer;
-        padding-block: 0.5rem;
       }
       .form-check-input:checked {
         background-color: var(--accent);
-        border-color: var(--accent);
+        border-color: var(--accent-text);
       }
-      .form-text,
-      .option-description {
-        font-size: 0.8125rem;
-        color: var(--muted);
+      .form-check-input:checked[type="checkbox"] {
+        --bs-form-check-bg-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23212529' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
+      }
+      .form-switch .form-check-input:checked {
+        --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23212529'/%3e%3c/svg%3e");
+      }
+      .form-check-input:focus,
+      .form-select:focus,
+      .form-control:focus {
+        border-color: var(--accent-text);
+        box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--accent-text) 20%, transparent);
       }
       .mobile-tabs.nav.nav-pills {
-        background: var(--panel-bg);
-        --bs-nav-link-color: var(--muted);
+        --bs-nav-link-color: var(--bs-secondary-color);
+        --bs-nav-link-hover-color: var(--accent-text);
         --bs-nav-pills-link-active-bg: var(--accent);
         --bs-nav-pills-link-active-color: var(--accent-ink);
       }
-      .mobile-tabs.nav .nav-link {
-        background-color: transparent;
-        color: var(--muted);
-      }
-      .mobile-tabs.nav .nav-link.active {
-        background-color: var(--accent);
-        color: var(--accent-ink);
-      }
-      /* =============
-             === PLAYGROUND & CODE ===
-             ============= */
       .source-picker {
         width: min(100%, 18rem);
       }
@@ -514,49 +523,45 @@
       }
       .panel + .panel,
       .metric + .metric {
-        border-left: 1px solid var(--panel-line);
+        border-left: 1px solid var(--bs-border-color);
       }
       .tab-content > .panel.active {
         display: flex;
       }
       .panel-heading {
         min-height: 68px;
+        flex-shrink: 0;
       }
-      .panel-heading .btn {
-        white-space: nowrap;
+      .panel-heading h3 {
+        min-width: 0;
+      }
+      .panel-heading .btn,
+      .feature-chip {
         min-height: 34px;
       }
-      .panel-body {
-        flex: 1;
-        min-height: 0;
-        overflow: auto;
+      .feature-chip {
+        --bs-btn-color: var(--bs-secondary-color);
+        --bs-btn-hover-color: var(--accent-text);
+        --bs-btn-hover-border-color: var(--bs-border-color);
+        font-weight: 400;
       }
-      /* Each editor and iframe owns its scrolling; the panel must not scroll too. */
-      .source-panel .panel-body,
-      .preview-panel .panel-body {
-        overflow: hidden;
+      .feature-chip[aria-pressed="true"] {
+        color: var(--accent-text);
+        border-color: var(--bs-border-color);
+      }
+      .panel-body {
+        min-height: 0;
       }
       .source-editor,
       .integration-code {
-        display: block;
-        width: 100%;
-        height: 100%;
         resize: none;
-        border: 0;
-        padding: 1.25rem 1.5rem;
-        background: var(--editor-bg);
-        color: var(--ink);
-        font: 0.875rem/1.8 var(--mono);
+        font-size: 0.875rem;
+        line-height: 1.8;
         white-space: pre;
-        overflow: auto;
         tab-size: 2;
       }
-      .source-editor:focus {
-        outline: 2px solid var(--accent);
-        outline-offset: -2px;
-      }
       .source-editor[aria-invalid="true"] {
-        outline: 2px solid var(--danger);
+        outline: 2px solid var(--bs-danger);
         outline-offset: -2px;
       }
       .integration-code {
@@ -564,46 +569,26 @@
         white-space: pre-wrap;
         overflow-wrap: anywhere;
       }
-      .panel-footer {
-        border-top: 1px solid var(--panel-line);
-        padding: 0.75rem 1.5rem;
-        font: 0.8125rem/1.5 var(--mono);
-        color: var(--muted);
-      }
-      #preview-frame {
-        display: block;
-        width: 100%;
-        height: 100%;
-        border: 0;
-      }
-      .feature-chip {
-        min-height: 34px;
-        border: 1px solid transparent;
-        background: transparent;
-        padding: 0.3rem 0.5rem;
-        font: 0.875rem var(--mono);
-        color: var(--muted);
-      }
-      .feature-chip:hover,
-      .feature-chip[aria-pressed="true"] {
-        color: var(--accent);
-        border-color: var(--panel-line);
-      }
       .accordion {
-        --bs-accordion-bg: var(--panel-bg);
-        --bs-accordion-active-bg: var(--panel-bg);
-        --bs-accordion-active-color: var(--accent);
+        --bs-accordion-bg: var(--bs-tertiary-bg);
+        --bs-accordion-active-bg: var(--bs-tertiary-bg);
+        --bs-accordion-active-color: var(--accent-text);
       }
       .accordion-button {
-        font: 0.875rem var(--mono);
+        font-size: 0.875rem;
       }
-      /* =============
-             === RESPONSIVE LAYOUT ===
-             ============= */
+      .accordion-button::after,
+      .accordion-button:not(.collapsed)::after {
+        background: currentColor;
+        mask: var(--bs-accordion-btn-icon) center / contain no-repeat;
+      }
+      .form-text {
+        font-size: 0.8125rem;
+      }
       @media (min-width: 768px) and (max-width: 1199px) {
         .config-panel {
           height: auto;
-          border-bottom: 1px solid var(--panel-line);
+          border-bottom: 1px solid var(--bs-border-color);
         }
         .config-panel .panel-body {
           overflow: visible;
@@ -615,6 +600,8 @@
         .source-panel {
           border-left: 0 !important;
         }
+      }
+      @media (min-width: 992px) and (max-width: 1199px) {
         .config-panel .accordion {
           display: flex;
         }
@@ -624,12 +611,12 @@
           border: 0;
         }
         .config-panel .accordion-item + .accordion-item {
-          border-left: 1px solid var(--panel-line);
+          border-left: 1px solid var(--bs-border-color);
         }
       }
       @media (min-width: 768px) and (max-width: 991px), (min-width: 1200px) and (max-width: 1399px) {
         .panel-heading {
-          min-height: 7rem;
+          min-height: 88px;
           align-content: center;
         }
       }
@@ -641,22 +628,15 @@
         .source-picker {
           width: 100%;
         }
-        .panel-heading .btn {
+        .panel-heading .btn,
+        .feature-chip {
           min-height: 44px;
         }
         .metric:nth-child(3) {
           border-left: 0;
         }
         .metric:nth-child(n + 3) {
-          border-top: 1px solid var(--panel-line);
-        }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        *,
-        *::before,
-        *::after {
-          scroll-behavior: auto !important;
-          transition: none !important;
+          border-top: 1px solid var(--bs-border-color);
         }
       }
     </style>
@@ -671,9 +651,7 @@
           return text.replace(new RegExp(`^${indentation}`, "gm"), "").trim();
         }
 
-        // =============
-        // === STATE & SAMPLES ===
-        // =============
+        // --- STATE & SAMPLES ---
         const optionDefinitions = [
           {
             name: "themeToggle",
@@ -835,17 +813,15 @@
         };
         state.drafts = { ...state.originals };
 
-        // =============
-        // === CONFIGURATION ===
-        // =============
+        // --- CONFIGURATION ---
         function buildConfigurator() {
           for (const option of optionDefinitions) {
             const row = document.createElement("div");
-            row.className = "option-row d-flex align-items-center gap-2 form-switch";
+            row.className = "option-row d-flex align-items-center form-switch gap-3 ps-0 m-0";
             row.innerHTML = dedent(/* HTML */ `
-              <input class="form-check-input" type="checkbox" role="switch" id="${option.name}" name="${option.name}" aria-describedby="${option.name}-description" ${option.default ? "checked" : ""} />
-              <label class="option-label flex-grow-1" for="${option.name}">${option.label}<span class="option-description d-block mt-1" id="${option.name}-description">${option.description}</span></label>
-              <button class="btn btn-link btn-sm p-1 flex-shrink-0 font-monospace text-decoration-none" type="button" data-example="${option.example}" aria-label="Show ${option.label.toLowerCase()} example" title="Show example">
+              <input class="form-check-input order-2 float-none flex-shrink-0 ms-0 my-0" type="checkbox" role="switch" id="${option.name}" name="${option.name}" ${option.default ? "checked" : ""} />
+              <label class="form-check-label flex-grow-1 py-2" for="${option.name}" title="${option.description}">${option.label}</label>
+              <button class="btn btn-link btn-sm p-1 flex-shrink-0 font-monospace text-decoration-none fw-semibold" type="button" data-example="${option.example}" aria-label="Show ${option.label.toLowerCase()} example" title="Show example">
                 Try <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i>
               </button>
             `);
@@ -854,25 +830,29 @@
           document.getElementById("viewer-options").insertAdjacentHTML(
             "beforeend",
             dedent(/* HTML */ `
-              <div class="row g-2 mt-3">
+              <div class="row g-2 mt-3 align-items-end">
                 <fieldset class="col-6" id="controlsSize">
-                  <legend class="option-label small mb-2">Controls Size</legend>
+                  <legend class="small mb-2 form-label">Controls Size</legend>
                   <div class="btn-group w-100" role="group" aria-label="Control size">
                     <input class="btn-check" id="controlsSize-small" name="controlsSize" type="radio" value="small" aria-label="Small controls" />
-                    <label class="btn btn-quiet btn-sm flex-fill" for="controlsSize-small" title="Small" data-bs-toggle="tooltip" data-bs-placement="bottom">a</label>
+                    <label class="btn btn-sm flex-fill btn-outline-secondary fw-semibold" for="controlsSize-small" title="Small" data-bs-toggle="tooltip" data-bs-placement="bottom">a</label>
                     <input class="btn-check" id="controlsSize-regular" name="controlsSize" type="radio" value="regular" aria-label="Regular controls" checked />
-                    <label class="btn btn-quiet btn-sm flex-fill" for="controlsSize-regular" title="Regular" data-bs-toggle="tooltip" data-bs-placement="bottom">Aa</label>
+                    <label class="btn btn-sm flex-fill btn-outline-secondary fw-semibold" for="controlsSize-regular" title="Regular" data-bs-toggle="tooltip" data-bs-placement="bottom">Aa</label>
                     <input class="btn-check" id="controlsSize-large" name="controlsSize" type="radio" value="large" aria-label="Large controls" />
-                    <label class="btn btn-quiet btn-sm flex-fill" for="controlsSize-large" title="Large" data-bs-toggle="tooltip" data-bs-placement="bottom">A</label>
+                    <label class="btn btn-sm flex-fill btn-outline-secondary fw-semibold" for="controlsSize-large" title="Large" data-bs-toggle="tooltip" data-bs-placement="bottom">A</label>
                   </div>
                 </fieldset>
                 <fieldset class="col-6" id="controlsPosition">
-                  <legend class="option-label small mb-2">Controls Position</legend>
+                  <legend class="small mb-2 form-label">Controls Position</legend>
                   <div class="btn-group w-100" role="group" aria-label="Controls position">
                     <input class="btn-check" id="controlsPosition-top" name="controlsPosition" type="radio" value="top" aria-label="Top controls" checked />
-                    <label class="btn btn-quiet btn-sm flex-fill" for="controlsPosition-top" title="Top" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></label>
+                    <label class="btn btn-sm flex-fill btn-outline-secondary fw-semibold" for="controlsPosition-top" title="Top" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                      ><i class="fa-solid fa-arrow-up" aria-hidden="true"></i
+                    ></label>
                     <input class="btn-check" id="controlsPosition-bottom" name="controlsPosition" type="radio" value="bottom" aria-label="Bottom controls" />
-                    <label class="btn btn-quiet btn-sm flex-fill" for="controlsPosition-bottom" title="Bottom" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></label>
+                    <label class="btn btn-sm flex-fill btn-outline-secondary fw-semibold" for="controlsPosition-bottom" title="Bottom" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                      ><i class="fa-solid fa-arrow-down" aria-hidden="true"></i
+                    ></label>
                   </div>
                 </fieldset>
               </div>
@@ -882,7 +862,7 @@
             "beforeend",
             dedent(/* HTML */ `
               <div class="mt-3">
-                <label class="option-label mb-1" for="linkTarget">Open links in</label>
+                <label class="mb-1 form-label" for="linkTarget">Open links in</label>
                 <select class="form-select form-select-sm config-select" name="linkTarget" id="linkTarget">
                   <option value="_blank">New tab (_blank)</option>
                   <option value="_self">Current frame (_self)</option>
@@ -893,9 +873,7 @@
           );
         }
 
-        // =============
-        // === SOURCE LOADING ===
-        // =============
+        // --- SOURCE LOADING ---
         // Source/document management: drafts are authoritative; async loads cannot replace a newer selection.
         function showSourceError(message = "", retry = false) {
           document.getElementById("source-error").hidden = !message;
@@ -971,9 +949,7 @@
           }
         }
 
-        // =============
-        // === PREVIEW ===
-        // =============
+        // --- PREVIEW ---
         function clearPreview() {
           clearTimeout(state.renderTimer);
           if (state.previewReady) frame.contentDocument.getElementById("document").textContent = "";
@@ -1025,8 +1001,8 @@
             try {
               state.previewReady = typeof frame.contentWindow.byMDviewer === "function";
               if (!state.previewReady) throw new Error("Renderer missing");
-              const themeLink = frame.contentDocument.getElementById("byVIEWtheme");
-              new MutationObserver(syncPreviewTheme).observe(themeLink, { attributes: true, attributeFilter: ["href"] });
+              const viewer = frame.contentDocument.getElementById("document");
+              new MutationObserver(syncPreviewTheme).observe(viewer, { attributes: true, attributeFilter: ["data-theme", "class"] });
               frame.contentDocument.addEventListener("click", (event) => {
                 const anchor = event.target.closest("a[href]");
                 if (!anchor) return;
@@ -1064,7 +1040,6 @@
               <head>
                 <base href="${base}" />
                 <link rel="stylesheet" href="md.css" />
-                <link id="byVIEWtheme" rel="stylesheet" href="md.light.css" />
                 <style>
                   body {
                     margin: 0;
@@ -1076,23 +1051,20 @@
                 ${'<script src="md.js"><\/script>'}
               </head>
               <body>
-                <main id="document" aria-label="Rendered Markdown"></main>
+                <main id="document" data-theme="light" aria-label="Rendered Markdown"></main>
                 <p id="empty-document" hidden>Start typing in Source to see your document here.</p>
               </body>
             </html>
           `);
         }
 
-        // =============
-        // === VIEWER THEME ===
-        // =============
-        // Theme handling: the native viewer owns the active stylesheet; the configurator observes it.
+        // --- VIEWER THEME ---
+        // The container owns its theme; the configurator observes that attribute.
         function syncPreviewTheme() {
-          const href = frame.contentDocument.getElementById("byVIEWtheme").getAttribute("href");
-          state.theme = href.includes("md.dark.css") ? "dark" : "light";
+          const viewer = frame.contentDocument.getElementById("document");
+          state.theme = getPreviewMode(viewer);
           document.getElementById(`preview-${state.theme}`).checked = true;
-          frame.contentDocument.documentElement.style.colorScheme = state.theme;
-          frame.contentDocument.body.style.background = state.theme === "dark" ? "#000" : "#fff";
+          setPreviewMode(viewer, state.theme);
           generateIntegration();
         }
 
@@ -1103,13 +1075,11 @@
             generateIntegration();
             return;
           }
-          frame.contentDocument.getElementById("byVIEWtheme").setAttribute("href", `md.${theme}.css`);
+          setPreviewMode(frame.contentDocument.getElementById("document"), theme);
           renderPreview();
         }
 
-        // =============
-        // === FEATURE EXAMPLES ===
-        // =============
+        // --- FEATURE EXAMPLES ---
         // Feature demonstrations preserve the other document drafts and the selected options.
         function showExample(name) {
           const example = examples[name];
@@ -1123,33 +1093,58 @@
           document.getElementById("feedback").textContent = `${example.label}. Your other document drafts are kept.`;
         }
 
-        // =============
-        // === INTEGRATION ===
-        // =============
+        // --- INTEGRATION ---
+        function settingsJSON(options) {
+          const field = (id) => document.getElementById(id)?.value || null;
+          const { forceMonospace, themeToggle, fontSizeControls, copyButton, controlsCompact, controlsSize, controlsPosition, ...rendering } = options;
+          return JSON.stringify(
+            {
+              theme: document.querySelector('[name="previewTheme"]:checked').value,
+              palette: field("preview-palette") || "monokai",
+              fontFamily: field("preview-font"),
+              fontSize: field("preview-size") === null ? null : Number(field("preview-size")),
+              lineHeight: field("preview-leading") === null ? null : Number(field("preview-leading")),
+              controlsFont: field("preview-controls-font") || "ui-monospace, monospace",
+              backgroundColor: field("preview-bg"),
+              textColor: field("preview-ink"),
+              customThemeCSS: field("preview-palette") === "custom" ? field("custom-theme-css") : null,
+              forceMonospace,
+              themeToggle,
+              fontSizeControls,
+              copyButton,
+              controlsCompact,
+              controlsSize,
+              controlsPosition,
+              ...rendering
+            },
+            null,
+            2
+          );
+        }
+
         function generateIntegration() {
-          document.getElementById("options-json").value = JSON.stringify(state.options, null, 2);
+          document.getElementById("options-json").value = settingsJSON(state.options);
           const cdn = state.integrationMode === "cdn";
-          const path = cdn ? "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@v1.8/" : "";
+          const path = cdn ? "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@main/" : "";
           const html = dedent(/* HTML */ `
             <!doctype html>
             <html lang="en">
               <head>
                 <meta charset="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
-                <title>My Markdown document</title>
-                <link rel="stylesheet" href="${path}${cdn ? "md.min.css" : "md.css"}" />
-                <link id="byVIEWtheme" rel="stylesheet" href="${path}md.light.css" />
-                ${`<script src="${path}${cdn ? "md.min.js" : "md.js"}" defer><\/script>`}
+                <title>easy-md-viewer</title>
+                <link rel="stylesheet" href="${path}md.css" />
+                ${`<script src="${path}md.js" defer><\/script>`}
               </head>
               <body>
-                <div id="document"></div>
-                ${"<script>"} document.addEventListener("DOMContentLoaded", () => { const markdown = "# A little Markdown. A real document.\\n\\nWrite something useful. Let **easy-md-viewer** handle the rendering.";
+                <div id="document" data-theme="light"></div>
+                ${"<script>"} document.addEventListener("DOMContentLoaded", () => { const markdown = ${JSON.stringify("# A little Markdown. A real document.\n\nWrite something useful. Let **easy-md-viewer** handle the rendering.")};
                 byMDviewer(document.getElementById("document"), markdown); }); ${"<\/script>"}
               </body>
             </html>
           `);
           document.getElementById("integration-code").value = html;
-          document.getElementById("integration-note").textContent = cdn ? "CDN pinned @v1.8. Local source may include newer fixes." : "Place the HTML beside md.js, md.css, md.light.css, and md.dark.css.";
+          document.getElementById("integration-note").textContent = cdn ? "CDN follows main and requires the updated files to be published there." : "Place the HTML beside md.js and md.css.";
           return html;
         }
 
@@ -1158,7 +1153,7 @@
           const url = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
           const link = document.createElement("a");
           link.href = url;
-          link.download = "my-markdown-document.html";
+          link.download = "easy-md-viewer.html";
           document.body.append(link);
           link.click();
           link.remove();
@@ -1166,18 +1161,16 @@
           document.getElementById("integration-feedback").textContent = "Downloaded. The starter uses default viewer settings.";
         }
 
-        // =============
-        // === CLIPBOARD ===
-        // =============
-        async function copyText(text, fallback, button) {
+        // --- CLIPBOARD ---
+        async function copyText(text, selectable, button) {
           const caption = button.querySelector("span");
           try {
             await navigator.clipboard.writeText(text);
             caption.textContent = "Copied!";
             button.removeAttribute("title");
           } catch {
-            fallback.focus();
-            fallback.select();
+            selectable.focus();
+            selectable.select();
             caption.textContent = "Failed";
             button.title = "Clipboard unavailable. Press Ctrl+C or ⌘C to copy the selected text.";
           }
@@ -1198,9 +1191,7 @@
           bootstrap.Tab.getOrCreateInstance(document.getElementById(`${panel}-tab`)).show();
         }
 
-        // =============
-        // === EVENTS ===
-        // =============
+        // --- EVENTS ---
         buildConfigurator();
         const controlTooltips = [];
         if (window.bootstrap?.Tooltip && typeof window.Popper?.createPopper === "function") {
@@ -1230,7 +1221,7 @@
         document.getElementById("config-form").addEventListener("change", (event) => {
           const field = event.target;
           if (field.name === "previewTheme") return setPreviewTheme(field.value);
-          if (!(field.name in defaults)) return;
+          if (!(field.name in defaults)) return generateIntegration();
           state.options[field.name] = field.type === "checkbox" ? field.checked : field.value === "false" ? false : field.value;
           renderPreview();
         });
@@ -1280,6 +1271,7 @@
         document.getElementById("rerun-benchmark").addEventListener("click", () => {
           if (!state.previewReady) {
             showSourceError();
+            // Reassigning srcdoc retries a failed iframe load.
             frame.srcdoc = frame.srcdoc;
           } else renderPreview();
         });
@@ -1307,15 +1299,160 @@
           button.querySelector("span").textContent = next === "light" ? "Light" : "Dark";
           button.querySelector("i").className = `fa-solid fa-${next === "light" ? "sun" : "moon"} me-1`;
           button.setAttribute("aria-label", `Switch website to ${next} theme`);
-          document.querySelector('meta[name="theme-color"]').content = getComputedStyle(document.documentElement).getPropertyValue("--page-bg").trim();
+          document.querySelector('meta[name="theme-color"]').content = getComputedStyle(document.documentElement).getPropertyValue("--bs-body-bg").trim();
         });
-        // =============
-        // === INITIALIZATION ===
-        // =============
+        // --- INITIALIZATION ---
         document.getElementById("year-txt").textContent = new Date().getFullYear();
         selectSource("showcase");
         initializePreview();
       });
+    </script>
+    <script>
+      function getPreviewMode(target) {
+        return ["light", "dark"].includes(target.dataset.theme) ? target.dataset.theme : target.classList.contains("dark") ? "dark" : "light";
+      }
+
+      function setPreviewMode(target, mode) {
+        const palette = document.getElementById("preview-palette").value;
+        // Only write changes: the preview observer watches these same attributes.
+        for (const value of ["light", "dark"]) {
+          if (target.classList.contains(value) !== (value === mode)) target.classList.toggle(value, value === mode);
+        }
+        const theme = palette === "monokai" ? mode : palette;
+        if (target.dataset.theme !== theme) target.dataset.theme = theme;
+        target.ownerDocument.documentElement.style.colorScheme = mode;
+        target.ownerDocument.body.style.background = target.ownerDocument.defaultView.getComputedStyle(target).backgroundColor;
+      }
+
+      (function appearance(name) {
+        document.addEventListener("DOMContentLoaded", () => {
+          const frame = document.getElementById("preview-frame");
+          const fields = [...document.querySelectorAll(".preview-appearance input, .preview-appearance select")];
+          const palette = document.getElementById("preview-palette");
+          const editor = document.getElementById("custom-theme-css");
+          const themeStatus = document.getElementById("theme-status");
+          const selector = `.by${name.toUpperCase()}document`;
+          const bg = name === "md" ? "--by-md-bg" : "--by-view-bg";
+          const ink = name === "md" ? "--by-md-text" : name === "json" ? "--by-json-text" : "--by-view-text";
+          const properties = ["font-family", "font-size", "line-height", "--by-view-controls-font", bg, ink];
+          const declarations = () => {
+            const rules = fields.map((field, index) => [properties[index], field.checkValidity() ? field.value + (field.id === "preview-size" && field.value ? "rem" : "") : ""]);
+            if (!["md", "json"].includes(name)) rules.push(["--by-view-content-font", rules[0][1]], ["--by-view-line-height", rules[2][1]]);
+            return rules;
+          };
+          const initialStyles = new Map();
+          let customDraft = null;
+          let themeTimer;
+          const target = () => frame.contentDocument?.querySelector(selector);
+          // Read both modes on temporary containers so exporting CSS never changes the live viewer.
+          const themeCSS = (selected) => {
+            const document = frame.contentDocument;
+            return ["light", "dark"]
+              .map((mode) => {
+                const probe = document.createElement("div");
+                probe.className = `${selector.slice(1)} ${mode}`;
+                probe.dataset.theme = selected;
+                probe.style.display = "none";
+                document.body.appendChild(probe);
+                const style = document.defaultView.getComputedStyle(probe);
+                const rules = [...style]
+                  .filter((property) => property.startsWith("--by-") && property !== "--by-view-toggle-position" && !/font|line-height/.test(property))
+                  .sort()
+                  .map((property) => `  ${property}: ${style.getPropertyValue(property).trim()};`)
+                  .join("\n");
+                probe.remove();
+                return `${selector}.${mode}[data-theme="custom"] {\n${rules}\n}`;
+              })
+              .join("\n\n");
+          };
+          const apply = () => {
+            const viewer = target();
+            if (!viewer) return;
+            let style = frame.contentDocument.getElementById("custom-theme-style");
+            if (!style) {
+              style = frame.contentDocument.createElement("style");
+              style.id = "custom-theme-style";
+              frame.contentDocument.head.appendChild(style);
+            }
+            const css = palette.value === "custom" ? editor.value : "";
+            if (style.textContent !== css) style.textContent = css;
+            for (const [property, value] of declarations()) {
+              if (value) {
+                if (!initialStyles.has(property)) initialStyles.set(property, viewer.style.getPropertyValue(property));
+                viewer.style.setProperty(property, value);
+              } else if (initialStyles.has(property)) {
+                viewer.style.setProperty(property, initialStyles.get(property));
+                initialStyles.delete(property);
+              }
+            }
+            viewer.dataset.byViewDefaultFontSize = viewer.style.fontSize;
+            setPreviewMode(viewer, getPreviewMode(viewer));
+            const invalid = fields.some((field) => !field.checkValidity());
+            document.getElementById("appearance-status").textContent = invalid ? "Use the shown number ranges and six-digit hex colors." : "";
+          };
+          const loadPalette = () => {
+            clearTimeout(themeTimer);
+            if (!target()) return;
+            const css = palette.value === "custom" ? (customDraft ?? themeCSS("monokai")) : themeCSS(palette.value);
+            if (editor.value !== css) editor.value = css;
+            apply();
+            themeStatus.textContent = "";
+          };
+          const editTheme = () => {
+            clearTimeout(themeTimer);
+            customDraft = editor.value;
+            palette.value = "custom";
+            palette.dispatchEvent(new Event("change", { bubbles: true }));
+            themeStatus.textContent = "Custom theme CSS applied to the preview.";
+          };
+          fields.forEach((field) => field.addEventListener("change", apply));
+          palette.addEventListener("change", loadPalette);
+          editor.addEventListener("input", () => {
+            customDraft = editor.value;
+            clearTimeout(themeTimer);
+            themeTimer = setTimeout(editTheme, 180);
+          });
+          editor.addEventListener("change", editTheme);
+          frame.addEventListener("load", () => {
+            initialStyles.clear();
+            loadPalette();
+          });
+          document.querySelectorAll("#reset-settings, #reset-options, #reset").forEach((button) =>
+            button.addEventListener("click", () => {
+              clearTimeout(themeTimer);
+              customDraft = null;
+              fields.forEach((field) => {
+                field.value = "";
+              });
+              palette.value = "monokai";
+              palette.dispatchEvent(new Event("change", { bubbles: true }));
+            })
+          );
+          document.getElementById("copy-theme").addEventListener("click", async () => {
+            try {
+              await navigator.clipboard.writeText(editor.value);
+              themeStatus.textContent = 'Theme CSS copied. Use data-theme="custom" with a light/dark class.';
+            } catch {
+              themeStatus.textContent = "Copy failed. Check clipboard access.";
+            }
+          });
+          document.getElementById("copy-appearance").addEventListener("click", async () => {
+            if (fields.some((field) => !field.checkValidity())) return apply();
+            const rules = declarations()
+              .filter(([, value]) => value)
+              .map(([property, value]) => `  ${property}: ${value};`)
+              .join("\n");
+            try {
+              await navigator.clipboard.writeText(`${selector} {\n${rules}\n}`);
+              document.getElementById("appearance-status").textContent = "CSS copied. Place it after the viewer stylesheet.";
+            } catch {
+              document.getElementById("appearance-status").textContent = "Copy failed. Check clipboard access.";
+            }
+          });
+          window.addEventListener("pagehide", () => clearTimeout(themeTimer));
+          loadPalette();
+        });
+      })("md");
     </script>
   </body>
 </html>
