@@ -19,11 +19,11 @@ Open `index.html` for the local playground; its page assets require internet acc
 **Recommended: CDN.** No downloads or package manager.
 
 ```html
-<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@main/md.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@main/md.js" defer></script>
+<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@latest/md.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@latest/md.js" defer></script>
 ```
 
-The CDN example tracks `@main` and requires internet access. Use a published tag or commit to pin a version.
+The CDN example uses `@latest` and requires internet access. Use a published tag or commit to pin a version.
 
 **Local files:** For offline use, save `md.js` and `md.css` beside your HTML:
 
@@ -164,8 +164,8 @@ Supports ATX headings, emphasis, strikethrough, code spans/fences, ordered/unord
 For syntax highlighting, load [easy-code-viewer](https://github.com/byuwur/easy-code-viewer)'s CSS and JavaScript before rendering Markdown:
 
 ```html
-<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@main/code.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@main/code.js" defer></script>
+<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@latest/code.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@latest/code.js" defer></script>
 ```
 
 Keep the Markdown files too. For offline use, save all four files beside your HTML and use local paths.

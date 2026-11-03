@@ -293,7 +293,7 @@ Write Markdown here…"></textarea>
           <p class="text-body-secondary">Copy or download this Markdown starter with default settings.</p>
           <p class="text-body-secondary small">CDN starters require internet access. Local starters need the viewer files beside the HTML.</p>
           <p class="text-body-secondary small">Playground powered by <a class="link-body-emphasis link-offset-2" href="https://github.com/byuwur/spa.js" target="_blank" rel="noopener">SPA.js</a>.</p>
-          <p id="integration-note" class="text-body-secondary small mb-2">CDN follows main and requires the updated files to be published there.</p>
+          <p id="integration-note" class="text-body-secondary small mb-2">CDN follows the latest release; updates may take time to reach caches.</p>
           <a class="small link-body-emphasis link-offset-2" href="https://github.com/byuwur/easy-md-viewer#readme" target="_blank" rel="noopener"
             >Read the full API <i class="fa-solid fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i
           ></a>
@@ -1055,7 +1055,7 @@ Write Markdown here…"></textarea>
               <head>
                 <base href="${base}" />
                 <link rel="stylesheet" href="md.css" />
-                <link rel="stylesheet" href="../easy-code-viewer/code.css" />
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@latest/code.css" />
                 <style>
                   body {
                     margin: 0;
@@ -1064,7 +1064,7 @@ Write Markdown here…"></textarea>
                     min-height: 100vh;
                   }
                 </style>
-                ${'<script src="../easy-code-viewer/code.js"><\/script>'}
+                ${'<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@latest/code.js"><\/script>'}
                 ${'<script src="md.js"><\/script>'}
               </head>
               <body>
@@ -1144,7 +1144,7 @@ Write Markdown here…"></textarea>
         function generateIntegration() {
           document.getElementById("options-json").value = settingsJSON(state.options);
           const cdn = state.integrationMode === "cdn";
-          const path = cdn ? "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@main/" : "";
+          const path = cdn ? "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@latest/" : "";
           const html = dedent(/* HTML */ `
             <!doctype html>
             <html lang="en">
@@ -1163,7 +1163,7 @@ Write Markdown here…"></textarea>
             </html>
           `);
           document.getElementById("integration-code").value = html;
-          document.getElementById("integration-note").textContent = cdn ? "CDN follows main and requires the updated files to be published there." : "Place the HTML beside md.js and md.css.";
+          document.getElementById("integration-note").textContent = cdn ? "CDN follows the latest release; updates may take time to reach caches." : "Place the HTML beside md.js and md.css.";
           return html;
         }
 

@@ -518,9 +518,12 @@ test("Markdown rendering", async (t) => {
       await playground.route("**/*", async (route) => {
         if (route.request().url() === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
         const url = new URL(route.request().url());
+        if (["https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@latest/code.css", "https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@latest/code.js"].includes(url.href)) {
+          const file = path.basename(url.pathname);
+          return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
+        }
         if (url.origin !== "https://viewer.test") return route.abort();
         const file = path.basename(url.pathname);
-        if (/^code\.(css|js)$/.test(file)) return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
         if (/^md\.(light|dark)\.css$/.test(file)) return route.fulfill({ body: legacyThemeCSS(file.includes(".dark.css") ? "dark" : "light"), contentType: "text/css" });
         const body = await fs.readFile(path.join(__dirname, "..", file));
         await route.fulfill({ body, contentType: file.endsWith(".html") ? "text/html" : file.endsWith(".js") ? "text/javascript" : "text/css" });
@@ -528,13 +531,13 @@ test("Markdown rendering", async (t) => {
       await playground.goto("https://viewer.test/index.html");
       const release = await playground.frameLocator("#preview-frame").locator(".byVIEWtoolbar").evaluate(() => byMDviewer.VERSION);
       assert.ok((await playground.frameLocator("#preview-frame").locator(".byVIEWinfo").textContent()).includes(` v${release} `), "Credits must match the runtime release");
-      const cdnBase = "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@main/";
+      const cdnBase = "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@latest/";
       const readme = require("node:fs").readFileSync(path.join(__dirname, "../README.md"), "utf8");
       for (const extension of ["css", "js"]) assert.ok(readme.includes(`${cdnBase}md.${extension}`), "README assets must match the CDN starter");
-      assert.equal(await playground.locator("#integration-note").textContent(), "CDN follows main and requires the updated files to be published there.");
+      assert.equal(await playground.locator("#integration-note").textContent(), "CDN follows the latest release; updates may take time to reach caches.");
       assert.ok((await playground.locator("#integration-code").inputValue()).includes(`href="${cdnBase}md.css"`));
       const codeRelease = await playground.frameLocator("#preview-frame").locator(".byVIEWtoolbar").evaluate(() => byCODEviewer.VERSION);
-      for (const extension of ["css", "js"]) assert.ok(readme.includes(`easy-code-viewer@main/code.${extension}`), "Markdown highlighting docs must use main");
+      for (const extension of ["css", "js"]) assert.ok(readme.includes(`easy-code-viewer@latest/code.${extension}`), "Markdown highlighting docs must use latest");
       const workflow = require("node:fs").readFileSync(path.join(__dirname, "../.github/workflows/rendering.yml"), "utf8");
       assert.ok(workflow.includes("ref: main"), "CI must test CODE from main");
       assert.match(codeRelease, /^\d+(?:\.\d+)*$/);
@@ -695,9 +698,12 @@ test("family customization, navigation and monospace controls", async () => {
     await page.route("**/*", async (route) => {
       if (route.request().url() === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
       const url = new URL(route.request().url());
+      if (["https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@latest/code.css", "https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@latest/code.js"].includes(url.href)) {
+        const file = path.basename(url.pathname);
+        return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
+      }
       if (url.origin !== "https://viewer.test") return route.abort();
       const file = path.basename(url.pathname);
-      if (/^code\.(css|js)$/.test(file)) return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
       if (/^md\.(light|dark)\.css$/.test(file)) return route.fulfill({ body: legacyThemeCSS(file.includes(".dark.css") ? "dark" : "light"), contentType: "text/css" });
       return route.fulfill({ path: path.join(__dirname, "..", file), contentType: file.endsWith(".html") ? "text/html" : file.endsWith(".js") ? "text/javascript" : "text/css" });
     });
@@ -1141,9 +1147,12 @@ test("playground palettes and editable two-mode custom themes stay synchronized"
     await page.route("**/*", async (route) => {
       const url = new URL(route.request().url());
       if (url.href === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
+      if (["https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@latest/code.css", "https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@latest/code.js"].includes(url.href)) {
+        const file = path.basename(url.pathname);
+        return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
+      }
       if (url.origin !== "https://viewer.test") return route.abort();
       const file = path.basename(url.pathname);
-      if (/^code\.(css|js)$/.test(file)) return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
       return route.fulfill({ path: path.join(__dirname, "..", file), contentType: file.endsWith(".html") ? "text/html" : file.endsWith(".js") ? "text/javascript" : "text/css" });
     });
     await page.goto("https://viewer.test/index.html");
@@ -1474,22 +1483,29 @@ test("optional code highlighting preserves Markdown and follows document themes"
   }
 });
 
-test("playground code examples can switch presentation without changing Markdown", async () => {
+test("playground code examples use the latest sibling assets and switch presentation without changing Markdown", async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined, channel: process.env.BROWSER_CHANNEL || undefined });
   try {
     const page = await browser.newPage();
     await page.route("**/*", async (route) => {
       const url = new URL(route.request().url());
       if (url.href === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
+      if (["https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@latest/code.css", "https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@latest/code.js"].includes(url.href)) {
+        const file = path.basename(url.pathname);
+        return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
+      }
       if (url.origin !== "https://viewer.test") return route.abort();
       const file = path.basename(url.pathname);
-      const root = /^code\.(css|js)$/.test(file) ? "../../easy-code-viewer" : "..";
-      return route.fulfill({ path: path.join(__dirname, root, file), contentType: file.endsWith(".html") ? "text/html" : file.endsWith(".js") ? "text/javascript" : "text/css" });
+      return route.fulfill({ path: path.join(__dirname, "..", file), contentType: file.endsWith(".html") ? "text/html" : file.endsWith(".js") ? "text/javascript" : "text/css" });
     });
     await page.goto("https://viewer.test/index.html");
     await page.locator('.feature-chip[data-example="code"]').click();
     const frame = page.frameLocator("#preview-frame");
     await frame.locator(".byCODEkeyword").first().waitFor();
+    assert.deepEqual(await frame.locator('head [href*="easy-code-viewer"], head [src*="easy-code-viewer"]').evaluateAll((assets) => assets.map((asset) => asset.href || asset.src).sort()), [
+      "https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@latest/code.css",
+      "https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@latest/code.js"
+    ]);
     const markdown = await page.locator("#markdown-source").inputValue();
     assert.equal(await frame.locator(".byCODEhighlight").count(), 2);
     await page.locator("#codeHighlighting").evaluate((input) => input.click());
