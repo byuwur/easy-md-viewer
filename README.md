@@ -2,9 +2,17 @@
 
 ![easy-md-viewer preview](prev.jpg)
 
-Render Markdown with light/dark themes and text-size controls. Plain JavaScript; no dependencies or build step.
+**Markdown, made to be read.**
 
-Try [GitHub Pages](https://byuwur.github.io/easy-md-viewer/) or [CodePen](https://codepen.io/byuwur/pen/VYPoWMM).
+Render Markdown into headings, lists, tables, tasks, links, and code blocks.
+
+Use it for READMEs, documentation, notes, and other Markdown content.
+
+One JavaScript file. One scoped stylesheet. No build step. Plain JavaScript, with no runtime dependencies.
+
+[Open the playground](https://byuwur.github.io/easy-md-viewer/) · [CodePen](https://codepen.io/byuwur/pen/VYPoWMM)
+
+Open `index.html` for the local playground; its page assets require internet access.
 
 ## Installation
 
@@ -51,27 +59,27 @@ Exported HTML starters use default settings, independently of playground changes
 
 Pass options as the third argument, such as `byMDviewer(target, markdown, { breaks: true })`.
 
-| Option              | Default     | Meaning                                                                            |
-| ------------------- | ----------- | ---------------------------------------------------------------------------------- |
-| `withLinks`         | `true`      | Render links, autolinks, bare URLs, and email addresses.                           |
-| `withImages`        | `true`      | Render supported images.                                                           |
-| `withTables`        | `true`      | Render GFM-style tables.                                                           |
-| `withTasks`         | `true`      | Render task checkboxes.                                                            |
-| `withStrikethrough` | `true`      | Render `~~strikethrough~~`.                                                        |
-| `breaks`            | `false`     | Convert paragraph line breaks to `<br>`.                                           |
-| `linkTarget`        | `"_blank"`  | Link target; `false` omits it. Same-document anchors stay in this tab.             |
+| Option              | Default     | Meaning                                                                      |
+| ------------------- | ----------- | ---------------------------------------------------------------------------- |
+| `withLinks`         | `true`      | Render links, autolinks, bare URLs, and email addresses.                     |
+| `withImages`        | `true`      | Render supported images.                                                     |
+| `withTables`        | `true`      | Render GFM-style tables.                                                     |
+| `withTasks`         | `true`      | Render task checkboxes.                                                      |
+| `withStrikethrough` | `true`      | Render `~~strikethrough~~`.                                                  |
+| `breaks`            | `false`     | Convert paragraph line breaks to `<br>`.                                     |
+| `linkTarget`        | `"_blank"`  | Link target; `false` omits it. Same-document anchors stay in this tab.       |
 | `themeToggle`       | `true`      | Show the theme toggle.                                                       |
-| `fontSizeControls`  | `true`      | Show A-/A+ controls.                                                               |
-| `copyButton`        | `true`      | Show Copy: click for rendered plain text; Shift+click for original Markdown.       |
-| `controlsSize`      | `"regular"` | Button size: `"small"`, `"regular"`, or `"large"`; invalid values use `"regular"`. |
-| `controlsCompact`   | `true`     | Put attribution beside the controls, wrapping when space is limited.               |
-| `controlsPosition`  | `"top"`     | Toolbar position: `"top"` or `"bottom"`; invalid values use `"top"`.               |
+| `fontSizeControls`  | `true`      | Show text-size controls.                                                     |
+| `copyButton`        | `true`      | Show Copy: click for rendered plain text; Shift+click for original Markdown. |
+| `controlsSize`      | `"regular"` | `"small"`, `"regular"`, or `"large"`; invalid values use `"regular"`.        |
+| `controlsCompact`   | `true`      | Keep credits beside controls; `false` stacks them. Wraps as needed.          |
+| `controlsPosition`  | `"top"`     | Sticky `"top"` or `"bottom"` toolbar; invalid values use `"top"`.            |
 
-Plain-text copying preserves paragraph and code line breaks and excludes viewer controls and attribution. Shift+click copies the source, including Markdown markers. Copy requires browser clipboard access in a secure context; the button reports failure if access is unavailable or denied.
+Plain-text copying preserves paragraph and code line breaks, excluding controls and credits. Copy requires clipboard permission in a secure context.
 
-Each toolbar shows a GitHub link, version, and author portfolio link in a muted theme color. Read the library version with `byMDviewer.VERSION`.
+Read the library version with `byMDviewer.VERSION`.
 
-Controls stay visible at the selected edge of the page or nearest scrolling container while the viewer is in view. Their opaque background follows the viewer theme. Bottom toolbars put credits below the buttons when stacked. For a compact header, use `{ controlsSize: "small", controlsCompact: true, controlsPosition: "top" }`. Button size is independent of the document text size.
+Controls stick to the selected edge of the page or nearest scrolling container.
 
 Controls use monospace by default; override `--by-view-controls-font` to change it.
 
