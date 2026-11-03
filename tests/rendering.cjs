@@ -1309,7 +1309,10 @@ test("optional code highlighting preserves Markdown and follows document themes"
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined, channel: process.env.BROWSER_CHANNEL || undefined });
   try {
     const page = await browser.newPage();
-    const errors = [], requests = [];
+    const errors = [], requests = [], warnings = [];
+    page.on("console", (message) => {
+      if (message.type() === "warning" && message.text().startsWith("easy-md-viewer:")) warnings.push(message.text());
+    });
     page.on("pageerror", (error) => errors.push(error.message));
     page.on("request", (request) => requests.push(request.url()));
     await page.setContent('<div id="viewer"></div><div id="reference"></div><div id="outside">Host</div>');
@@ -1326,6 +1329,16 @@ test("optional code highlighting preserves Markdown and follows document themes"
       renderMarkdown();
     }, markdown);
     await t.test("missing libraries stay plain and late loading takes effect on rerender", async () => {
+      assert.equal(warnings.length, 1, "Multiple and nested fences warn once per render");
+      assert.match(warnings[0], /Code highlighting requires easy-code-viewer/);
+      assert.ok(warnings[0].includes("https://byuwur.github.io/easy-code-viewer/"));
+      await page.evaluate(() => {
+        renderMarkdown({ codeHighlighting: false });
+        byMDviewer(document.getElementById("viewer"), "Only inline `code`.");
+      });
+      assert.equal(warnings.length, 1, "Disabled highlighting and documents without fences do not warn");
+      await page.evaluate(() => renderMarkdown());
+      assert.equal(warnings.length, 2, "A new render can report its missing dependency");
       assert.equal(await page.locator("#viewer .byCODEhighlight").count(), 0);
       assert.equal(await page.locator("#viewer pre code").first().textContent(), source);
       await page.locator("#viewer .byVIEWcopy").click();
@@ -1334,6 +1347,7 @@ test("optional code highlighting preserves Markdown and follows document themes"
       assert.equal(await page.locator("#viewer .byCODEhighlight").count(), 0);
       await page.evaluate(() => renderMarkdown());
       assert.equal(await page.locator("#viewer .byCODEhighlight").count(), 5);
+      assert.equal(warnings.length, 2, "Loaded highlighting does not warn");
       assert.equal(await page.locator("#viewer pre code").first().textContent(), source);
       assert.equal(await page.locator("#viewer pre code").first().getAttribute("data-language"), "js");
       assert.ok(await page.locator("#viewer blockquote .byCODEtag").count() > 0);

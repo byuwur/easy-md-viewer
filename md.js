@@ -918,7 +918,12 @@
       code.dataset.language = language;
     }
     code.textContent = body.join("\n");
-    if (options.codeHighlighting && typeof global.byCODEviewer?.highlight === "function") {
+    if (options.codeHighlighting && typeof global.byCODEviewer?.highlight !== "function") {
+      console.warn("easy-md-viewer: Code highlighting requires easy-code-viewer. https://byuwur.github.io/easy-code-viewer/");
+      // These options belong to this render; avoid repeating the warning for each fence.
+      options.codeHighlighting = false;
+    }
+    if (options.codeHighlighting) {
       try {
         code.replaceChildren(global.byCODEviewer.highlight(code.textContent, language || "plain"));
       } catch {

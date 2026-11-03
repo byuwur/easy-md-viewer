@@ -172,6 +172,8 @@ Label fences with `js`, `javascript`, or another language supported by the code 
 
 Only fenced blocks are enhanced, without extra controls or line numbers. Inline code stays plain. Unknown languages stay uncolored; missing libraries or highlighting limits/errors leave the original code readable. No assets are fetched by the renderer. Loading the library later takes effect on the next render. Set `codeHighlighting: false` to opt out.
 
+If highlighting is enabled but the library is missing, the first fence logs a console warning with the easy-code-viewer landing link, once per render.
+
 The playground includes this integration; exported starters keep the standalone Markdown setup. Add the two code-viewer files to enable highlighting in a starter.
 
 ### Heading anchors
