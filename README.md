@@ -66,6 +66,7 @@ Pass options as the third argument, such as `byMDviewer(target, markdown, { brea
 | `withTables`        | `true`      | Render GFM-style tables.                                                     |
 | `withTasks`         | `true`      | Render task checkboxes.                                                      |
 | `withStrikethrough` | `true`      | Render `~~strikethrough~~`.                                                  |
+| `codeHighlighting` | `true` | Highlight fenced code when easy-code-viewer is loaded; `false` keeps plain code. |
 | `breaks`            | `false`     | Convert paragraph line breaks to `<br>`.                                     |
 | `linkTarget`        | `"_blank"`  | Link target; `false` omits it. Same-document anchors stay in this tab.       |
 | `toolbar` | `true` | Show the viewer header; secondary tools are configured separately. |
@@ -156,6 +157,23 @@ Legacy integrations can use `#byVIEWtheme` or a detected `md.light.css` / `md.da
 
 Supports ATX headings, emphasis, strikethrough, code spans/fences, ordered/unordered/nested/task lists, recursive blockquotes, horizontal rules, images, links, aligned GFM tables, escapes, and common HTML entities. Task checkboxes are disabled. This covers practical documents rather than every CommonMark edge case or extension.
 
+### Code blocks
+
+For syntax highlighting, load [easy-code-viewer](https://github.com/byuwur/easy-code-viewer)'s CSS and JavaScript before rendering Markdown:
+
+```html
+<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@main/code.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@main/code.js" defer></script>
+```
+
+Keep the Markdown files too. For offline use, save all four files beside your HTML and use local paths.
+
+Label fences with `js`, `javascript`, or another language supported by the code viewer; aliases work too. Blocks inherit the document's palette, mode, and text size, including High Contrast. Custom palettes can override `--by-code-comment`, `--by-code-keyword`, `--by-code-string`, `--by-code-number`, `--by-code-property`, and `--by-code-tag` on `.byMDdocument`.
+
+Only fenced blocks are enhanced, without extra controls or line numbers. Inline code stays plain. Unknown languages stay uncolored; missing libraries or highlighting limits/errors leave the original code readable. No assets are fetched by the renderer. Loading the library later takes effect on the next render. Set `codeHighlighting: false` to opt out.
+
+The playground includes this integration; exported starters keep the standalone Markdown setup. Add the two code-viewer files to enable highlighting in a starter.
+
 ### Heading anchors
 
 `## Installation` gets `installation`; repeated headings get suffixes such as `example-1`. Nested headings also receive IDs. Link with `[Installation](#installation)`.
@@ -168,7 +186,7 @@ Raw HTML is displayed as text. Comments and document markers such as `[//]: # "O
 
 ## Checks
 
-Theme tests cover both modes, container isolation, legacy links, custom CSS, and High Contrast.
+Theme tests cover both modes, container isolation, legacy links, custom CSS, and High Contrast. Integration tests use the actual code viewer; check out `easy-code-viewer` beside this repository before running the full suite.
 
 Landing tests fetch the pinned Bootstrap stylesheet unless `BOOTSTRAP_CSS_PATH` points to a cached copy.
 

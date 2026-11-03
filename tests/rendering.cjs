@@ -520,6 +520,7 @@ test("Markdown rendering", async (t) => {
         const url = new URL(route.request().url());
         if (url.origin !== "https://viewer.test") return route.abort();
         const file = path.basename(url.pathname);
+        if (/^code\.(css|js)$/.test(file)) return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
         if (/^md\.(light|dark)\.css$/.test(file)) return route.fulfill({ body: legacyThemeCSS(file.includes(".dark.css") ? "dark" : "light"), contentType: "text/css" });
         const body = await fs.readFile(path.join(__dirname, "..", file));
         await route.fulfill({ body, contentType: file.endsWith(".html") ? "text/html" : file.endsWith(".js") ? "text/javascript" : "text/css" });
@@ -685,6 +686,7 @@ test("family customization, navigation and monospace controls", async () => {
       const url = new URL(route.request().url());
       if (url.origin !== "https://viewer.test") return route.abort();
       const file = path.basename(url.pathname);
+      if (/^code\.(css|js)$/.test(file)) return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
       if (/^md\.(light|dark)\.css$/.test(file)) return route.fulfill({ body: legacyThemeCSS(file.includes(".dark.css") ? "dark" : "light"), contentType: "text/css" });
       return route.fulfill({ path: path.join(__dirname, "..", file), contentType: file.endsWith(".html") ? "text/html" : file.endsWith(".js") ? "text/javascript" : "text/css" });
     });
@@ -1130,6 +1132,7 @@ test("playground palettes and editable two-mode custom themes stay synchronized"
       if (url.href === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
       if (url.origin !== "https://viewer.test") return route.abort();
       const file = path.basename(url.pathname);
+      if (/^code\.(css|js)$/.test(file)) return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
       return route.fulfill({ path: path.join(__dirname, "..", file), contentType: file.endsWith(".html") ? "text/html" : file.endsWith(".js") ? "text/javascript" : "text/css" });
     });
     await page.goto("https://viewer.test/index.html");
@@ -1285,6 +1288,168 @@ test("viewer defaults, optional tools, and copy feedback", async () => {
     await page.locator(".byVIEWcopy").click();
     assert.equal(await page.locator(".byVIEWcopy").getAttribute("data-state"), "success");
     assert.match(await page.evaluate(() => copiedSource), /needle/);
+  } finally {
+    await browser.close();
+  }
+});
+
+
+test("optional code highlighting preserves Markdown and follows document themes", async (t) => {
+  const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined, channel: process.env.BROWSER_CHANNEL || undefined });
+  try {
+    const page = await browser.newPage();
+    const errors = [], requests = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    page.on("request", (request) => requests.push(request.url()));
+    await page.setContent('<div id="viewer"></div><div id="reference"></div><div id="outside">Host</div>');
+    await page.addStyleTag({ path: path.join(__dirname, "../md.css") });
+    await page.addStyleTag({ path: path.join(__dirname, "../../easy-code-viewer/code.css") });
+    await page.addScriptTag({ path: path.join(__dirname, "../md.js") });
+    const source = 'const message = "<img src=x onerror=window.injected=1>";\n// comment\nconst total = 42;\n';
+    const markdown = '# Source\n\nInline: ' + String.fromCharCode(96) + 'const inline = 1;' + String.fromCharCode(96) + '\n\n~~~js\n' + source + '\n~~~\n\n> ~~~html\n> <div>Safe & exact</div>\n> ~~~\n\n- Nested\n\n  ~~~javascript\n  const nested = true;\n  ~~~\n\n~~~unknown\n<tag>&value\n~~~\n\n~~~\nUnlabelled source\n~~~';
+    await page.evaluate((markdown) => {
+      window.markdown = markdown;
+      window.renderMarkdown = (options = {}) => byMDviewer(document.getElementById("viewer"), markdown, options);
+      window.copies = [];
+      Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: async (value) => copies.push(value) } });
+      renderMarkdown();
+    }, markdown);
+    await t.test("missing libraries stay plain and late loading takes effect on rerender", async () => {
+      assert.equal(await page.locator("#viewer .byCODEhighlight").count(), 0);
+      assert.equal(await page.locator("#viewer pre code").first().textContent(), source);
+      await page.locator("#viewer .byVIEWcopy").click();
+      const plain = await page.evaluate(() => copies.at(-1));
+      await page.addScriptTag({ path: path.join(__dirname, "../../easy-code-viewer/code.js") });
+      assert.equal(await page.locator("#viewer .byCODEhighlight").count(), 0);
+      await page.evaluate(() => renderMarkdown());
+      assert.equal(await page.locator("#viewer .byCODEhighlight").count(), 5);
+      assert.equal(await page.locator("#viewer pre code").first().textContent(), source);
+      assert.equal(await page.locator("#viewer pre code").first().getAttribute("data-language"), "js");
+      assert.ok(await page.locator("#viewer blockquote .byCODEtag").count() > 0);
+      assert.ok(await page.locator("#viewer li .byCODEkeyword").count() > 0);
+      assert.equal(await page.locator("#viewer .byMDinlineCode .byCODEhighlight").count(), 0);
+      assert.equal(await page.locator("#viewer .language-unknown .byCODEhighlight").textContent(), "<tag>&value");
+      assert.equal(await page.locator("#viewer .language-unknown .byCODEhighlight > *").count(), 0);
+      assert.equal(await page.locator("#viewer pre :is(img,script,button,input)").count(), 0);
+      assert.equal(await page.locator("#viewer .byVIEWtoolbar").count(), 1);
+      assert.equal(await page.evaluate(() => window.injected), undefined);
+      await page.locator("#viewer .byVIEWcopy").click();
+      assert.equal(await page.evaluate(() => copies.at(-1)), plain);
+      await page.locator("#viewer .byVIEWcopy").click({ modifiers: ["Shift"] });
+      assert.equal(await page.evaluate(() => copies.at(-1)), markdown);
+      assert.equal(requests.length, 0, "The renderer must not fetch optional assets");
+    });
+    await t.test("opt-outs and per-block failures retain source and allow later blocks", async () => {
+      await page.evaluate(() => renderMarkdown({ codeHighlighting: false }));
+      assert.equal(await page.locator("#viewer .byCODEhighlight").count(), 0);
+      const result = await page.evaluate(() => {
+        const highlight = byCODEviewer.highlight;
+        try {
+          byCODEviewer.highlight = (source, language) => {
+            if (language === "js") throw new Error("Highlight unavailable");
+            return highlight(source, language);
+          };
+          renderMarkdown();
+          return { first: document.querySelector("#viewer pre code").textContent, highlighted: document.querySelectorAll("#viewer .byCODEhighlight").length };
+        } finally {
+          byCODEviewer.highlight = highlight;
+        }
+      });
+      assert.deepEqual(result, { first: source, highlighted: 4 });
+      const limit = await page.evaluate(() => {
+        const source = "x".repeat(2000001);
+        byMDviewer(document.getElementById("viewer"), "~~~js\n" + source + "\n~~~\n\n# Still readable");
+        return { preserved: document.querySelector("#viewer pre code").textContent === source, highlighted: document.querySelectorAll("#viewer .byCODEhighlight").length, heading: document.querySelector("#viewer h1").textContent };
+      });
+      assert.deepEqual(limit, { preserved: true, highlighted: 0, heading: "Still readable" });
+      await page.evaluate(() => renderMarkdown());
+    });
+    await t.test("all palettes, mode switches, and text sizing follow the Markdown container", async () => {
+      for (const palette of ["monokai", "github", "solarized", "high-contrast"]) {
+        await page.locator("#viewer").evaluate((root, palette) => {
+          root.dataset.theme = palette;
+          root.classList.remove("light", "dark");
+          root.classList.add("light");
+        }, palette);
+        for (const mode of ["light", "dark"]) {
+          if (mode === "dark") await page.locator("#viewer .byVIEWthemeToggle").click();
+          const colors = await page.evaluate(async ({ mode, palette, source }) => {
+            const reference = document.getElementById("reference");
+            reference.dataset.theme = palette;
+            reference.classList.toggle("light", mode === "light");
+            reference.classList.toggle("dark", mode === "dark");
+            await byCODEviewer(reference, source, { language: "js", toolbar: false }).ready;
+            const colors = (root) => ["keyword", "string", "comment", "number"].map((token) => getComputedStyle(root.querySelector(".byCODE" + token)).color);
+            return { markdown: colors(document.querySelector("#viewer pre")), reference: colors(reference) };
+          }, { mode, palette, source });
+          assert.deepEqual(colors.markdown, colors.reference, palette + " " + mode);
+        }
+      }
+      const size = () => page.locator("#viewer .byCODEkeyword").first().evaluate((token) => parseFloat(getComputedStyle(token).fontSize));
+      const before = await size();
+      await page.locator("#viewer .byVIEWfontSize").nth(2).click();
+      assert.ok(await size() > before);
+      await page.locator("#viewer .byVIEWfontSize").nth(1).click();
+      assert.equal(await size(), before);
+      await page.locator("#viewer").evaluate((root) => root.style.setProperty("--by-code-keyword", "#123456"));
+      assert.equal(await page.locator("#viewer .byCODEkeyword").first().evaluate((token) => getComputedStyle(token).color), "rgb(18, 52, 86)");
+      assert.notEqual(await page.locator("#reference .byCODEkeyword").first().evaluate((token) => getComputedStyle(token).color), "rgb(18, 52, 86)");
+      assert.equal(await page.locator("#outside").evaluate((root) => getComputedStyle(root).getPropertyValue("--by-code-keyword")), "");
+      await page.locator("#viewer").evaluate((root) => root.style.removeProperty("--by-code-keyword"));
+    });
+    await t.test("legacy stylesheets still color code and preserve theme URLs", async () => {
+      await page.route("https://legacy.test/**", (route) => route.fulfill({ contentType: "text/css", body: legacyThemeCSS(route.request().url().includes(".dark.css") ? "dark" : "light") }));
+      await page.evaluate(async () => {
+        const root = document.getElementById("viewer");
+        root.removeAttribute("data-theme");
+        root.classList.remove("light", "dark");
+        await new Promise((resolve) => {
+          const link = document.createElement("link");
+          link.id = "byVIEWtheme";
+          link.rel = "stylesheet";
+          link.href = "https://legacy.test/md.dark.css?cache=1#theme";
+          link.onload = resolve;
+          document.head.append(link);
+        });
+        renderMarkdown();
+      });
+      const color = () => page.locator("#viewer .byCODEkeyword").first().evaluate((token) => getComputedStyle(token).color);
+      assert.equal(await color(), "rgb(249, 38, 114)");
+      await page.locator("#viewer .byVIEWthemeToggle").click();
+      await page.waitForFunction(() => getComputedStyle(document.querySelector("#viewer .byCODEkeyword")).color === "rgb(183, 25, 86)");
+      assert.equal(await page.locator("#byVIEWtheme").getAttribute("href"), "https://legacy.test/md.light.css?cache=1#theme");
+    });
+    assert.deepEqual(errors, []);
+  } finally {
+    await browser.close();
+  }
+});
+
+test("playground code examples can switch highlighting without changing the Markdown", async () => {
+  const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined, channel: process.env.BROWSER_CHANNEL || undefined });
+  try {
+    const page = await browser.newPage();
+    await page.route("**/*", async (route) => {
+      const url = new URL(route.request().url());
+      if (url.href === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
+      if (url.origin !== "https://viewer.test") return route.abort();
+      const file = path.basename(url.pathname);
+      const root = /^code\.(css|js)$/.test(file) ? "../../easy-code-viewer" : "..";
+      return route.fulfill({ path: path.join(__dirname, root, file), contentType: file.endsWith(".html") ? "text/html" : file.endsWith(".js") ? "text/javascript" : "text/css" });
+    });
+    await page.goto("https://viewer.test/index.html");
+    await page.locator('.feature-chip[data-example="code"]').click();
+    const frame = page.frameLocator("#preview-frame");
+    await frame.locator(".byCODEkeyword").first().waitFor();
+    const markdown = await page.locator("#markdown-source").inputValue();
+    assert.equal(await frame.locator(".byCODEhighlight").count(), 2);
+    await page.locator("#codeHighlighting").evaluate((input) => input.click());
+    await page.waitForFunction(() => !document.getElementById("preview-frame").contentDocument.querySelector(".byCODEhighlight"));
+    assert.equal(await page.locator("#markdown-source").inputValue(), markdown);
+    assert.equal(JSON.parse(await page.locator("#options-json").inputValue()).codeHighlighting, false);
+    await page.locator("#codeHighlighting").evaluate((input) => input.click());
+    await frame.locator(".byCODEkeyword").first().waitFor();
+    assert.equal(JSON.parse(await page.locator("#options-json").inputValue()).codeHighlighting, true);
   } finally {
     await browser.close();
   }

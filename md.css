@@ -3,6 +3,7 @@
 /* Monokai is the default. Classes select mode; named data-theme values select a palette.
    data-theme="light" / "dark" remain mode aliases and override mode classes. */
 
+/* Syntax variables match easy-code-viewer palettes; code.css owns the token styles. */
 /* --- LIGHT --- */
 .byMDdocument,
 .byMDdocument.light:not([data-theme="dark"]),
@@ -18,6 +19,12 @@
   --by-md-code-bg: #eeeee4;
   --by-md-quote: #747461;
   --by-md-table-alt: #eeeee4;
+  --by-code-comment: #747461;
+  --by-code-keyword: #b71956;
+  --by-code-string: #647d00;
+  --by-code-number: #7c42b5;
+  --by-code-property: #996118;
+  --by-code-tag: #b71956;
 }
 
 /* --- DARK --- */
@@ -34,6 +41,12 @@
   --by-md-code-bg: #20211c;
   --by-md-quote: #a6a28c;
   --by-md-table-alt: #34352f;
+  --by-code-comment: #75715e;
+  --by-code-keyword: #f92672;
+  --by-code-string: #e6db74;
+  --by-code-number: #ae81ff;
+  --by-code-property: #a6e22e;
+  --by-code-tag: #f92672;
 }
 
 /* --- GITHUB --- */
@@ -48,6 +61,12 @@
   --by-md-code-bg: #f6f8fa;
   --by-md-quote: #59636e;
   --by-md-table-alt: #f6f8fa;
+  --by-code-comment: #59636e;
+  --by-code-keyword: #cf222e;
+  --by-code-string: #0a3069;
+  --by-code-number: #0550ae;
+  --by-code-property: #953800;
+  --by-code-tag: #116329;
 }
 /* Dark */
 .byMDdocument.dark[data-theme="github"] {
@@ -60,6 +79,12 @@
   --by-md-code-bg: #161b22;
   --by-md-quote: #9198a1;
   --by-md-table-alt: #161b22;
+  --by-code-comment: #9198a1;
+  --by-code-keyword: #ff7b72;
+  --by-code-string: #a5d6ff;
+  --by-code-number: #79c0ff;
+  --by-code-property: #ffa657;
+  --by-code-tag: #7ee787;
 }
 
 /* --- SOLARIZED --- */
@@ -74,6 +99,12 @@
   --by-md-code-bg: #eee8d5;
   --by-md-quote: #657b83;
   --by-md-table-alt: #eee8d5;
+  --by-code-comment: #657b83;
+  --by-code-keyword: #859900;
+  --by-code-string: #2aa198;
+  --by-code-number: #d33682;
+  --by-code-property: #b58900;
+  --by-code-tag: #268bd2;
 }
 /* Dark */
 .byMDdocument.dark[data-theme="solarized"] {
@@ -86,6 +117,12 @@
   --by-md-code-bg: #073642;
   --by-md-quote: #839496;
   --by-md-table-alt: #073642;
+  --by-code-comment: #839496;
+  --by-code-keyword: #859900;
+  --by-code-string: #2aa198;
+  --by-code-number: #d33682;
+  --by-code-property: #b58900;
+  --by-code-tag: #268bd2;
 }
 
 /* --- HIGH CONTRAST --- */
@@ -100,6 +137,12 @@
   --by-md-code-bg: #f0f0f0;
   --by-md-quote: #333333;
   --by-md-table-alt: #f0f0f0;
+  --by-code-comment: #404040;
+  --by-code-keyword: #7a003b;
+  --by-code-string: #005a30;
+  --by-code-number: #490080;
+  --by-code-property: #3f5100;
+  --by-code-tag: #0038a8;
 }
 /* Dark */
 .byMDdocument.dark[data-theme="high-contrast"] {
@@ -112,6 +155,12 @@
   --by-md-code-bg: #171717;
   --by-md-quote: #dddddd;
   --by-md-table-alt: #171717;
+  --by-code-comment: #c8c8c8;
+  --by-code-keyword: #ffb5ff;
+  --by-code-string: #ffff00;
+  --by-code-number: #00ffff;
+  --by-code-property: #9aff9a;
+  --by-code-tag: #ffb5ff;
 }
 
 /* --- VIEWER --- */

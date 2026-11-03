@@ -697,6 +697,7 @@ Write Markdown here…"></textarea>
           { name: "withTables", label: "Tables", description: "Columns & text alignment", default: true, example: "tables" },
           { name: "withTasks", label: "Task lists", description: "Read-only task checkboxes", default: true, example: "tasks" },
           { name: "withStrikethrough", label: "Strikethrough", description: "Render ~~crossed-out text~~", default: true, example: "formatting" },
+          { name: "codeHighlighting", label: "Syntax highlighting", default: true, example: "code" },
           { name: "breaks", label: "Soft line breaks", description: "Keep paragraph line breaks", default: false, example: "breaks" }
         ];
         const defaults = { ...Object.fromEntries(optionDefinitions.map((option) => [option.name, option.default])), controlsSize: "regular", controlsPosition: "top", linkTarget: "_blank" };
@@ -758,7 +759,7 @@ Write Markdown here…"></textarea>
           code: {
             label: "Code blocks",
             markdown:
-              '# Code, as written\n\nInline: `const ready = true;`\n\n~~~javascript\nconst container = document.getElementById("document");\nbyMDviewer(container, "# Hello **world**");\n~~~\n\nLanguage metadata is preserved; syntax highlighting is not included.\n\n~~~html\n<!-- Comments inside code stay visible. -->\n<div>Raw code stays code.</div>\n~~~'
+              '# Code, as written\n\nInline: `const ready = true;`\n\n~~~javascript\nconst container = document.getElementById("document");\nbyMDviewer(container, "# Hello **world**");\n~~~\n\nFenced blocks use easy-code-viewer for syntax highlighting. Inline code stays simple.\n\n~~~html\n<!-- Comments inside code stay visible. -->\n<div>Raw code stays code.</div>\n~~~'
           },
           lists: {
             label: "Lists & nested quotes",
@@ -1052,6 +1053,7 @@ Write Markdown here…"></textarea>
               <head>
                 <base href="${base}" />
                 <link rel="stylesheet" href="md.css" />
+                <link rel="stylesheet" href="../easy-code-viewer/code.css" />
                 <style>
                   body {
                     margin: 0;
@@ -1060,6 +1062,7 @@ Write Markdown here…"></textarea>
                     min-height: 100vh;
                   }
                 </style>
+                ${'<script src="../easy-code-viewer/code.js"><\/script>'}
                 ${'<script src="md.js"><\/script>'}
               </head>
               <body>

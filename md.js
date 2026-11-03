@@ -888,14 +888,15 @@
   };
 
   /**
-   * Renders a fenced code block.
+   * Renders a fenced code block, optionally enhanced by easy-code-viewer.
    *
    * @param {Node} parent
    * @param {string[]} lines
    * @param {number} start
+   * @param {Object} options
    * @return {number}
    */
-  const appendFencedCode = (parent, lines, start) => {
+  const appendFencedCode = (parent, lines, start, options) => {
     const opening = matchFence(lines[start]);
     const marker = opening[1][0];
     const minimumLength = opening[1].length;
@@ -917,6 +918,13 @@
       code.dataset.language = language;
     }
     code.textContent = body.join("\n");
+    if (options.codeHighlighting && typeof global.byCODEviewer?.highlight === "function") {
+      try {
+        code.replaceChildren(global.byCODEviewer.highlight(code.textContent, language || "plain"));
+      } catch {
+        // Optional highlighting must not interrupt Markdown or discard the original code.
+      }
+    }
     pre.appendChild(code);
     parent.appendChild(pre);
     return index;
@@ -1097,7 +1105,7 @@
       }
       // Render fenced code.
       if (matchFence(line)) {
-        index = appendFencedCode(parent, lines, index);
+        index = appendFencedCode(parent, lines, index, options);
         continue;
       }
       // Render ATX headings from H1 through H6.
@@ -1379,6 +1387,7 @@
    * @param {boolean} [options.withTables=true]
    * @param {boolean} [options.withTasks=true]
    * @param {boolean} [options.withStrikethrough=true]
+   * @param {boolean} [options.codeHighlighting=true] - Highlights fences when easy-code-viewer is loaded.
    * @param {boolean} [options.breaks=false]
    * @param {string|false} [options.linkTarget="_blank"]
    * @param {boolean} [options.toolbar=true] - Show the viewer header.
@@ -1405,6 +1414,7 @@
       withTables: true,
       withTasks: true,
       withStrikethrough: true,
+      codeHighlighting: true,
       breaks: false,
       linkTarget: "_blank",
       toolbar: true,

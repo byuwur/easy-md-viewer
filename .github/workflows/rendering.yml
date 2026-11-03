@@ -14,6 +14,12 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: easy-md-viewer
+      - uses: actions/checkout@v4
+        with:
+          repository: byuwur/easy-code-viewer
+          path: easy-code-viewer
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -22,6 +28,7 @@ jobs:
           npm install --prefix "$RUNNER_TEMP/viewer-tests" --no-package-lock playwright@1.63.0
           node "$RUNNER_TEMP/viewer-tests/node_modules/playwright/cli.js" install --with-deps chromium
       - name: Check source and rendering
+        working-directory: easy-md-viewer
         env:
           NODE_PATH: ${{ runner.temp }}/viewer-tests/node_modules
         run: |
