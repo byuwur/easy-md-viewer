@@ -242,6 +242,7 @@
 }
 .byMDinlineCode,
 .byMDcodeBlock code {
+  color: var(--by-md-text);
   font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
   font-size: 0.85em;
 }
@@ -251,6 +252,7 @@
   background: var(--by-md-code-bg);
 }
 .byMDcodeBlock {
+  color: var(--by-md-text);
   margin: 0 0 1em;
   padding: 1rem;
   overflow: auto;
