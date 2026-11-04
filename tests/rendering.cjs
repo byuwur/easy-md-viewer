@@ -5,7 +5,9 @@ const fs = require("node:fs/promises");
 const test = require("node:test");
 const { pathToFileURL } = require("node:url");
 const { chromium } = require("playwright");
-const codeVersion = require("node:fs").readFileSync(path.join(__dirname, "../../easy-code-viewer/code.js"), "utf8").match(/byCODEviewer\.VERSION = "([^"]+)"/)[1];
+const codeVersion = require("node:fs")
+  .readFileSync(path.join(__dirname, "../../easy-code-viewer/code.js"), "utf8")
+  .match(/byCODEviewer\.VERSION = "([^"]+)"/)[1];
 const codeCDNBase = `https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v${codeVersion}/`;
 
 // Caller-provided legacy stylesheets reuse the canonical palettes without distribution files.

@@ -181,7 +181,9 @@
                           <label class="d-block form-label" for="preview-container-bg">Content &amp; controls background</label>
                           <div class="input-group mb-2">
                             <input id="preview-container-bg" class="form-control" type="text" placeholder="Theme default" title="CSS color, including transparent, hex, or rgba" maxlength="80" />
-                            <button class="btn btn-outline-secondary" type="button" data-color-picker="preview-container-bg" aria-label="Choose content and controls background color"><i class="fa-solid fa-palette" aria-hidden="true"></i></button>
+                            <button class="btn btn-outline-secondary" type="button" data-color-picker="preview-container-bg" aria-label="Choose content and controls background color">
+                              <i class="fa-solid fa-palette" aria-hidden="true"></i>
+                            </button>
                           </div>
                           <label class="d-block form-label" for="preview-ink">Text color</label
                           ><input id="preview-ink" class="form-control mb-2" type="text" placeholder="Theme default" pattern="#[0-9a-fA-F]{6}" title="Six-digit hex color, for example #eeeeee" maxlength="7" />
@@ -1088,8 +1090,7 @@ Write Markdown here…"></textarea>
                     min-height: 100vh;
                   }
                 </style>
-                ${'<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v1.2/code.js"><\/script>'}
-                ${'<script src="md.js"><\/script>'}
+                ${'<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v1.2/code.js"><\/script>'} ${'<script src="md.js"><\/script>'}
               </head>
               <body>
                 <main id="document" data-theme="light" aria-label="Rendered Markdown"></main>
@@ -1369,7 +1370,12 @@ Write Markdown here…"></textarea>
               continue;
             }
             const picker = Pickr.create({
-              el: button, useAsButton: true, position: "bottom-start", theme: "classic", default: "#fafaf5", defaultRepresentation: "HEX",
+              el: button,
+              useAsButton: true,
+              position: "bottom-start",
+              theme: "classic",
+              default: "#fafaf5",
+              defaultRepresentation: "HEX",
               components: { preview: true, opacity: true, hue: true, interaction: { hex: true, rgba: false, hsla: false, hsva: false, cmyk: false, input: true, save: true, clear: true } },
               i18n: { "btn:clear": "Theme default", "aria:btn:clear": "Use the theme background" }
             });
@@ -1397,7 +1403,9 @@ Write Markdown here…"></textarea>
             picker.on("save", () => picker.hide());
             pickers.push(picker);
           }
-          window.addEventListener("pagehide", (event) => { if (!event.persisted) pickers.forEach((picker) => picker.destroyAndRemove()); });
+          window.addEventListener("pagehide", (event) => {
+            if (!event.persisted) pickers.forEach((picker) => picker.destroyAndRemove());
+          });
         });
       })();
     </script>
