@@ -53,32 +53,34 @@ byMDviewer(target, document.getElementById("markdownSource"));
 
 Use `byMDviewer(target)` instead when the target itself contains Markdown.
 
+`byMDviewer(target, markdown?, options?)` replaces the target's contents synchronously and returns `undefined`. Invalid targets or source types throw `TypeError`. It has no `ready` promise or controller; call it again to replace the document. Pass the Markdown again on subsequent calls, because the target now contains rendered content.
+
 Exported HTML starters use default settings, independently of playground changes.
 
 ## Options
 
 Pass options as the third argument, such as `byMDviewer(target, markdown, { breaks: true })`.
 
-| Option              | Default     | Meaning                                                                      |
-| ------------------- | ----------- | ---------------------------------------------------------------------------- |
-| `withLinks`         | `true`      | Render links, autolinks, bare URLs, and email addresses.                     |
-| `withImages`        | `true`      | Render supported images.                                                     |
-| `withTables`        | `true`      | Render GFM-style tables.                                                     |
-| `withTasks`         | `true`      | Render task checkboxes.                                                      |
-| `withStrikethrough` | `true`      | Render `~~strikethrough~~`.                                                  |
-| `codeHighlighting` | `true` | Highlight fenced code when easy-code-viewer is loaded; `false` keeps plain code. |
-| `codeLineNumbers` | `false` | Show a framed code block with a line-number gutter. |
-| `codeStatusBar` | `false` | Show a framed code block with its language and line count. |
-| `breaks`            | `false`     | Convert paragraph line breaks to `<br>`.                                     |
-| `linkTarget`        | `"_blank"`  | Link target; `false` omits it. Same-document anchors stay in this tab.       |
-| `toolbar` | `true` | Show the viewer header; secondary tools are configured separately. |
-| `credits` | `true` | Show attribution in the header. |
-| `themeToggle`       | `true`      | Show the theme toggle.                                                       |
-| `fontSizeControls`  | `true`      | Show text-size controls.                                                     |
-| `copyButton`        | `true`      | Show Copy: click for rendered plain text; Shift+click for original Markdown. |
-| `controlsSize`      | `"regular"` | `"small"`, `"regular"`, or `"large"`; invalid values use `"regular"`.        |
-| `controlsCompact`   | `true`      | Keep credits beside controls; `false` stacks them. Wraps as needed.          |
-| `controlsPosition`  | `"top"`     | Sticky `"top"` or `"bottom"` toolbar; invalid values use `"top"`.            |
+| Option              | Default     | Meaning                                                                          |
+| ------------------- | ----------- | -------------------------------------------------------------------------------- |
+| `withLinks`         | `true`      | Render links, autolinks, bare URLs, and email addresses.                         |
+| `withImages`        | `true`      | Render supported images.                                                         |
+| `withTables`        | `true`      | Render GFM-style tables.                                                         |
+| `withTasks`         | `true`      | Render task checkboxes.                                                          |
+| `withStrikethrough` | `true`      | Render `~~strikethrough~~`.                                                      |
+| `codeHighlighting`  | `true`      | Highlight fenced code when easy-code-viewer is loaded; `false` keeps plain code. |
+| `codeLineNumbers`   | `false`     | Show a framed code block with a line-number gutter.                              |
+| `codeStatusBar`     | `false`     | Show a framed code block with its language and line count.                       |
+| `breaks`            | `false`     | Convert paragraph line breaks to `<br>`.                                         |
+| `linkTarget`        | `"_blank"`  | Link target; `false` omits it. Same-document anchors stay in this tab.           |
+| `toolbar`           | `true`      | Show the viewer header; secondary tools are configured separately.               |
+| `credits`           | `true`      | Show attribution in the header.                                                  |
+| `themeToggle`       | `true`      | Show the theme toggle.                                                           |
+| `fontSizeControls`  | `true`      | Show text-size controls.                                                         |
+| `copyButton`        | `true`      | Show Copy: click for rendered plain text; Shift+click for original Markdown.     |
+| `controlsSize`      | `"regular"` | `"small"`, `"regular"`, or `"large"`; invalid values use `"regular"`.            |
+| `controlsCompact`   | `true`      | Keep credits beside controls; `false` stacks them. Wraps as needed.              |
+| `controlsPosition`  | `"top"`     | Sticky `"top"` or `"bottom"` toolbar; invalid values use `"top"`.                |
 
 Plain-text copying preserves paragraph and code line breaks, excluding controls and credits. Copy requires clipboard permission in a secure context.
 
@@ -86,7 +88,7 @@ Read the library version with `byMDviewer.VERSION`.
 
 Controls stick to the selected edge of the page or nearest scrolling container.
 
-The default header shows Theme, text-size controls, and Copy. Secondary tools are opt-in. Use `toolbar: false` to hide the header, or switch individual controls off as needed.
+Use `toolbar: false` to hide the header, or disable `credits`, `themeToggle`, `fontSizeControls`, and `copyButton` individually.
 
 Controls use monospace by default; override `--by-view-controls-font` to change it.
 
@@ -119,7 +121,7 @@ High Contrast text colors target at least [7:1 contrast](https://www.w3.org/WAI/
 
 ### Make it yours
 
-**Custom theme CSS** starts with the selected palette's complete Light/Dark defaults, including controls and format-specific colors. Switching presets keeps your custom draft until Reset. On your page, use `data-theme="custom"` with `class="light"` or `class="dark"`.
+The playground's **Custom theme CSS** field edits both modes of the selected palette. Export those rules to your own stylesheet and use `data-theme="custom"` with `class="light"` or `class="dark"`. Custom drafts stay in the playground; the renderer does not store them.
 
 Define a named palette after the viewer stylesheet. Unspecified colors inherit Monokai:
 
@@ -157,7 +159,9 @@ Legacy integrations can use `#byVIEWtheme` or a detected `md.light.css` / `md.da
 
 ## Supported Markdown
 
-Supports ATX headings, emphasis, strikethrough, code spans/fences, ordered/unordered/nested/task lists, recursive blockquotes, horizontal rules, images, links, aligned GFM tables, escapes, and common HTML entities. Task checkboxes are disabled. This covers practical documents rather than every CommonMark edge case or extension.
+Supports ATX headings, emphasis, strikethrough, code spans/fences, ordered/unordered/nested/task lists, recursive blockquotes, horizontal rules, images, links, aligned GFM tables, escapes, and common HTML entities. Task checkboxes are read-only; use [easy-md-editor](https://github.com/byuwur/easy-md-editor) to edit Markdown. This covers practical documents rather than every CommonMark edge case or extension.
+
+Rendering normalizes CR/LF/CRLF and removes a leading BOM; Shift+Copy retains the original Markdown. Full-document rendering is synchronous and has no document-size limit. Bound large documents in the calling application; the inline parser's limit below does not cap the renderer.
 
 ### Code blocks
 
@@ -227,13 +231,24 @@ Theme tests cover both modes, container isolation, legacy links, custom CSS, and
 
 Landing tests fetch the pinned Bootstrap stylesheet unless `BOOTSTRAP_CSS_PATH` points to a cached copy.
 
+Install Playwright outside the repository and set `NODE_PATH` to its `node_modules` directory:
+
+```sh
+node --check md.js
+node --test tests/rendering.cjs
+```
+
+`CHROMIUM_EXECUTABLE_PATH` selects a Chromium executable for every test. Otherwise, install Playwright Chromium; `BROWSER_CHANNEL=chrome` applies only to the suites that support it.
+
 [GitHub Actions](.github/workflows/rendering.yml) runs `tests/rendering.cjs` against local `md.js` in Chromium, including the benchmark and playground exports. For visual checks, serve `index.html` over HTTP and select `test.md` from the Document menu.
 
 ## The easy viewers
 
-Need a viewer for another format? Explore the family:
+Need another format, or a Markdown editor? Explore the family:
 
 [Markdown](https://github.com/byuwur/easy-md-viewer) · [JSON](https://github.com/byuwur/easy-json-viewer) · [CSV & TSV](https://github.com/byuwur/easy-csv-viewer) · [Logs](https://github.com/byuwur/easy-log-viewer) · [Diff](https://github.com/byuwur/easy-diff-viewer) · [XML](https://github.com/byuwur/easy-xml-viewer) · [YAML](https://github.com/byuwur/easy-yaml-viewer) · [Source code](https://github.com/byuwur/easy-code-viewer)
+
+[Write Markdown with easy-md-editor](https://github.com/byuwur/easy-md-editor).
 
 ## License
 

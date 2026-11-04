@@ -10,22 +10,16 @@
 (function (global) {
   /* --- SETUP --- */
   if (global.byMDviewer?.initialized) return;
-  /* --- CONTENT --- */
+
   const ESCAPABLE = /[\\`*{}\[\]()#+\-.!_>~|]/;
+
   const SAFE_LINK_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:", "ftp:", "ftps:"]);
+
   const SAFE_IMAGE_PROTOCOLS = new Set(["http:", "https:"]);
+
   const HEADING_IDS = Symbol("headingIds");
 
-  /**
-   * Appends a text node to an element.
-   * @param {Node} parent - Parent DOM node.
-   * @param {string} text - Text to append.
-   * @returns {void}
-   */
-  const appendText = (parent, text) => {
-    if (text) parent.appendChild(document.createTextNode(text));
-  };
-
+  /* --- PARSING --- */
   /**
    * Returns the amount of leading indentation, treating tabs as four spaces.
    * @param {string} line - Source line.
@@ -344,19 +338,6 @@
   };
 
   /**
-   * Adds target/rel behavior to external links. Same-document anchor links remain in the current tab.
-   *
-   * @param {HTMLAnchorElement} anchor
-   * @param {Object} options
-   * @returns {void}
-   */
-  const configureAnchor = (anchor, options) => {
-    if (!options.linkTarget || anchor.getAttribute("href")?.startsWith("#")) return;
-    anchor.target = options.linkTarget;
-    if (options.linkTarget === "_blank") anchor.rel = "noopener noreferrer";
-  };
-
-  /**
    * Trims punctuation commonly following
    * a bare URL in prose.
    * @param {unknown} value Value supplied by the caller.
@@ -490,43 +471,6 @@
     }
     literal(text.length);
     return tokens;
-  };
-
-  /** Render the shared inline tokens with DOM methods; source is never interpreted as HTML. */
-  const appendInline = (parent, text, options) => {
-    const append = (target, tokens) => {
-      for (const token of tokens) {
-        if (["text", "escape", "entity"].includes(token.type)) {
-          appendText(target, token.text);
-          continue;
-        }
-        const tag = { strongEm: "strong", image: "img", link: "a" }[token.type] || token.type;
-        const element = document.createElement(tag);
-        if (token.type === "code") {
-          element.className = "byMDinlineCode";
-          element.textContent = token.text;
-        } else if (token.type === "image") {
-          element.className = "byMDimage";
-          element.src = token.url;
-          element.alt = token.text;
-          element.loading = "lazy";
-          if (token.title) element.title = token.title;
-        } else if (token.type === "link") {
-          element.className = "byMDlink";
-          element.href = token.url;
-          if (token.title) element.title = token.title;
-          configureAnchor(element, options);
-          if (token.auto) element.textContent = token.text ?? text.slice(token.bodyFrom, token.bodyTo);
-          else append(element, token.children);
-        } else if (token.type === "strongEm") {
-          const em = document.createElement("em");
-          append(em, token.children);
-          element.appendChild(em);
-        } else append(element, token.children);
-        target.appendChild(element);
-      }
-    };
-    append(parent, inlineTokens(text, options));
   };
 
   /**
@@ -764,6 +708,241 @@
   };
 
   /**
+   * Reads a blockquote and removes one level of quote prefixes.
+   * @param {string[]} lines - Source lines.
+   * @param {number} start - Opening line index.
+   * @return {{lines: string[], next: number}} Quote content and first following line.
+   */
+  const readBlockquote = (lines, start) => {
+    const quoteLines = [];
+    let index = start;
+    while (index < lines.length) {
+      const match = lines[index].match(/^ {0,3}> ?(.*)$/);
+      if (match) {
+        quoteLines.push(match[1]);
+        index += 1;
+        continue;
+      }
+      if (!lines[index].trim() && index + 1 < lines.length && /^ {0,3}>/.test(lines[index + 1])) {
+        quoteLines.push("");
+        index += 1;
+        continue;
+      }
+      break;
+    }
+    return { lines: quoteLines, next: index };
+  };
+
+  /**
+   * Reads one list item's continuations and nested blocks.
+   * @param {string[]} lines - Source lines.
+   * @param {number} start - Opening line index.
+   * @param {Object} options - Renderer options used to detect block boundaries.
+   * @return {{lines: string[], next: number}} Item content and first following line.
+   */
+  const readListItem = (lines, start, options) => {
+    const item = matchListItem(lines[start]);
+    const baseIndent = item.indent;
+    const ordered = item.ordered;
+    const itemLines = [item.content];
+    let next = start + 1;
+    while (next < lines.length) {
+      const line = lines[next];
+      const candidate = matchListItem(line);
+      // A sibling starts the next item.
+      // Another list at the same or lower indentation ends this list.
+      if (candidate) {
+        if (candidate.indent <= baseIndent) break;
+        itemLines.push(removeIndent(line, item.contentIndent));
+        next += 1;
+        continue;
+      }
+      // Keep blank-line handling strict so normal content after lists does not get swallowed.
+      if (!line.trim()) {
+        let lookahead = next + 1;
+        while (lookahead < lines.length && !lines[lookahead].trim()) lookahead += 1;
+        if (lookahead >= lines.length) {
+          next = lookahead;
+          break;
+        }
+        const afterBlank = matchListItem(lines[lookahead]);
+        if (afterBlank && afterBlank.indent === baseIndent && afterBlank.ordered === ordered) {
+          next = lookahead;
+          break;
+        }
+        if (getIndent(lines[lookahead]) > baseIndent) {
+          itemLines.push("");
+          next += 1;
+          continue;
+        }
+        // A blank line followed by normal unindented content ends the list.
+        next = lookahead;
+        break;
+      }
+      // Handle indented continuations and nested blocks.
+      if (getIndent(line) > baseIndent) {
+        itemLines.push(removeIndent(line, item.contentIndent));
+        next += 1;
+        continue;
+      }
+      // Allow lazy continuation text inside a list item.
+      // A new block terminates the lazy continuation.
+      if (!startsBlock(lines, next, options)) {
+        itemLines.push(line);
+        next += 1;
+        continue;
+      }
+      break;
+    }
+    return { lines: itemLines, next };
+  };
+
+  /**
+   * Scan one physical line; the caller carries the previous result's state forward.
+   * Look ahead only for table headers. This is an editing classifier, not the full block renderer.
+   */
+  const scanLine = (text, context = {}, next = "") => {
+    const result = { type: "paragraph", bodyFrom: 0, bodyTo: text.length, state: { fence: null, table: 0 } };
+    if (context.fence) {
+      const fence = context.fence;
+      const closing = new RegExp(`^ {0,3}${fence.marker}{${fence.length},}\\s*$`).test(text);
+      result.type = closing ? "fenceClose" : "code";
+      result.state.fence = closing ? null : fence;
+      return result;
+    }
+    const fence = matchFence(text);
+    if (fence) {
+      result.type = "fenceOpen";
+      result.language = fence[2].trim().split(/\s+/)[0] || "plain";
+      result.state.fence = { marker: fence[1][0], length: fence[1].length };
+      return result;
+    }
+    if (!text.trim()) {
+      result.type = "blank";
+      return result;
+    }
+    // Complex containers retain exact source until visual editing can map them safely.
+    if (text.includes("<!--") || /^\s*\[\/\/\]:/.test(text) || /^(?: {4}|\t)/.test(text) || /^ {0,3}>\s*>/.test(text)) {
+      result.type = "source";
+      return result;
+    }
+    const heading = text.match(/^ {0,3}(#{1,6})(?:\s+|$)/);
+    if (heading) {
+      result.type = "heading";
+      result.level = heading[1].length;
+      result.bodyFrom = heading[0].length;
+      result.bodyTo = Math.max(result.bodyFrom, text.replace(/\s+#+\s*$/, "").length);
+      return result;
+    }
+    if (isHorizontalRule(text)) {
+      result.type = "rule";
+      return result;
+    }
+    if (/^ {0,3}>/.test(text)) {
+      result.type = "quote";
+      result.bodyFrom = text.match(/^ {0,3}> ?/)[0].length;
+      return result;
+    }
+    if (context.table && parseTableDelimiter(text)) {
+      result.type = "tableDelimiter";
+      result.state.table = context.table;
+      return result;
+    }
+    if (text.includes("|") && parseTableDelimiter(next)) {
+      result.type = "tableHeader";
+      result.cells = tableCells(text);
+      result.state.table = result.cells.length;
+      return result;
+    }
+    if (context.table && text.includes("|") && !startsBlock([text], 0, { withTables: false })) {
+      result.type = "tableRow";
+      result.cells = tableCells(text);
+      result.state.table = context.table;
+      return result;
+    }
+    const list = matchListItem(text);
+    if (list) {
+      if (list.indent > 0) {
+        result.type = "source";
+        return result;
+      }
+      result.type = list.ordered ? "ordered" : "bullet";
+      result.number = list.start;
+      result.bodyFrom = text.length - list.content.length;
+      const task = list.content.match(/^\[([ xX])\]\s+/);
+      if (task) {
+        result.type = "task";
+        result.checked = task[1].toLowerCase() === "x";
+        result.checkFrom = result.bodyFrom + 1;
+        result.bodyFrom += task[0].length;
+      }
+    }
+    return result;
+  };
+
+  /* --- RENDERING --- */
+  /**
+   * Appends a text node to an element.
+   * @param {Node} parent - Parent DOM node.
+   * @param {string} text - Text to append.
+   * @returns {void}
+   */
+  const appendText = (parent, text) => {
+    if (text) parent.appendChild(document.createTextNode(text));
+  };
+
+  /**
+   * Adds target/rel behavior to external links. Same-document anchor links remain in the current tab.
+   *
+   * @param {HTMLAnchorElement} anchor
+   * @param {Object} options
+   * @returns {void}
+   */
+  const configureAnchor = (anchor, options) => {
+    if (!options.linkTarget || anchor.getAttribute("href")?.startsWith("#")) return;
+    anchor.target = options.linkTarget;
+    if (options.linkTarget === "_blank") anchor.rel = "noopener noreferrer";
+  };
+
+  /** Render the shared inline tokens with DOM methods; source is never interpreted as HTML. */
+  const appendInline = (parent, text, options) => {
+    /** Queue one atomic batch. Parsing must finish before retained entries and parser indices advance. */
+    const append = (target, tokens) => {
+      for (const token of tokens) {
+        if (["text", "escape", "entity"].includes(token.type)) {
+          appendText(target, token.text);
+          continue;
+        }
+        const tag = { strongEm: "strong", image: "img", link: "a" }[token.type] || token.type;
+        const element = document.createElement(tag);
+        if (token.type === "code") {
+          element.className = "byMDinlineCode";
+          element.textContent = token.text;
+        } else if (token.type === "image") {
+          element.className = "byMDimage";
+          element.src = token.url;
+          element.alt = token.text;
+          element.loading = "lazy";
+          if (token.title) element.title = token.title;
+        } else if (token.type === "link") {
+          element.className = "byMDlink";
+          element.href = token.url;
+          if (token.title) element.title = token.title;
+          configureAnchor(element, options);
+          if (token.auto) element.textContent = token.text ?? text.slice(token.bodyFrom, token.bodyTo);
+          else append(element, token.children);
+        } else if (token.type === "strongEm") {
+          const em = document.createElement("em");
+          append(em, token.children);
+          element.appendChild(em);
+        } else append(element, token.children);
+        target.appendChild(element);
+      }
+    };
+    append(parent, inlineTokens(text, options));
+  };
+
+  /**
    * Appends one line of inline Markdown
    * and handles Markdown line breaks.
    *
@@ -894,32 +1073,6 @@
   };
 
   /**
-   * Reads a blockquote and removes one level of quote prefixes.
-   * @param {string[]} lines - Source lines.
-   * @param {number} start - Opening line index.
-   * @return {{lines: string[], next: number}} Quote content and first following line.
-   */
-  const readBlockquote = (lines, start) => {
-    const quoteLines = [];
-    let index = start;
-    while (index < lines.length) {
-      const match = lines[index].match(/^ {0,3}> ?(.*)$/);
-      if (match) {
-        quoteLines.push(match[1]);
-        index += 1;
-        continue;
-      }
-      if (!lines[index].trim() && index + 1 < lines.length && /^ {0,3}>/.test(lines[index + 1])) {
-        quoteLines.push("");
-        index += 1;
-        continue;
-      }
-      break;
-    }
-    return { lines: quoteLines, next: index };
-  };
-
-  /**
    * Renders a blockquote recursively.
    *
    * @param {Node} parent
@@ -935,70 +1088,6 @@
     renderBlocks(quote, quoteLines, options);
     parent.appendChild(quote);
     return next;
-  };
-
-  /**
-   * Reads one list item's continuations and nested blocks.
-   * @param {string[]} lines - Source lines.
-   * @param {number} start - Opening line index.
-   * @param {Object} options - Renderer options used to detect block boundaries.
-   * @return {{lines: string[], next: number}} Item content and first following line.
-   */
-  const readListItem = (lines, start, options) => {
-    const item = matchListItem(lines[start]);
-    const baseIndent = item.indent;
-    const ordered = item.ordered;
-    const itemLines = [item.content];
-    let next = start + 1;
-    while (next < lines.length) {
-      const line = lines[next];
-      const candidate = matchListItem(line);
-      // A sibling starts the next item.
-      // Another list at the same or lower indentation ends this list.
-      if (candidate) {
-        if (candidate.indent <= baseIndent) break;
-        itemLines.push(removeIndent(line, item.contentIndent));
-        next += 1;
-        continue;
-      }
-      // Keep blank-line handling strict so normal content after lists does not get swallowed.
-      if (!line.trim()) {
-        let lookahead = next + 1;
-        while (lookahead < lines.length && !lines[lookahead].trim()) lookahead += 1;
-        if (lookahead >= lines.length) {
-          next = lookahead;
-          break;
-        }
-        const afterBlank = matchListItem(lines[lookahead]);
-        if (afterBlank && afterBlank.indent === baseIndent && afterBlank.ordered === ordered) {
-          next = lookahead;
-          break;
-        }
-        if (getIndent(lines[lookahead]) > baseIndent) {
-          itemLines.push("");
-          next += 1;
-          continue;
-        }
-        // A blank line followed by normal unindented content ends the list.
-        next = lookahead;
-        break;
-      }
-      // Handle indented continuations and nested blocks.
-      if (getIndent(line) > baseIndent) {
-        itemLines.push(removeIndent(line, item.contentIndent));
-        next += 1;
-        continue;
-      }
-      // Allow lazy continuation text inside a list item.
-      // A new block terminates the lazy continuation.
-      if (!startsBlock(lines, next, options)) {
-        itemLines.push(line);
-        next += 1;
-        continue;
-      }
-      break;
-    }
-    return { lines: itemLines, next };
   };
 
   /**
@@ -1335,89 +1424,6 @@
     else element.prepend(toolbar);
   };
 
-  /**
-   * Scan one physical line; the caller carries the previous result's state forward.
-   * Look ahead only for table headers. This is an editing classifier, not the full block renderer.
-   */
-  const scanLine = (text, context = {}, next = "") => {
-    const result = { type: "paragraph", bodyFrom: 0, bodyTo: text.length, state: { fence: null, table: 0 } };
-    if (context.fence) {
-      const fence = context.fence;
-      const closing = new RegExp(`^ {0,3}${fence.marker}{${fence.length},}\\s*$`).test(text);
-      result.type = closing ? "fenceClose" : "code";
-      result.state.fence = closing ? null : fence;
-      return result;
-    }
-    const fence = matchFence(text);
-    if (fence) {
-      result.type = "fenceOpen";
-      result.language = fence[2].trim().split(/\s+/)[0] || "plain";
-      result.state.fence = { marker: fence[1][0], length: fence[1].length };
-      return result;
-    }
-    if (!text.trim()) {
-      result.type = "blank";
-      return result;
-    }
-    // Complex containers retain exact source until visual editing can map them safely.
-    if (text.includes("<!--") || /^\s*\[\/\/\]:/.test(text) || /^(?: {4}|\t)/.test(text) || /^ {0,3}>\s*>/.test(text)) {
-      result.type = "source";
-      return result;
-    }
-    const heading = text.match(/^ {0,3}(#{1,6})(?:\s+|$)/);
-    if (heading) {
-      result.type = "heading";
-      result.level = heading[1].length;
-      result.bodyFrom = heading[0].length;
-      result.bodyTo = Math.max(result.bodyFrom, text.replace(/\s+#+\s*$/, "").length);
-      return result;
-    }
-    if (isHorizontalRule(text)) {
-      result.type = "rule";
-      return result;
-    }
-    if (/^ {0,3}>/.test(text)) {
-      result.type = "quote";
-      result.bodyFrom = text.match(/^ {0,3}> ?/)[0].length;
-      return result;
-    }
-    if (context.table && parseTableDelimiter(text)) {
-      result.type = "tableDelimiter";
-      result.state.table = context.table;
-      return result;
-    }
-    if (text.includes("|") && parseTableDelimiter(next)) {
-      result.type = "tableHeader";
-      result.cells = tableCells(text);
-      result.state.table = result.cells.length;
-      return result;
-    }
-    if (context.table && text.includes("|") && !startsBlock([text], 0, { withTables: false })) {
-      result.type = "tableRow";
-      result.cells = tableCells(text);
-      result.state.table = context.table;
-      return result;
-    }
-    const list = matchListItem(text);
-    if (list) {
-      if (list.indent > 0) {
-        result.type = "source";
-        return result;
-      }
-      result.type = list.ordered ? "ordered" : "bullet";
-      result.number = list.start;
-      result.bodyFrom = text.length - list.content.length;
-      const task = list.content.match(/^\[([ xX])\]\s+/);
-      if (task) {
-        result.type = "task";
-        result.checked = task[1].toLowerCase() === "x";
-        result.checkFrom = result.bodyFrom + 1;
-        result.bodyFrom += task[0].length;
-      }
-    }
-    return result;
-  };
-
   /* --- PUBLIC API --- */
   /**
    * Main API.
@@ -1494,12 +1500,26 @@
     appendViewerControls(element, options, "md", source);
   };
   global.byMDviewer.VERSION = "2.3"; // 2026-11-04
-  // This per-call editing limit does not impose a size limit on full-document rendering.
+  /**
+   * Return inline tokens with UTF-16 source ranges without creating DOM.
+   * @param {string} source At most 65,536 characters; this limit does not cap full-document rendering.
+   * @param {Object} [options] Inline link, image, and strikethrough flags, enabled unless false.
+   * @returns {Object[]} Tokens with source/body ranges and nested children where applicable.
+   * @throws {TypeError|RangeError} Invalid source type or excessive length.
+   */
   global.byMDviewer.parseInline = (source, options = {}) => {
     if (typeof source !== "string") throw new TypeError("byMDviewer.parseInline: source must be a string.");
     if (source.length > 65536) throw new RangeError("Inline parsing is limited to 65,536 characters; edit longer lines as source.");
     return inlineTokens(source, options);
   };
+  /**
+   * Classify one physical line for incremental editing without creating DOM.
+   * @param {string} source Current source line.
+   * @param {Object} [context] Previous scan result's state, or an empty object for a fresh document.
+   * @param {string} [next] Next source line, used to recognize table headers.
+   * @returns {Object} Line type, source ranges, and state for the following line.
+   * @throws {TypeError} A supplied line is not a string.
+   */
   global.byMDviewer.scanLine = (source, context = {}, next = "") => {
     if (typeof source !== "string" || typeof next !== "string") throw new TypeError("byMDviewer.scanLine: lines must be strings.");
     return scanLine(source, context, next);
