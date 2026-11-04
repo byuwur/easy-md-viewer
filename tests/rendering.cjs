@@ -38,6 +38,67 @@ test("Markdown rendering", async (t) => {
       await page.addScriptTag({ path: path.join(__dirname, "../md.js") });
       assert.equal(await page.evaluate(() => byMDviewer === installedRenderer), true);
     });
+    await t.test("source-ranged inline parsing shares renderer semantics without creating DOM", async () => {
+      const result = await page.evaluate(() => {
+        const source = "😀 **a _word_** and [`code`](https://example.com) &amp; \\*literal*";
+        const before = document.documentElement.outerHTML;
+        const tokens = byMDviewer.parseInline(source);
+        const ranges = [];
+        const visit = (items) => {
+          for (const item of items) {
+            ranges.push({ type: item.type, source: source.slice(item.from, item.to), body: source.slice(item.bodyFrom, item.bodyTo), valid: item.from >= 0 && item.to <= source.length && item.from <= item.to });
+            if (item.children) visit(item.children);
+          }
+        };
+        visit(tokens);
+        const unsafe = byMDviewer.parseInline("[bad](javascript:alert(1))");
+        let limited = false;
+        try {
+          byMDviewer.parseInline("x".repeat(65537));
+        } catch (error) {
+          limited = error instanceof RangeError;
+        }
+        const deep = byMDviewer.parseInline("[x ".repeat(100) + "word" + "](https://example.com)".repeat(100));
+        const depth = (items) => 1 + Math.max(0, ...items.map((item) => (item.children ? depth(item.children) : 0)));
+        return { ranges, unchanged: before === document.documentElement.outerHTML, unsafeLink: unsafe.some((token) => token.type === "link"), limited, depth: depth(deep) };
+      });
+      assert.equal(result.unchanged, true);
+      assert.equal(result.unsafeLink, false);
+      assert.equal(result.limited, true);
+      assert.ok(result.depth <= 33);
+      assert.ok(result.ranges.every((range) => range.valid));
+      assert.ok(result.ranges.some((range) => range.type === "strong" && range.body === "a _word_"));
+      assert.ok(result.ranges.some((range) => range.type === "em" && range.body === "word"));
+      assert.ok(result.ranges.some((range) => range.type === "code" && range.body === "code"));
+      assert.ok(result.ranges.some((range) => range.type === "entity" && range.source === "&amp;"));
+    });
+    await t.test("incremental line scanning carries fences and exact table-cell ranges", async () => {
+      const result = await page.evaluate(() => {
+        const open = byMDviewer.scanLine("~~~js"),
+          body = byMDviewer.scanLine("**literal**", open.state),
+          close = byMDviewer.scanLine("~~~", body.state);
+        const header = byMDviewer.scanLine("| Name | Value |", {}, "| --- | --- |");
+        const delimiter = byMDviewer.scanLine("| --- | --- |", header.state);
+        const line = "| `a|b` |   |",
+          row = byMDviewer.scanLine(line, delimiter.state);
+        const empty = byMDviewer.scanLine("   |   |", delimiter.state).cells[0];
+        const heading = byMDviewer.scanLine("# ###");
+        return { open, body, close, delimiter, cells: row.cells.map((cell) => ({ ...cell, source: line.slice(cell.from, cell.to) })), nested: byMDviewer.scanLine("  - Nested").type, empty, heading };
+      });
+      assert.equal(result.open.type, "fenceOpen");
+      assert.equal(result.open.language, "js");
+      assert.equal(result.body.type, "code");
+      assert.equal(result.close.state.fence, null);
+      assert.equal(result.delimiter.type, "tableDelimiter");
+      assert.equal(result.nested, "source");
+      assert.deepEqual(
+        result.cells.map((cell) => cell.source),
+        ["`a|b`", ""]
+      );
+      assert.ok(result.cells.every((cell) => cell.from <= cell.to));
+      assert.equal(result.empty.from, 7);
+      assert.ok(result.heading.bodyFrom <= result.heading.bodyTo);
+    });
     const results = await page.evaluate(() => {
       const cases = [
         ["single backticks ignore longer runs", "`a``b`", (root) => root.querySelector("code")?.textContent === "a``b"],

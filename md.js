@@ -381,215 +381,152 @@
   };
 
   /**
-   * Renders inline Markdown without
-   * ever using innerHTML.
-   * @param {HTMLElement} parent Element that receives the created content.
-   * @param {string} text Text to format or render.
-   * @param {Object} options Options that configure this operation.
-   * @returns {void}
+   * One inline grammar serves rendering and editing. Ranges include delimiters; body ranges exclude them.
+   * UTF-16 offsets stay relative to the original argument, including recursively parsed children.
    */
-  const appendInline = (parent, text, options) => {
-    let buffer = "";
-    const flush = () => {
-      appendText(parent, buffer);
-      buffer = "";
+  const inlineTokens = (text, options = {}, base = 0, depth = 0) => {
+    // Deep input stays literal instead of exhausting recursion in either rendering or editing.
+    if (depth >= 32) return [{ type: "text", from: base, to: base + text.length, text }];
+    const tokens = [];
+    let start = 0;
+    const literal = (end) => {
+      if (end > start) tokens.push({ type: "text", from: base + start, to: base + end, text: text.slice(start, end) });
+    };
+    const formatted = (type, from, to, bodyFrom, bodyTo, extra = {}) => {
+      literal(from);
+      const token = { type, from: base + from, to: base + to, bodyFrom: base + bodyFrom, bodyTo: base + bodyTo, ...extra };
+      if (!["code", "image", "entity", "escape"].includes(type) && !extra.auto) token.children = inlineTokens(text.slice(bodyFrom, bodyTo), options, base + bodyFrom, depth + 1);
+      tokens.push(token);
+      start = to;
+      return to;
     };
     for (let i = 0; i < text.length; ) {
       const char = text[i];
-      // Handle backslash escapes.
       if (char === "\\" && i + 1 < text.length && ESCAPABLE.test(text[i + 1])) {
-        buffer += text[i + 1];
-        i += 2;
+        i = formatted("escape", i, i + 2, i + 1, i + 2, { text: text[i + 1] });
         continue;
       }
-      // Support arbitrary backtick-run delimiters for inline code.
       if (char === "`") {
-        const run = markerRun(text, i);
-        const close = findClosingCodeRun(text, i + run, run);
+        const run = markerRun(text, i),
+          close = findClosingCodeRun(text, i + run, run);
         if (close !== -1) {
-          flush();
-          let codeText = text.slice(i + run, close).replace(/\n/g, " ");
-          if (/^\s.*\s$/.test(codeText) && /\S/.test(codeText)) codeText = codeText.slice(1, -1);
-          const code = document.createElement("code");
-          code.className = "byMDinlineCode";
-          code.textContent = codeText;
-          parent.appendChild(code);
-          i = close + run;
+          let value = text.slice(i + run, close).replace(/\n/g, " ");
+          if (/^\s.*\s$/.test(value) && /\S/.test(value)) value = value.slice(1, -1);
+          i = formatted("code", i, close + run, i + run, close, { text: value });
           continue;
         }
-        buffer += "`".repeat(run);
         i += run;
         continue;
       }
-      // Handle images and inline links.
-      const isImage = options.withImages && text.startsWith("![", i);
-      const isLink = options.withLinks && char === "[";
-      if (isImage || isLink) {
-        const openBracket = isImage ? i + 1 : i;
-        const closeBracket = findClosingBracket(text, openBracket);
-        if (closeBracket !== -1 && text[closeBracket + 1] === "(") {
-          const closeParen = findClosingParen(text, closeBracket + 1);
-          if (closeParen !== -1) {
-            const destination = parseDestination(text.slice(closeBracket + 2, closeParen));
-            if (destination && isSafeUrl(destination.url, isImage)) {
-              flush();
-              const label = text.slice(openBracket + 1, closeBracket);
-              if (isImage) {
-                const img = document.createElement("img");
-                img.className = "byMDimage";
-                img.src = destination.url;
-                img.alt = plainText(label);
-                if (destination.title) img.title = destination.title;
-                img.loading = "lazy";
-                parent.appendChild(img);
-              } else {
-                const a = document.createElement("a");
-                a.className = "byMDlink";
-                a.href = destination.url;
-                if (destination.title) a.title = destination.title;
-                configureAnchor(a, options);
-                appendInline(a, label, options);
-                parent.appendChild(a);
-              }
-              i = closeParen + 1;
-              continue;
-            }
+      const image = options.withImages !== false && text.startsWith("![", i);
+      if (image || (options.withLinks !== false && char === "[")) {
+        const open = image ? i + 1 : i,
+          close = findClosingBracket(text, open);
+        if (close !== -1 && text[close + 1] === "(") {
+          const end = findClosingParen(text, close + 1);
+          const destination = end === -1 ? null : parseDestination(text.slice(close + 2, end));
+          if (destination && isSafeUrl(destination.url, image)) {
+            i = formatted(image ? "image" : "link", i, end + 1, open + 1, close, { url: destination.url, title: destination.title, text: plainText(text.slice(open + 1, close)) });
+            continue;
           }
         }
       }
-      // Handle explicit Markdown URL and email autolinks.
-      if (options.withLinks && char === "<") {
+      if (options.withLinks !== false && char === "<") {
         const close = text.indexOf(">", i + 1);
         if (close !== -1) {
           const value = text.slice(i + 1, close);
-          const isUrl = /^(?:https?|ftp|ftps):\/\/[^\s<>]+$/i.test(value) && isSafeUrl(value);
-          const isEmail = /^[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+$/.test(value);
-          if (isUrl || isEmail) {
-            flush();
-            const a = document.createElement("a");
-            a.className = "byMDlink";
-            a.href = isEmail ? `mailto:${value}` : value;
-            a.textContent = value;
-            configureAnchor(a, options);
-            parent.appendChild(a);
-            i = close + 1;
+          const url = /^(?:https?|ftp|ftps):\/\/[^\s<>]+$/i.test(value) && isSafeUrl(value);
+          const email = /^[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+$/.test(value);
+          if (url || email) {
+            i = formatted("link", i, close + 1, i + 1, close, { url: email ? `mailto:${value}` : value, auto: true });
             continue;
           }
         }
       }
-      // Handle GFM-style bare URLs and email addresses.
-      if (options.withLinks) {
-        const rest = text.slice(i);
-        const urlMatch = rest.match(/^https?:\/\/[^\s<>"']+/i);
-        if (urlMatch) {
-          const url = trimBareUrl(urlMatch[0]);
-          if (url && isSafeUrl(url)) {
-            flush();
-            const a = document.createElement("a");
-            a.className = "byMDlink";
-            a.href = url;
-            a.textContent = url;
-            configureAnchor(a, options);
-            parent.appendChild(a);
-            i += url.length;
-            continue;
-          }
-        }
+      if (options.withLinks !== false) {
+        const rest = text.slice(i),
+          url = rest.match(/^https?:\/\/[^\s<>"']+/i);
         const previous = i > 0 ? text[i - 1] : "";
-        if (!/[\w.%+-]/.test(previous)) {
-          const emailMatch = rest.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
-          if (emailMatch) {
-            flush();
-            const a = document.createElement("a");
-            a.className = "byMDlink";
-            a.href = `mailto:${emailMatch[0]}`;
-            a.textContent = emailMatch[0];
-            configureAnchor(a, options);
-            parent.appendChild(a);
-            i += emailMatch[0].length;
-            continue;
-          }
-        }
-      }
-      // Handle combined strong emphasis.
-      const triple = text.slice(i, i + 3);
-      if (triple === "***" || triple === "___") {
-        const close = findClosingDelimiter(text, triple, i + 3);
-        if (close > i + 3) {
-          flush();
-          const strong = document.createElement("strong");
-          const em = document.createElement("em");
-          appendInline(em, text.slice(i + 3, close), options);
-          strong.appendChild(em);
-          parent.appendChild(strong);
-          i = close + 3;
+        const email = /[\w.%+-]/.test(previous) ? null : rest.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+        const value = url ? trimBareUrl(url[0]) : email?.[0];
+        if (value && (email || isSafeUrl(value))) {
+          // Autolink labels are literal, rather than recursively parsed Markdown.
+          literal(i);
+          tokens.push({ type: "link", from: base + i, to: base + i + value.length, bodyFrom: base + i, bodyTo: base + i + value.length, url: email ? `mailto:${value}` : value, auto: true, text: value });
+          i += value.length;
+          start = i;
           continue;
         }
       }
-      // Handle strong emphasis.
-      const double = text.slice(i, i + 2);
-      if (double === "**" || double === "__") {
-        const close = findClosingDelimiter(text, double, i + 2);
-        if (close > i + 2) {
-          flush();
-          const strong = document.createElement("strong");
-          appendInline(strong, text.slice(i + 2, close), options);
-          parent.appendChild(strong);
-          i = close + 2;
-          continue;
-        }
+      let matched = false;
+      for (const [delimiter, type] of [
+        ["***", "strongEm"],
+        ["___", "strongEm"],
+        ["**", "strong"],
+        ["__", "strong"],
+        ["~~", "del"],
+        ["*", "em"],
+        ["_", "em"]
+      ]) {
+        if (!text.startsWith(delimiter, i) || (type === "del" && options.withStrikethrough === false)) continue;
+        if (delimiter === "_" && /[\p{L}\p{N}]/u.test(text[i - 1] || "") && /[\p{L}\p{N}]/u.test(text[i + 1] || "")) continue;
+        const close = findClosingDelimiter(text, delimiter, i + delimiter.length);
+        if (close <= i + delimiter.length) continue;
+        if (delimiter === "_" && /[\p{L}\p{N}]/u.test(text[close - 1] || "") && /[\p{L}\p{N}]/u.test(text[close + 1] || "")) continue;
+        i = formatted(type, i, close + delimiter.length, i + delimiter.length, close);
+        matched = true;
+        break;
       }
-      // Handle GFM strikethrough.
-      if (options.withStrikethrough && double === "~~") {
-        const close = findClosingDelimiter(text, "~~", i + 2);
-        if (close > i + 2) {
-          flush();
-          const del = document.createElement("del");
-          appendInline(del, text.slice(i + 2, close), options);
-          parent.appendChild(del);
-          i = close + 2;
-          continue;
-        }
-      }
-      // Handle emphasis.
-      // Keep underscores inside words literal.
-      if (char === "*" || char === "_") {
-        const previous = i > 0 ? text[i - 1] : "";
-        const next = text[i + 1] || "";
-        const underscoreInsideWord = char === "_" && /[\p{L}\p{N}]/u.test(previous) && /[\p{L}\p{N}]/u.test(next);
-        if (!underscoreInsideWord) {
-          const close = findClosingDelimiter(text, char, i + 1);
-          if (close > i + 1) {
-            const beforeClose = text[close - 1] || "";
-            const afterClose = text[close + 1] || "";
-            const closingUnderscoreInsideWord = char === "_" && /[\p{L}\p{N}]/u.test(beforeClose) && /[\p{L}\p{N}]/u.test(afterClose);
-            if (!closingUnderscoreInsideWord) {
-              flush();
-              const em = document.createElement("em");
-              appendInline(em, text.slice(i + 1, close), options);
-              parent.appendChild(em);
-              i = close + 1;
-              continue;
-            }
-          }
-        }
-      }
-      // Decode a small entity subset without using innerHTML.
+      if (matched) continue;
       if (char === "&") {
         const match = text.slice(i).match(/^&(?:amp|lt|gt|quot|apos|#\d+|#x[\da-fA-F]+);/);
-        if (match) {
-          const decoded = decodeEntity(match[0]);
-          if (decoded !== null) {
-            buffer += decoded;
-            i += match[0].length;
-            continue;
-          }
+        const value = match && decodeEntity(match[0]);
+        if (value !== null && value !== undefined) {
+          i = formatted("entity", i, i + match[0].length, i, i + match[0].length, { text: value });
+          continue;
         }
       }
-      buffer += char;
       i += 1;
     }
-    flush();
+    literal(text.length);
+    return tokens;
+  };
+
+  /** Render the shared inline tokens with DOM methods; source is never interpreted as HTML. */
+  const appendInline = (parent, text, options) => {
+    const append = (target, tokens) => {
+      for (const token of tokens) {
+        if (["text", "escape", "entity"].includes(token.type)) {
+          appendText(target, token.text);
+          continue;
+        }
+        const tag = { strongEm: "strong", image: "img", link: "a" }[token.type] || token.type;
+        const element = document.createElement(tag);
+        if (token.type === "code") {
+          element.className = "byMDinlineCode";
+          element.textContent = token.text;
+        } else if (token.type === "image") {
+          element.className = "byMDimage";
+          element.src = token.url;
+          element.alt = token.text;
+          element.loading = "lazy";
+          if (token.title) element.title = token.title;
+        } else if (token.type === "link") {
+          element.className = "byMDlink";
+          element.href = token.url;
+          if (token.title) element.title = token.title;
+          configureAnchor(element, options);
+          if (token.auto) element.textContent = token.text ?? text.slice(token.bodyFrom, token.bodyTo);
+          else append(element, token.children);
+        } else if (token.type === "strongEm") {
+          const em = document.createElement("em");
+          append(em, token.children);
+          element.appendChild(em);
+        } else append(element, token.children);
+        target.appendChild(element);
+      }
+    };
+    append(parent, inlineTokens(text, options));
   };
 
   /**
@@ -732,14 +669,26 @@
    * escaped pipes and inline code.
    *
    * @param {string} line
-   * @return {string[]}
+   * @return {{from: number, to: number, text: string}[]}
    */
-  const splitTableRow = (line) => {
+  const tableCells = (line) => {
     let source = line.trim();
-    if (source.startsWith("|")) source = source.slice(1);
+    let base = line.length - line.trimStart().length;
+    if (source.startsWith("|")) {
+      source = source.slice(1);
+      base++;
+    }
     if (source.endsWith("|") && !source.endsWith("\\|")) source = source.slice(0, -1);
     const cells = [];
-    let cell = "";
+    let cell = "",
+      start = 0;
+    // Trim displayed cells without losing their positions in the unmodified source line.
+    const push = (end) => {
+      const leading = cell.length - cell.trimStart().length;
+      const from = base + start + leading;
+      cells.push({ from, to: Math.max(from, base + start + cell.trimEnd().length), text: cell.trim() });
+      start = end + 1;
+    };
     for (let i = 0; i < source.length; i++) {
       if (source[i] === "\\" && i + 1 < source.length) {
         cell += source[i] + source[i + 1];
@@ -759,15 +708,17 @@
         continue;
       }
       if (source[i] === "|") {
-        cells.push(cell.trim());
+        push(i);
         cell = "";
         continue;
       }
       cell += source[i];
     }
-    cells.push(cell.trim());
+    push(source.length);
     return cells;
   };
+
+  const splitTableRow = (line) => tableCells(line).map((cell) => cell.text);
 
   /**
    * Parses a Markdown table separator row.
@@ -925,11 +876,13 @@
         options.codeHighlighting = options.codeLineNumbers = options.codeStatusBar = false;
       } else {
         try {
-          code.replaceChildren(global.byCODEviewer.highlight(code.textContent, language || "plain", {
-            highlighting: options.codeHighlighting,
-            lineNumbers: options.codeLineNumbers,
-            statusBar: options.codeStatusBar
-          }));
+          code.replaceChildren(
+            global.byCODEviewer.highlight(code.textContent, language || "plain", {
+              highlighting: options.codeHighlighting,
+              lineNumbers: options.codeLineNumbers,
+              statusBar: options.codeStatusBar
+            })
+          );
         } catch {
           // Optional code presentation must not interrupt Markdown or discard the source.
         }
@@ -1167,6 +1120,7 @@
   }
 
   /* --- CONTROLS --- */
+  // Mirrored across the family so each viewer can run without a shared runtime.
   /**
    * Adds container light/dark controls, retaining legacy stylesheet links as a fallback.
    * @param {HTMLElement} element Viewer container and theme owner.
@@ -1190,7 +1144,8 @@
     const button = document.createElement("button");
     button.type = "button";
     button.className = "byVIEWthemeToggle";
-    button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 0 1 11.2 3 9 9 0 1 0 21 12.8Z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4m0-14.2-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>';
+    button.innerHTML =
+      '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 0 1 11.2 3 9 9 0 1 0 21 12.8Z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4m0-14.2-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>';
     const sync = () => {
       const next = getTheme() === "dark" ? "light" : "dark";
       const toggles = !localTheme(element) && legacyTheme() ? [button, ...document.querySelectorAll(".byMDdocument > .byVIEWtoolbar > .byVIEWcontrols > .byVIEWthemeToggle")] : [button];
@@ -1380,6 +1335,89 @@
     else element.prepend(toolbar);
   };
 
+  /**
+   * Scan one physical line; the caller carries the previous result's state forward.
+   * Look ahead only for table headers. This is an editing classifier, not the full block renderer.
+   */
+  const scanLine = (text, context = {}, next = "") => {
+    const result = { type: "paragraph", bodyFrom: 0, bodyTo: text.length, state: { fence: null, table: 0 } };
+    if (context.fence) {
+      const fence = context.fence;
+      const closing = new RegExp(`^ {0,3}${fence.marker}{${fence.length},}\\s*$`).test(text);
+      result.type = closing ? "fenceClose" : "code";
+      result.state.fence = closing ? null : fence;
+      return result;
+    }
+    const fence = matchFence(text);
+    if (fence) {
+      result.type = "fenceOpen";
+      result.language = fence[2].trim().split(/\s+/)[0] || "plain";
+      result.state.fence = { marker: fence[1][0], length: fence[1].length };
+      return result;
+    }
+    if (!text.trim()) {
+      result.type = "blank";
+      return result;
+    }
+    // Complex containers retain exact source until visual editing can map them safely.
+    if (text.includes("<!--") || /^\s*\[\/\/\]:/.test(text) || /^(?: {4}|\t)/.test(text) || /^ {0,3}>\s*>/.test(text)) {
+      result.type = "source";
+      return result;
+    }
+    const heading = text.match(/^ {0,3}(#{1,6})(?:\s+|$)/);
+    if (heading) {
+      result.type = "heading";
+      result.level = heading[1].length;
+      result.bodyFrom = heading[0].length;
+      result.bodyTo = Math.max(result.bodyFrom, text.replace(/\s+#+\s*$/, "").length);
+      return result;
+    }
+    if (isHorizontalRule(text)) {
+      result.type = "rule";
+      return result;
+    }
+    if (/^ {0,3}>/.test(text)) {
+      result.type = "quote";
+      result.bodyFrom = text.match(/^ {0,3}> ?/)[0].length;
+      return result;
+    }
+    if (context.table && parseTableDelimiter(text)) {
+      result.type = "tableDelimiter";
+      result.state.table = context.table;
+      return result;
+    }
+    if (text.includes("|") && parseTableDelimiter(next)) {
+      result.type = "tableHeader";
+      result.cells = tableCells(text);
+      result.state.table = result.cells.length;
+      return result;
+    }
+    if (context.table && text.includes("|") && !startsBlock([text], 0, { withTables: false })) {
+      result.type = "tableRow";
+      result.cells = tableCells(text);
+      result.state.table = context.table;
+      return result;
+    }
+    const list = matchListItem(text);
+    if (list) {
+      if (list.indent > 0) {
+        result.type = "source";
+        return result;
+      }
+      result.type = list.ordered ? "ordered" : "bullet";
+      result.number = list.start;
+      result.bodyFrom = text.length - list.content.length;
+      const task = list.content.match(/^\[([ xX])\]\s+/);
+      if (task) {
+        result.type = "task";
+        result.checked = task[1].toLowerCase() === "x";
+        result.checkFrom = result.bodyFrom + 1;
+        result.bodyFrom += task[0].length;
+      }
+    }
+    return result;
+  };
+
   /* --- PUBLIC API --- */
   /**
    * Main API.
@@ -1455,6 +1493,16 @@
     renderBlocks(content, normalized.split("\n"), options);
     appendViewerControls(element, options, "md", source);
   };
-  global.byMDviewer.VERSION = "2.2"; // 2026-11-03
+  global.byMDviewer.VERSION = "2.3"; // 2026-11-04
+  // This per-call editing limit does not impose a size limit on full-document rendering.
+  global.byMDviewer.parseInline = (source, options = {}) => {
+    if (typeof source !== "string") throw new TypeError("byMDviewer.parseInline: source must be a string.");
+    if (source.length > 65536) throw new RangeError("Inline parsing is limited to 65,536 characters; edit longer lines as source.");
+    return inlineTokens(source, options);
+  };
+  global.byMDviewer.scanLine = (source, context = {}, next = "") => {
+    if (typeof source !== "string" || typeof next !== "string") throw new TypeError("byMDviewer.scanLine: lines must be strings.");
+    return scanLine(source, context, next);
+  };
   global.byMDviewer.initialized = true;
 })(typeof window !== "undefined" ? window : this);

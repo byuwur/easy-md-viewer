@@ -197,6 +197,30 @@ Links accept relative paths, anchors, and `http`, `https`, `ftp`, `ftps`, `mailt
 
 Raw HTML is displayed as text. Comments and document markers such as `[//]: # "OPTIONAL:SECTION"` are hidden except inside code.
 
+### Source ranges for editing
+
+`byMDviewer.parseInline(source, options = {})` exposes the renderer's inline tokens without creating DOM or changing the source. Token types are `text`, `escape`, `entity`, `code`, `image`, `link`, `strong`, `em`, `strongEm`, and `del`. Every token has `from` and `to`; formatted tokens also provide `bodyFrom`, `bodyTo`, and nested `children` where applicable. Ranges are half-open UTF-16 indexes into the supplied string, matching JavaScript slicing and DOM selections. `withLinks`, `withImages`, and `withStrikethrough` default to `true`, with the renderer's URL checks.
+
+Non-string source throws `TypeError`; more than 65,536 characters throws `RangeError`. Inline nesting beyond 32 levels stays literal, in both parsing and rendering.
+
+```javascript
+const tokens = byMDviewer.parseInline("A **small** document.");
+// The strong token covers [2, 11), with its body at [4, 9).
+```
+
+`byMDviewer.scanLine(line, context = {}, nextLine = "")` classifies an editing line and returns `type`, `bodyFrom`, `bodyTo`, and `state`. Pass the preceding result's `state` as `context`; `nextLine` enables table-header detection. Fences carry their marker and length; tables expose trimmed cell ranges. Complex nested constructs return `source` so an editor can preserve them literally. This lightweight scanner supports incremental editing; use `byMDviewer()` for complete document rendering.
+
+```javascript
+const opening = byMDviewer.scanLine("~~~js");
+const code = byMDviewer.scanLine("const answer = 42;", opening.state);
+const closing = byMDviewer.scanLine("~~~", code.state);
+// Types: fenceOpen, code, fenceClose. closing.state.fence is null.
+```
+
+Both line arguments must be strings or `scanLine()` throws `TypeError`. Omit `context` for the first line; otherwise use a preceding scanner result's `state`. Scanning creates no DOM and does not parse the whole document.
+
+[easy-md-editor](https://github.com/byuwur/easy-md-editor) uses these APIs to keep Markdown as its source of truth and this viewer for exact, read-only Preview.
+
 ## Checks
 
 Theme tests cover both modes, container isolation, legacy links, custom CSS, and High Contrast. Integration tests use the actual code viewer; check out `easy-code-viewer` beside this repository before running the full suite.
