@@ -283,9 +283,9 @@ test("Markdown rendering", async (t) => {
         const palette = () =>
           themed.locator("#first").evaluate((root) => {
             const background = getComputedStyle(root).backgroundColor;
-            const toolbar = getComputedStyle(root.querySelector(".byVIEWtoolbar"));
+            const toolbar = getComputedStyle(root.querySelector(".byVIEWtoolbar button"));
             const credits = getComputedStyle(root.querySelector(".byVIEWinfo"));
-            return { matched: toolbar.backgroundColor === background, opaque: !toolbar.backgroundColor.includes("rgba"), color: credits.color, opacity: credits.opacity };
+            return { matched: getComputedStyle(root.querySelector(".byVIEWtoolbar")).backgroundColor === "rgba(0, 0, 0, 0)", opaque: !toolbar.backgroundColor.includes("rgba"), color: credits.color, opacity: credits.opacity };
           });
         assert.deepEqual(await palette(), { matched: true, opaque: true, color: "rgb(138, 136, 117)", opacity: "0.25" });
         const background = await themed.locator("#first").evaluate((root) => getComputedStyle(root).backgroundColor);
@@ -654,7 +654,7 @@ test("Markdown rendering", async (t) => {
                   visible: bounds.top >= 0 && bounds.bottom <= view.innerHeight,
                   pinned: Math.abs(position === "top" ? bounds.top : view.innerHeight - bounds.bottom) < 1,
                   creditsOrdered: position !== "bottom" || credits.top >= controls.bottom || (credits.top < controls.bottom && credits.bottom > controls.top),
-                  opaque: getComputedStyle(toolbar).backgroundColor === getComputedStyle(root).backgroundColor,
+                  opaque: getComputedStyle(root.querySelector(".byVIEWcopy")).backgroundColor === getComputedStyle(root).backgroundColor,
                   clickable: button.contains(root.ownerDocument.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2))
                 };
               },
@@ -1655,6 +1655,55 @@ test("playground code examples pin sibling releases and switch presentation with
     await page.locator("#reset-options").click();
     await page.waitForFunction(() => !document.getElementById("preview-frame").contentDocument.querySelector(".byCODEblock"));
     for (const name of ["codeLineNumbers", "codeStatusBar"]) assert.equal(await page.locator(`#${name}`).isChecked(), false);
+  } finally {
+    await browser.close();
+  }
+});
+
+test("document and content backgrounds stay independent through theme and toolbar changes", async () => {
+  const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined, channel: process.env.BROWSER_CHANNEL || "chrome" });
+  try {
+    const page = await browser.newPage();
+    await page.route("https://cdn.jsdelivr.net/**", (route) => route.abort());
+    await page.setContent('<div id="viewer" data-theme="light"></div><div id="neighbor" data-theme="light"></div>');
+    await page.addStyleTag({ path: path.join(__dirname, "../md.css") });
+    await page.addScriptTag({ path: path.join(__dirname, "../md.js") });
+    await page.evaluate(async () => {
+      for (const id of ["viewer", "neighbor"]) {
+        const result = byMDviewer(document.getElementById(id), "# Heading\n\n~~~js\nconst answer = 42;\n~~~");
+        await result?.ready;
+      }
+    });
+    const root = page.locator("#viewer");
+    const neighbor = await page.locator("#neighbor").evaluate((element) => getComputedStyle(element).backgroundColor);
+    await root.evaluate((element) => {
+      element.style.setProperty("--by-view-document-bg", "transparent");
+      element.style.setProperty("--by-view-container-bg", "#123456");
+    });
+    await page.waitForFunction(() => getComputedStyle(document.querySelector("#viewer .byVIEWcopy")).backgroundColor === "rgb(18, 52, 86)");
+    for (const changeMode of [false, true]) {
+      if (changeMode) await root.locator(".byVIEWthemeToggle").click();
+      assert.equal(await root.evaluate((element) => getComputedStyle(element).backgroundColor), "rgba(0, 0, 0, 0)");
+      assert.equal(await root.locator(".byMDcontent").evaluate((element) => getComputedStyle(element).backgroundColor), "rgb(18, 52, 86)");
+      assert.equal(
+        await root
+          .locator(".byVIEWcopy")
+          .first()
+          .evaluate((element) => getComputedStyle(element).backgroundColor),
+        "rgb(18, 52, 86)"
+      );
+      assert.equal(await root.locator(".byVIEWtoolbar").evaluate((element) => getComputedStyle(element).backgroundColor), "rgba(0, 0, 0, 0)");
+    }
+    assert.equal(await page.locator("#neighbor").evaluate((element) => getComputedStyle(element).backgroundColor), neighbor);
+    await root.evaluate((element) => element.style.removeProperty("--by-view-container-bg"));
+    await page.waitForFunction(() => getComputedStyle(document.querySelector("#viewer .byVIEWcopy")).backgroundColor === "rgb(39, 40, 34)");
+    assert.notEqual(
+      await root
+        .locator(".byVIEWcopy")
+        .first()
+        .evaluate((element) => getComputedStyle(element).backgroundColor),
+      "rgba(0, 0, 0, 0)"
+    );
   } finally {
     await browser.close();
   }
