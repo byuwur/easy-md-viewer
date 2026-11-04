@@ -231,10 +231,13 @@ test("Markdown rendering", async (t) => {
         assert.deepEqual(await palette(), { matched: true, opaque: true, color: "rgb(117, 113, 94)", opacity: "0.25" });
         assert.equal(await themed.locator("#viewer-theme").getAttribute("href"), "https://themes.test/md.light.css/archive/md.dark.css?keep=md.light.css#md.light.css");
         assert.equal(await themed.locator("#byVIEWtheme").getAttribute("href"), "https://themes.test/other.dark.css");
-        assert.deepEqual(await themed.locator("#first .byVIEWthemeToggle, #second .byVIEWthemeToggle").evaluateAll((buttons) => buttons.map((button) => [button.querySelectorAll("svg").length, button.title, button.getAttribute("aria-label")])), [
-          [2, "Switch to light theme", "Switch to light theme"],
-          [2, "Switch to light theme", "Switch to light theme"]
-        ]);
+        assert.deepEqual(
+          await themed.locator("#first .byVIEWthemeToggle, #second .byVIEWthemeToggle").evaluateAll((buttons) => buttons.map((button) => [button.querySelectorAll("svg").length, button.title, button.getAttribute("aria-label")])),
+          [
+            [2, "Switch to light theme", "Switch to light theme"],
+            [2, "Switch to light theme", "Switch to light theme"]
+          ]
+        );
         assert.equal(await themed.locator("#host-control").evaluate((button) => getComputedStyle(button, "::after").content), "none");
         await themed.locator("#viewer-theme").evaluate((link) => link.remove());
         await themed.evaluate(() => byMDviewer(document.getElementById("first"), "# Content", { fontSizeControls: false, copyButton: false }));
@@ -529,14 +532,20 @@ test("Markdown rendering", async (t) => {
         await route.fulfill({ body, contentType: file.endsWith(".html") ? "text/html" : file.endsWith(".js") ? "text/javascript" : "text/css" });
       });
       await playground.goto("https://viewer.test/index.html");
-      const release = await playground.frameLocator("#preview-frame").locator(".byVIEWtoolbar").evaluate(() => byMDviewer.VERSION);
+      const release = await playground
+        .frameLocator("#preview-frame")
+        .locator(".byVIEWtoolbar")
+        .evaluate(() => byMDviewer.VERSION);
       assert.ok((await playground.frameLocator("#preview-frame").locator(".byVIEWinfo").textContent()).includes(` v${release} `), "Credits must match the runtime release");
       const cdnBase = "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@latest/";
       const readme = require("node:fs").readFileSync(path.join(__dirname, "../README.md"), "utf8");
       for (const extension of ["css", "js"]) assert.ok(readme.includes(`${cdnBase}md.${extension}`), "README assets must match the CDN starter");
       assert.equal(await playground.locator("#integration-note").textContent(), "CDN follows the latest release; updates may take time to reach caches.");
       assert.ok((await playground.locator("#integration-code").inputValue()).includes(`href="${cdnBase}md.css"`));
-      const codeRelease = await playground.frameLocator("#preview-frame").locator(".byVIEWtoolbar").evaluate(() => byCODEviewer.VERSION);
+      const codeRelease = await playground
+        .frameLocator("#preview-frame")
+        .locator(".byVIEWtoolbar")
+        .evaluate(() => byCODEviewer.VERSION);
       for (const extension of ["css", "js"]) assert.ok(readme.includes(`easy-code-viewer@latest/code.${extension}`), "Markdown highlighting docs must use latest");
       const workflow = require("node:fs").readFileSync(path.join(__dirname, "../.github/workflows/rendering.yml"), "utf8");
       assert.ok(workflow.includes("ref: main"), "CI must test CODE from main");
@@ -787,7 +796,9 @@ test("family customization, navigation and monospace controls", async () => {
       "backgroundColor",
       "textColor",
       "customThemeCSS",
-      "toolbar", "credits", "themeToggle",
+      "toolbar",
+      "credits",
+      "themeToggle",
       "fontSizeControls",
       "copyButton",
       "controlsCompact",
@@ -1232,12 +1243,15 @@ test("viewer defaults, optional tools, and copy feedback", async () => {
     await page.setContent('<div id="viewer"></div>');
     await page.addStyleTag({ path: path.join(__dirname, "../md.css") });
     await page.addScriptTag({ path: path.join(__dirname, "../md.js") });
-    await page.evaluate((args) => {
-      window.renderUI = async (options = {}) => {
-        const result = byMDviewer(document.getElementById("viewer"), ...args, options);
-        await result?.ready;
-      };
-    }, ["# Example\n\nneedle"]);
+    await page.evaluate(
+      (args) => {
+        window.renderUI = async (options = {}) => {
+          const result = byMDviewer(document.getElementById("viewer"), ...args, options);
+          await result?.ready;
+        };
+      },
+      ["# Example\n\nneedle"]
+    );
     await page.evaluate(() => renderUI());
     assert.equal(await page.locator(".byVIEWcontrols button").count(), 5);
     assert.equal(await page.locator(".byVIEWfontSizes").count(), 1);
@@ -1252,25 +1266,32 @@ test("viewer defaults, optional tools, and copy feedback", async () => {
       for (const controlsSize of ["small", "regular", "large"]) {
         for (const font of ["ui-monospace, monospace", "Georgia, serif"]) {
           for (const mode of ["light", "dark"]) {
-            const errors = await page.evaluate(async ({ scale, controlsSize, font, mode }) => {
-              document.documentElement.style.fontSize = `${scale}rem`;
-              const host = document.getElementById("viewer");
-              host.dataset.theme = mode;
-              host.style.setProperty("--by-view-controls-font", font);
-              await renderUI({ controlsSize });
-              const button = host.querySelector(".byVIEWthemeToggle");
-              const rect = button.getBoundingClientRect();
-              const style = getComputedStyle(button), thumb = getComputedStyle(button, "::after");
-              const innerWidth = rect.width - parseFloat(style.borderLeftWidth) - parseFloat(style.borderRightWidth);
-              const innerHeight = rect.height - parseFloat(style.borderTopWidth) - parseFloat(style.borderBottomWidth);
-              const position = (value, extent) => value.endsWith("%") ? parseFloat(value) * extent / 100 : parseFloat(value);
-              const centerX = rect.left + parseFloat(style.borderLeftWidth) + position(thumb.left, innerWidth);
-              const centerY = rect.top + parseFloat(style.borderTopWidth) + position(thumb.top, innerHeight);
-              const icons = [...button.querySelectorAll("svg")];
-              const icon = icons[mode === "dark" ? 1 : 0].getBoundingClientRect();
-              return [Math.abs(centerX - icon.x - icon.width / 2), Math.abs(centerY - icon.y - icon.height / 2), Math.abs(centerY - rect.y - rect.height / 2)];
-            }, { scale, controlsSize, font, mode });
-            assert.ok(errors.every((error) => error < 0.06), `${scale} ${controlsSize} ${font} ${mode}: ${errors}`);
+            const errors = await page.evaluate(
+              async ({ scale, controlsSize, font, mode }) => {
+                document.documentElement.style.fontSize = `${scale}rem`;
+                const host = document.getElementById("viewer");
+                host.dataset.theme = mode;
+                host.style.setProperty("--by-view-controls-font", font);
+                await renderUI({ controlsSize });
+                const button = host.querySelector(".byVIEWthemeToggle");
+                const rect = button.getBoundingClientRect();
+                const style = getComputedStyle(button),
+                  thumb = getComputedStyle(button, "::after");
+                const innerWidth = rect.width - parseFloat(style.borderLeftWidth) - parseFloat(style.borderRightWidth);
+                const innerHeight = rect.height - parseFloat(style.borderTopWidth) - parseFloat(style.borderBottomWidth);
+                const position = (value, extent) => (value.endsWith("%") ? (parseFloat(value) * extent) / 100 : parseFloat(value));
+                const centerX = rect.left + parseFloat(style.borderLeftWidth) + position(thumb.left, innerWidth);
+                const centerY = rect.top + parseFloat(style.borderTopWidth) + position(thumb.top, innerHeight);
+                const icons = [...button.querySelectorAll("svg")];
+                const icon = icons[mode === "dark" ? 1 : 0].getBoundingClientRect();
+                return [Math.abs(centerX - icon.x - icon.width / 2), Math.abs(centerY - icon.y - icon.height / 2), Math.abs(centerY - rect.y - rect.height / 2)];
+              },
+              { scale, controlsSize, font, mode }
+            );
+            assert.ok(
+              errors.every((error) => error < 0.06),
+              `${scale} ${controlsSize} ${font} ${mode}: ${errors}`
+            );
           }
         }
       }
@@ -1281,7 +1302,9 @@ test("viewer defaults, optional tools, and copy feedback", async () => {
       await renderUI();
     });
     for (const mode of ["light", "dark"]) {
-      await page.locator("#viewer").evaluate((element, mode) => { element.dataset.theme = mode; }, mode);
+      await page.locator("#viewer").evaluate((element, mode) => {
+        element.dataset.theme = mode;
+      }, mode);
       await page.evaluate(() => renderUI({ toolbar: false, controlsPosition: "bottom", sorting: false, pagination: false, collapsible: false, details: false, lineNumbers: false, loadMore: false }));
       assert.equal(await page.locator("#viewer :is(button, input, select, summary):visible").count(), 0);
       assert.equal(await page.locator(".byVIEWtoolbar").count(), 0);
@@ -1297,14 +1320,25 @@ test("viewer defaults, optional tools, and copy feedback", async () => {
     assert.equal(await page.locator(".byVIEWfontSize").count(), 3);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
     await page.evaluate(() => {
-      Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: async () => { throw new Error("Denied"); } } });
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: {
+          writeText: async () => {
+            throw new Error("Denied");
+          }
+        }
+      });
     });
     await page.locator(".byVIEWcopy").click();
     await page.mouse.move(0, 0);
     await page.locator(".byVIEWcopy").evaluate((element) => element.blur());
     assert.equal(await page.locator(".byVIEWcopy").getAttribute("data-state"), "error");
     assert.equal(await page.locator(".byVIEWcopy").textContent(), "Failed");
-    await page.evaluate(() => { navigator.clipboard.writeText = async (value) => { window.copiedSource = value; }; });
+    await page.evaluate(() => {
+      navigator.clipboard.writeText = async (value) => {
+        window.copiedSource = value;
+      };
+    });
     await page.locator(".byVIEWcopy").click();
     assert.equal(await page.locator(".byVIEWcopy").getAttribute("data-state"), "success");
     assert.match(await page.evaluate(() => copiedSource), /needle/);
@@ -1313,12 +1347,13 @@ test("viewer defaults, optional tools, and copy feedback", async () => {
   }
 });
 
-
 test("optional code highlighting preserves Markdown and follows document themes", async (t) => {
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined, channel: process.env.BROWSER_CHANNEL || undefined });
   try {
     const page = await browser.newPage();
-    const errors = [], requests = [], warnings = [];
+    const errors = [],
+      requests = [],
+      warnings = [];
     page.on("console", (message) => {
       if (message.type() === "warning" && message.text().startsWith("easy-md-viewer:")) warnings.push(message.text());
     });
@@ -1329,7 +1364,14 @@ test("optional code highlighting preserves Markdown and follows document themes"
     await page.addStyleTag({ path: path.join(__dirname, "../../easy-code-viewer/code.css") });
     await page.addScriptTag({ path: path.join(__dirname, "../md.js") });
     const source = 'const message = "<img src=x onerror=window.injected=1>";\n// comment\nconst total = 42;\n';
-    const markdown = '# Source\n\nInline: ' + String.fromCharCode(96) + 'const inline = 1;' + String.fromCharCode(96) + '\n\n~~~js\n' + source + '\n~~~\n\n> ~~~html\n> <div>Safe & exact</div>\n> ~~~\n\n- Nested\n\n  ~~~javascript\n  const nested = true;\n  ~~~\n\n~~~unknown\n<tag>&value\n~~~\n\n~~~\nUnlabelled source\n~~~';
+    const markdown =
+      "# Source\n\nInline: " +
+      String.fromCharCode(96) +
+      "const inline = 1;" +
+      String.fromCharCode(96) +
+      "\n\n~~~js\n" +
+      source +
+      "\n~~~\n\n> ~~~html\n> <div>Safe & exact</div>\n> ~~~\n\n- Nested\n\n  ~~~javascript\n  const nested = true;\n  ~~~\n\n~~~unknown\n<tag>&value\n~~~\n\n~~~\nUnlabelled source\n~~~";
     await page.evaluate((markdown) => {
       window.markdown = markdown;
       window.renderMarkdown = (options = {}) => byMDviewer(document.getElementById("viewer"), markdown, options);
@@ -1359,8 +1401,8 @@ test("optional code highlighting preserves Markdown and follows document themes"
       assert.equal(warnings.length, 2, "Loaded highlighting does not warn");
       assert.equal(await page.locator("#viewer pre code").first().textContent(), source);
       assert.equal(await page.locator("#viewer pre code").first().getAttribute("data-language"), "js");
-      assert.ok(await page.locator("#viewer blockquote .byCODEtag").count() > 0);
-      assert.ok(await page.locator("#viewer li .byCODEkeyword").count() > 0);
+      assert.ok((await page.locator("#viewer blockquote .byCODEtag").count()) > 0);
+      assert.ok((await page.locator("#viewer li .byCODEkeyword").count()) > 0);
       assert.equal(await page.locator("#viewer .byMDinlineCode .byCODEhighlight").count(), 0);
       assert.equal(await page.locator("#viewer .language-unknown .byCODEhighlight").textContent(), "<tag>&value");
       assert.equal(await page.locator("#viewer .language-unknown .byCODEhighlight > *").count(), 0);
@@ -1431,27 +1473,46 @@ test("optional code highlighting preserves Markdown and follows document themes"
         }, palette);
         for (const mode of ["light", "dark"]) {
           if (mode === "dark") await page.locator("#viewer .byVIEWthemeToggle").click();
-          const colors = await page.evaluate(async ({ mode, palette, source }) => {
-            const reference = document.getElementById("reference");
-            reference.dataset.theme = palette;
-            reference.classList.toggle("light", mode === "light");
-            reference.classList.toggle("dark", mode === "dark");
-            await byCODEviewer(reference, source, { language: "js", toolbar: false }).ready;
-            const colors = (root) => ["keyword", "string", "comment", "number"].map((token) => getComputedStyle(root.querySelector(".byCODE" + token)).color);
-            return { markdown: colors(document.querySelector("#viewer pre")), reference: colors(reference) };
-          }, { mode, palette, source });
+          const colors = await page.evaluate(
+            async ({ mode, palette, source }) => {
+              const reference = document.getElementById("reference");
+              reference.dataset.theme = palette;
+              reference.classList.toggle("light", mode === "light");
+              reference.classList.toggle("dark", mode === "dark");
+              await byCODEviewer(reference, source, { language: "js", toolbar: false }).ready;
+              const colors = (root) => ["keyword", "string", "comment", "number"].map((token) => getComputedStyle(root.querySelector(".byCODE" + token)).color);
+              return { markdown: colors(document.querySelector("#viewer pre")), reference: colors(reference) };
+            },
+            { mode, palette, source }
+          );
           assert.deepEqual(colors.markdown, colors.reference, palette + " " + mode);
         }
       }
-      const size = () => page.locator("#viewer .byCODEkeyword").first().evaluate((token) => parseFloat(getComputedStyle(token).fontSize));
+      const size = () =>
+        page
+          .locator("#viewer .byCODEkeyword")
+          .first()
+          .evaluate((token) => parseFloat(getComputedStyle(token).fontSize));
       const before = await size();
       await page.locator("#viewer .byVIEWfontSize").nth(2).click();
-      assert.ok(await size() > before);
+      assert.ok((await size()) > before);
       await page.locator("#viewer .byVIEWfontSize").nth(1).click();
       assert.equal(await size(), before);
       await page.locator("#viewer").evaluate((root) => root.style.setProperty("--by-code-keyword", "#123456"));
-      assert.equal(await page.locator("#viewer .byCODEkeyword").first().evaluate((token) => getComputedStyle(token).color), "rgb(18, 52, 86)");
-      assert.notEqual(await page.locator("#reference .byCODEkeyword").first().evaluate((token) => getComputedStyle(token).color), "rgb(18, 52, 86)");
+      assert.equal(
+        await page
+          .locator("#viewer .byCODEkeyword")
+          .first()
+          .evaluate((token) => getComputedStyle(token).color),
+        "rgb(18, 52, 86)"
+      );
+      assert.notEqual(
+        await page
+          .locator("#reference .byCODEkeyword")
+          .first()
+          .evaluate((token) => getComputedStyle(token).color),
+        "rgb(18, 52, 86)"
+      );
       assert.equal(await page.locator("#outside").evaluate((root) => getComputedStyle(root).getPropertyValue("--by-code-keyword")), "");
       await page.locator("#viewer").evaluate((root) => root.style.removeProperty("--by-code-keyword"));
     });
@@ -1471,7 +1532,11 @@ test("optional code highlighting preserves Markdown and follows document themes"
         });
         renderMarkdown();
       });
-      const color = () => page.locator("#viewer .byCODEkeyword").first().evaluate((token) => getComputedStyle(token).color);
+      const color = () =>
+        page
+          .locator("#viewer .byCODEkeyword")
+          .first()
+          .evaluate((token) => getComputedStyle(token).color);
       assert.equal(await color(), "rgb(249, 38, 114)");
       await page.locator("#viewer .byVIEWthemeToggle").click();
       await page.waitForFunction(() => getComputedStyle(document.querySelector("#viewer .byCODEkeyword")).color === "rgb(183, 25, 86)");
