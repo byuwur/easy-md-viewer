@@ -189,7 +189,7 @@ byMDviewer(document.getElementById("document"), markdown, {
 
 If highlighting or code-block details are enabled but the library is missing, the first fence logs a console warning with the easy-code-viewer landing link, once per render.
 
-The playground includes this integration; exported starters keep the standalone Markdown setup. Add the two code-viewer files to enable highlighting in a starter.
+The playground pins its CODE dependency to a numbered release; documentation examples follow `@latest`. Use explicit release tags in deployed pages. Exported starters keep the standalone Markdown setup. Add the two code-viewer files to enable highlighting in a starter.
 
 ### Heading anchors
 
