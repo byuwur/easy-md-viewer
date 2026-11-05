@@ -11,11 +11,10 @@ const fs = require("node:fs/promises");
 const test = require("node:test");
 const { pathToFileURL } = require("node:url");
 const { chromium } = require("playwright");
-// Match the checked-out companion release to the playground's pinned CDN URLs.
-const codeVersion = require("node:fs")
-  .readFileSync(path.join(__dirname, "../../easy-code-viewer/code.js"), "utf8")
-  .match(/byCODEviewer\.VERSION = "([^"]+)"/)[1];
-const codeCDNBase = `https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v${codeVersion}/`;
+// Match the published companion pin, independently of newer sibling source.
+const codeCDNBase = require("node:fs")
+  .readFileSync(path.join(__dirname, "../index.html"), "utf8")
+  .match(/https:\/\/cdn\.jsdelivr\.net\/gh\/byuwur\/easy-code-viewer@v[\d.]+\//)[0];
 
 // Read the displayed source without line numbers or status text.
 const readStarter = async (page) => {
@@ -41,6 +40,16 @@ const getBootstrapCSS = () =>
     return response.text();
   })());
 
+const codeAssets = new Map();
+const getCodeAsset = (url) => {
+  if (!codeAssets.has(url)) codeAssets.set(url, (async () => {
+    const response = await fetch(url, { signal: AbortSignal.timeout(15000) });
+    assert.ok(response.ok, "Unable to load pinned CODE asset");
+    return { body: await response.text(), contentType: url.endsWith(".js") ? "text/javascript" : "text/css" };
+  })());
+  return codeAssets.get(url);
+};
+
 /* --- PLAYGROUND AND STARTER EXPORTS --- */
 test("displayed, copied, and downloaded starters match with CDN or local assets", async () => {
   const browser = await chromium.launch({ channel: process.env.BROWSER_CHANNEL || undefined, executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined });
@@ -61,8 +70,7 @@ test("displayed, copied, and downloaded starters match with CDN or local assets"
       if (route.request().url() === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
       const url = new URL(route.request().url());
       if ([`${codeCDNBase}code.min.css`, `${codeCDNBase}code.min.js`].includes(url.href)) {
-        const file = path.basename(url.pathname).replace(/\.min(?=\.(?:css|js)$)/, "");
-        return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
+        return route.fulfill(await getCodeAsset(url.href));
       }
       if (url.origin !== "https://viewer.test") return route.abort();
       const file = path.basename(url.pathname).replace(/\.min(?=\.(?:css|js)$)/, "");
@@ -279,8 +287,7 @@ test("family customization, navigation and monospace controls", async () => {
       if (route.request().url() === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
       const url = new URL(route.request().url());
       if ([`${codeCDNBase}code.min.css`, `${codeCDNBase}code.min.js`].includes(url.href)) {
-        const file = path.basename(url.pathname).replace(/\.min(?=\.(?:css|js)$)/, "");
-        return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
+        return route.fulfill(await getCodeAsset(url.href));
       }
       if (url.origin !== "https://viewer.test") return route.abort();
       const file = path.basename(url.pathname).replace(/\.min(?=\.(?:css|js)$)/, "");
@@ -557,8 +564,7 @@ test("playground palettes and editable two-mode custom themes stay synchronized"
       const url = new URL(route.request().url());
       if (url.href === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
       if ([`${codeCDNBase}code.min.css`, `${codeCDNBase}code.min.js`].includes(url.href)) {
-        const file = path.basename(url.pathname).replace(/\.min(?=\.(?:css|js)$)/, "");
-        return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
+        return route.fulfill(await getCodeAsset(url.href));
       }
       if (url.origin !== "https://viewer.test") return route.abort();
       const file = path.basename(url.pathname).replace(/\.min(?=\.(?:css|js)$)/, "");
@@ -677,8 +683,7 @@ test("playground code examples pin sibling releases and switch presentation with
       const url = new URL(route.request().url());
       if (url.href === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
       if ([`${codeCDNBase}code.min.css`, `${codeCDNBase}code.min.js`].includes(url.href)) {
-        const file = path.basename(url.pathname).replace(/\.min(?=\.(?:css|js)$)/, "");
-        return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
+        return route.fulfill(await getCodeAsset(url.href));
       }
       if (url.origin !== "https://viewer.test") return route.abort();
       const file = path.basename(url.pathname).replace(/\.min(?=\.(?:css|js)$)/, "");
