@@ -373,11 +373,17 @@
   font: 0.875rem/1.25 var(--by-view-controls-font, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace);
   white-space: normal;
 }
+.byMDdocument > .byVIEWtoolbar[data-size="xs"] {
+  font-size: 0.5rem;
+}
 .byMDdocument > .byVIEWtoolbar[data-size="small"] {
   font-size: 0.7rem;
 }
 .byMDdocument > .byVIEWtoolbar[data-size="large"] {
   font-size: 1rem;
+}
+.byMDdocument > .byVIEWtoolbar[data-size="xl"] {
+  font-size: 1.25rem;
 }
 .byMDdocument.byVIEWbottom {
   padding-top: 1rem;
