@@ -61,26 +61,27 @@ Exported HTML starters use default settings, independently of playground changes
 
 Pass options as the third argument, such as `byMDviewer(target, markdown, { breaks: true })`.
 
-| Option              | Default     | Meaning                                                                          |
-| ------------------- | ----------- | -------------------------------------------------------------------------------- |
-| `withLinks`         | `true`      | Render links, autolinks, bare URLs, and email addresses.                         |
-| `withImages`        | `true`      | Render supported images.                                                         |
-| `withTables`        | `true`      | Render GFM-style tables.                                                         |
-| `withTasks`         | `true`      | Render task checkboxes.                                                          |
-| `withStrikethrough` | `true`      | Render `~~strikethrough~~`.                                                      |
-| `codeHighlighting`  | `true`      | Highlight fenced code when easy-code-viewer is loaded; `false` keeps plain code. |
-| `codeLineNumbers`   | `false`     | Show a framed code block with a line-number gutter.                              |
-| `codeStatusBar`     | `false`     | Show a framed code block with its language and line count.                       |
-| `breaks`            | `false`     | Convert paragraph line breaks to `<br>`.                                         |
-| `linkTarget`        | `"_blank"`  | Link target; `false` omits it. Same-document anchors stay in this tab.           |
-| `toolbar`           | `true`      | Show the viewer header; secondary tools are configured separately.               |
-| `credits`           | `true`      | Show attribution in the header.                                                  |
-| `themeToggle`       | `true`      | Show the theme toggle.                                                           |
-| `fontSizeControls`  | `true`      | Show text-size controls.                                                         |
-| `copyButton`        | `true`      | Show Copy: click for rendered plain text; Shift+click for original Markdown.     |
-| `controlsSize`      | `"regular"` | `"small"`, `"regular"`, or `"large"`; invalid values use `"regular"`.            |
-| `controlsCompact`   | `true`      | Keep credits beside controls; `false` stacks them. Wraps as needed.              |
-| `controlsPosition`  | `"top"`     | Sticky `"top"` or `"bottom"` toolbar; invalid values use `"top"`.                |
+| Option              | Default     | Meaning                                                                                                              |
+| ------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------- |
+| `withLinks`         | `true`      | Render links, autolinks, bare URLs, and email addresses.                                                             |
+| `withImages`        | `true`      | Render supported images.                                                                                             |
+| `withTables`        | `true`      | Render GFM-style tables.                                                                                             |
+| `withTasks`         | `true`      | Render task checkboxes.                                                                                              |
+| `withStrikethrough` | `true`      | Render `~~strikethrough~~`.                                                                                          |
+| `codeHighlighting`  | `true`      | Highlight fenced code when easy-code-viewer is loaded; `false` keeps plain code.                                     |
+| `codeLineNumbers`   | `false`     | Show a framed code block with a line-number gutter.                                                                  |
+| `codeStatusBar`     | `false`     | Show a framed code block with its language and line count.                                                           |
+| `breaks`            | `false`     | Convert paragraph line breaks to `<br>`.                                                                             |
+| `linkTarget`        | `"_blank"`  | Link target; `false` omits it. Same-document anchors stay in this tab.                                               |
+| `animations`        | `true`      | Brief control/disclosure motion. `true` enables it and `false` disables it, overriding the system motion preference. |
+| `toolbar`           | `true`      | Show the viewer header; secondary tools are configured separately.                                                   |
+| `credits`           | `true`      | Show attribution in the header.                                                                                      |
+| `themeToggle`       | `true`      | Show the theme toggle.                                                                                               |
+| `fontSizeControls`  | `true`      | Show text-size controls.                                                                                             |
+| `copyButton`        | `true`      | Show Copy: click for rendered plain text; Shift+click for original Markdown.                                         |
+| `controlsSize`      | `"regular"` | `"small"`, `"regular"`, or `"large"`; invalid values use `"regular"`.                                                |
+| `controlsCompact`   | `true`      | Keep credits beside controls; `false` stacks them. Wraps as needed.                                                  |
+| `controlsPosition`  | `"top"`     | Sticky `"top"` or `"bottom"` toolbar; invalid values use `"top"`.                                                    |
 
 Plain-text copying preserves paragraph and code line breaks, excluding controls and credits. Copy requires clipboard permission in a secure context.
 
@@ -93,6 +94,8 @@ Use `toolbar: false` to hide the header, or disable `credits`, `themeToggle`, `f
 Controls use monospace by default; override `--by-view-controls-font` to change it.
 
 ## Themes
+
+Initial content appears immediately. Animations affect controls and deliberate show/hide actions; rows, tokens, and typing are not animated. Disclosure size/exit transitions progressively enhance browsers that support them.
 
 The outer document and inner surfaces have independent CSS backgrounds. Both follow the selected theme unless overridden. Set `--by-view-document-bg: #0000` to reveal the host page while keeping content panels and individual controls readable. `--by-view-container-bg` sets the shared background of those panels and controls; it also accepts alpha colors or `transparent`. The toolbar and credits have no background. These overrides survive theme changes.
 

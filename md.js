@@ -1489,6 +1489,7 @@
       copyButton: true,
       controlsSize: "regular",
       controlsCompact: true,
+      animations: true,
       controlsPosition: "top",
       ...options,
       [HEADING_IDS]: Object.create(null)
@@ -1496,6 +1497,7 @@
     // Clear the target safely.
     element.textContent = "";
     element.classList.add("byMDdocument");
+    element.classList.toggle("byVIEWmotion", options.animations !== false);
     // Normalize line endings and remove the BOM.
     const normalized = source.replace(/\r\n?/g, "\n").replace(/^\uFEFF/, "");
     const content = document.createElement("div");
