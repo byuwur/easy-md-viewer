@@ -349,7 +349,7 @@ test("Markdown rendering", async (t) => {
                   const themeFits =
                     [...toggle.children].every((icon) => {
                       const rect = icon.getBoundingClientRect();
-                      return rect.height > track.height * 0.65 && rect.top >= track.top + 1 && rect.bottom <= track.bottom - 1;
+                      return rect.height >= parseFloat(getComputedStyle(toggle).fontSize) && rect.top >= track.top + 1 && rect.bottom <= track.bottom - 1;
                     }) && parseFloat(getComputedStyle(toggle, "::after").width) > track.height * 0.72;
                   const fits =
                     root.scrollWidth <= root.clientWidth + 1 &&
@@ -1350,8 +1350,9 @@ test("viewer defaults, optional tools, and copy feedback", async () => {
                 const innerWidth = rect.width - parseFloat(style.borderLeftWidth) - parseFloat(style.borderRightWidth);
                 const innerHeight = rect.height - parseFloat(style.borderTopWidth) - parseFloat(style.borderBottomWidth);
                 const position = (value, extent) => (value.endsWith("%") ? (parseFloat(value) * extent) / 100 : parseFloat(value));
-                const centerX = rect.left + parseFloat(style.borderLeftWidth) + position(thumb.left, innerWidth);
-                const centerY = rect.top + parseFloat(style.borderTopWidth) + position(thumb.top, innerHeight);
+                const transform = new DOMMatrixReadOnly(thumb.transform);
+                const centerX = rect.left + parseFloat(style.borderLeftWidth) + position(thumb.left, innerWidth) + transform.m41 + parseFloat(thumb.width) / 2;
+                const centerY = rect.top + parseFloat(style.borderTopWidth) + position(thumb.top, innerHeight) + transform.m42 + parseFloat(thumb.height) / 2;
                 const icons = [...button.querySelectorAll("svg")];
                 const icon = icons[mode === "dark" ? 1 : 0].getBoundingClientRect();
                 return [Math.abs(centerX - icon.x - icon.width / 2), Math.abs(centerY - icon.y - icon.height / 2), Math.abs(centerY - rect.y - rect.height / 2)];
