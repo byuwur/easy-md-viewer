@@ -24,11 +24,26 @@
   const HEADING_IDS = Symbol("headingIds");
 
   /* --- APPEARANCE --- */
+  const extraPalettes = new Set(
+    "dracula darcula nord catppuccin catppuccin-frappe catppuccin-macchiato rose-pine rose-pine-moon gruvbox gruvbox-material tokyo-night tokyo-storm tokyo-moon one material material-ocean night-owl synthwave ayu everforest kanagawa selenized vscode monokai-dimmed discord slack bonyur sakura bubblegum candy rose-gold lavender cyberpunk sunset volcano amber terminal paper ink ocean forest mint ice sepia".split(
+      " "
+    )
+  );
+  const warnedPalettes = new Set();
+  const warnMissingThemes = (element, palette = element.dataset.theme) => {
+    if (!extraPalettes.has(palette) || warnedPalettes.has(palette)) return;
+    const document = element.ownerDocument;
+    if (document.defaultView.getComputedStyle(document.documentElement).getPropertyValue("--by-md-themes-loaded").trim() === "1") return;
+    warnedPalettes.add(palette);
+    console.warn(`easy-md-viewer: Palette "${palette}" requires md.themes.css. Import it after md.css. https://byuwur.github.io/easy-md-viewer/`);
+  };
+
   /** Explicit appearance options override markup; omitted values preserve the container's state. */
   const applyAppearance = (element, options) => {
     const { theme, palette, fontSize } = options;
     if (theme != null && !["light", "dark"].includes(theme)) throw new RangeError("Theme must be light or dark.");
     if (palette != null && (typeof palette !== "string" || !/^[a-z][\w-]*$/i.test(palette) || ["light", "dark"].includes(palette))) throw new RangeError("Palette must be a CSS theme name; use theme for light or dark.");
+    warnMissingThemes(element, palette ?? element.dataset.theme);
     const size = typeof fontSize === "number" ? `${Math.max(0.5, Math.min(3, fontSize))}rem` : typeof fontSize === "string" ? `clamp(0.5rem, ${fontSize}, 3rem)` : "";
     if (fontSize != null && (typeof fontSize === "number" ? !Number.isFinite(fontSize) : typeof fontSize !== "string" || !CSS.supports("font-size", size))) throw new RangeError("Font size must be a finite multiplier or a CSS size.");
     if (theme != null || palette != null) {
