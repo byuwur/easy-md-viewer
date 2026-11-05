@@ -242,18 +242,19 @@ Both line arguments must be strings or `scanLine()` throws `TypeError`. Omit `co
 
 Theme tests cover both modes, container isolation, legacy links, custom CSS, and High Contrast. Integration tests use the actual code viewer; check out `easy-code-viewer` beside this repository before running the full suite.
 
-Landing tests fetch the pinned Bootstrap stylesheet unless `BOOTSTRAP_CSS_PATH` points to a cached copy.
+Playground tests fetch the pinned Bootstrap stylesheet unless `BOOTSTRAP_CSS_PATH` points to a cached copy.
 
 Install Playwright outside the repository and set `NODE_PATH` to its `node_modules` directory:
 
 ```sh
 node --check md.js
-node --test tests/rendering.cjs
+node --test tests/rendering.cjs   # Library
+node --test tests/playground.cjs  # Playground
 ```
 
 `CHROMIUM_EXECUTABLE_PATH` selects a Chromium executable for every test. Otherwise, install Playwright Chromium; `BROWSER_CHANNEL=chrome` applies only to the suites that support it.
 
-[GitHub Actions](.github/workflows/rendering.yml) runs `tests/rendering.cjs` against local `md.js` in Chromium, including the benchmark and playground exports. For visual checks, serve `index.html` over HTTP and select `test.md` from the Document menu.
+[GitHub Actions](.github/workflows/rendering.yml) reports Library and Playground as independent jobs; a failed suite does not cancel the other. Library checks load the renderer directly; playground checks cover the landing page, configuration, and exports.
 
 ## The easy viewers
 
