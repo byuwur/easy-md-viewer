@@ -583,7 +583,7 @@ test("container themes are scoped, independent, and compatible with legacy links
     await page.evaluate(
       async (args) => {
         window.renderTheme = async (element) => {
-          const controller = window.byMDviewer(element, ...args);
+          const controller = window.byMDviewer(element, ...args.slice(0, 1), { ...args[1], animations: false });
           if (controller?.ready) await controller.ready;
         };
         for (const id of ["first", "second", "third"]) await renderTheme(document.getElementById(id));
@@ -1081,7 +1081,9 @@ test("optional code highlighting preserves Markdown and follows document themes"
     await t.test("all palettes, mode switches, and text sizing follow the Markdown container", async () => {
       await page.addStyleTag({ path: path.join(__dirname, "../md.themes.css") });
       await page.evaluate(() => renderMarkdown({ codeLineNumbers: true, codeStatusBar: true }));
-      const select = require("node:fs").readFileSync(path.join(__dirname, "../index.html"), "utf8").match(/<select id="preview-palette"[\s\S]*?<\/select>/)[0];
+      const select = require("node:fs")
+        .readFileSync(path.join(__dirname, "../index.html"), "utf8")
+        .match(/<select id="preview-palette"[\s\S]*?<\/select>/)[0];
       const names = [...select.matchAll(/<option value="([^"]+)"/g)].map((match) => match[1]).filter((name) => name !== "custom");
       for (const palette of names) {
         await page.locator("#viewer").evaluate((root, palette) => {
@@ -1233,8 +1235,8 @@ test("animation options preserve initial visibility and override system motion p
     await page.addStyleTag({ path: path.join(__dirname, "../md.css") });
     await page.addScriptTag({ path: path.join(__dirname, "../md.js") });
     await page.evaluate(() => {
-      window.renderMotion = async (animations) => {
-        window.motionController = byMDviewer(document.getElementById("motion-viewer"), "# Heading\n\nUseful text.", { animations });
+      window.renderMotion = async (animations, appearAnimation = false) => {
+        window.motionController = byMDviewer(document.getElementById("motion-viewer"), "# Heading\n\nUseful text.", { animations, appearAnimation });
         await motionController?.ready;
       };
     });
@@ -1283,6 +1285,42 @@ test("animation options preserve initial visibility and override system motion p
       "0s"
     );
     assert.equal(await root.evaluate((element) => element.getAnimations({ subtree: true }).length), 0);
+    await page.emulateMedia({ media: "screen", reducedMotion: "reduce" });
+    await page.evaluate(() => renderMotion(true));
+    await page.waitForFunction(() => document.getElementById("motion-viewer").classList.contains("byVIEWready"));
+    const fade = await root.evaluate((element) => {
+      const before = getComputedStyle(element).backgroundColor;
+      element.querySelector('[aria-label^="Switch to"]').click();
+      const transition = element.getAnimations().find((animation) => animation.transitionProperty === "background-color");
+      if (!transition) return { active: false };
+      transition.pause();
+      transition.currentTime = 90;
+      const middle = getComputedStyle(element).backgroundColor;
+      transition.finish();
+      return { active: true, before, middle, after: getComputedStyle(element).backgroundColor, fontTransition: getComputedStyle(element).transitionProperty.includes("font-size") };
+    });
+    assert.equal(fade.active, true, "Theme backgrounds fade after the first paint");
+    assert.notEqual(fade.middle, fade.before);
+    assert.notEqual(fade.middle, fade.after);
+    assert.equal(fade.fontTransition, false);
+    await root.evaluate((element) => {
+      element.dataset.theme = "high-contrast";
+    });
+    assert.equal(await root.evaluate((element) => element.getAnimations().filter((animation) => animation.transitionProperty === "background-color").length), 0);
+    const entrance = await page.evaluate(async () => {
+      await renderMotion(true, true);
+      const element = document.getElementById("motion-viewer");
+      const animation = element.getAnimations().find((animation) => animation.animationName === "byVIEWappear");
+      if (!animation) return { active: false };
+      animation.pause();
+      animation.currentTime = 90;
+      return { active: true, opacity: Number(getComputedStyle(element).opacity), content: element.textContent.length };
+    });
+    assert.equal(entrance.active, true, "Entrance motion is explicit even when the system requests reduced motion");
+    assert.ok(entrance.opacity > 0 && entrance.opacity < 1);
+    assert.ok(entrance.content > 0, "Rendering completes without waiting for the animation");
+    await page.evaluate(() => renderMotion(false, true));
+    assert.equal(await root.evaluate((element) => element.getAnimations({ subtree: true }).length), 0, "Animations off overrides the requested entrance");
   } finally {
     await browser.close();
   }

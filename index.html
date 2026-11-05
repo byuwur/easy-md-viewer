@@ -840,6 +840,7 @@ Write Markdown here…"></textarea>
             example: "controls"
           },
           { name: "animations", label: "Animations", description: "Brief interaction motion; overrides the system motion preference", default: true, group: "viewer", example: "controls" },
+          { name: "appearAnimation", label: "Appearing animation", description: "Fade in on appearance when Animations is enabled", default: false, group: "viewer", example: "controls" },
           { name: "withLinks", label: "Links", description: "Links, URLs & email addresses", default: true, example: "links" },
           { name: "withImages", label: "Images", description: "Responsive, lazy-loaded images", default: true, example: "images" },
           { name: "withTables", label: "Tables", description: "Columns & text alignment", default: true, example: "tables" },
@@ -1206,7 +1207,8 @@ Write Markdown here…"></textarea>
             <html lang="en">
               <head>
                 <base href="${base}" />
-                <link rel="stylesheet" href="md.css" /><link rel="stylesheet" href="md.themes.css" />
+                <link rel="stylesheet" href="md.css" />
+                <link rel="stylesheet" href="md.themes.css" />
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v1.5/code.css" />
                 <style>
                   body {
@@ -1264,7 +1266,7 @@ Write Markdown here…"></textarea>
         // --- INTEGRATION ---
         function settingsJSON(options) {
           const field = (id) => (id === "preview-controls-font" ? document.querySelector('[name="preview-controls-font"]:checked')?.value : document.getElementById(id)?.value) || null;
-          const { forceMonospace, toolbar, credits, themeToggle, fontSizeControls, copyButton, controlsCompact, animations, controlsSize, controlsPosition, ...rendering } = options;
+          const { forceMonospace, toolbar, credits, themeToggle, fontSizeControls, copyButton, controlsCompact, animations, appearAnimation, controlsSize, controlsPosition, ...rendering } = options;
           return JSON.stringify(
             {
               theme: document.querySelector('[name="previewTheme"]:checked').value,
@@ -1285,6 +1287,7 @@ Write Markdown here…"></textarea>
               copyButton,
               controlsCompact,
               animations,
+              appearAnimation,
               controlsSize,
               controlsPosition,
               ...rendering
@@ -1312,6 +1315,8 @@ Write Markdown here…"></textarea>
 
         function generateIntegration() {
           document.body.classList.toggle("byVIEWmotion", state.options.animations !== false);
+          for (const control of document.querySelectorAll('#credits, #themeToggle, #fontSizeControls, #copyButton, #controlsCompact, [name="controlsSize"], [name="controlsPosition"]')) control.disabled = state.options.toolbar === false;
+          document.getElementById("appearAnimation").disabled = state.options.animations === false;
           document.getElementById("options-json").value = settingsJSON(state.options);
           const cdn = state.integrationMode === "cdn";
           const path = cdn ? "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@latest/" : "";

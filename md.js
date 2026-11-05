@@ -1529,6 +1529,7 @@
       controlsSize: "regular",
       controlsCompact: true,
       animations: true,
+      appearAnimation: false,
       controlsPosition: "top",
       ...options,
       [HEADING_IDS]: Object.create(null)
@@ -1538,6 +1539,14 @@
     element.textContent = "";
     element.classList.add("byMDdocument");
     element.classList.toggle("byVIEWmotion", options.animations !== false);
+    element.classList.toggle("byVIEWappear", options.animations !== false && options.appearAnimation === true);
+    if (!element.classList.contains("byVIEWready")) {
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          if (element.classList.contains("byMDdocument")) element.classList.add("byVIEWready");
+        })
+      );
+    }
     // Normalize line endings and remove the BOM.
     const normalized = source.replace(/\r\n?/g, "\n").replace(/^\uFEFF/, "");
     const content = document.createElement("div");

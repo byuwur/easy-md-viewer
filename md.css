@@ -392,12 +392,30 @@
 }
 
 /* --- MOTION --- */
-/* Initial document content is immediate; motion belongs to controls and disclosures. */
+/* Initial content is immediate unless the entrance animation is explicitly enabled. */
 .byMDdocument {
   --by-view-motion-duration: 0s;
 }
 .byMDdocument.byVIEWmotion {
   --by-view-motion-duration: 0.18s;
+}
+/* Background fades stay on shared surfaces, never individual rows or syntax tokens. */
+.byMDdocument.byVIEWready,
+.byMDdocument :is(.byVIEWpanel, .byVIEWstatus) {
+  transition: background-color var(--by-view-motion-duration, 0s) ease;
+}
+.byMDdocument.byVIEWmotion.byVIEWappear {
+  animation: byVIEWappear var(--by-view-motion-duration) ease-out;
+}
+@keyframes byVIEWappear {
+  from {
+    opacity: 0;
+    translate: 0 0.25rem;
+  }
+  to {
+    opacity: 1;
+    translate: 0;
+  }
 }
 .byMDdocument :is(button, input, select, textarea, summary, a) {
   transition:
@@ -435,10 +453,18 @@
 }
 
 /* High Contrast switches colors immediately so intermediate colors cannot lose contrast. */
+.byMDdocument[data-theme="high-contrast"],
+.byMDdocument[data-theme="high-contrast"] :is(.byVIEWpanel, .byVIEWstatus) {
+  transition: none;
+}
 .byMDdocument[data-theme="high-contrast"] :is(button, input, select, textarea, summary, a) {
   transition-property: opacity, translate;
 }
 @media (forced-colors: active) {
+  .byMDdocument,
+  .byMDdocument :is(.byVIEWpanel, .byVIEWstatus) {
+    transition: none;
+  }
   .byMDdocument :is(button, input, select, textarea, summary, a) {
     transition-property: opacity, translate;
   }
