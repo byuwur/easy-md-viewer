@@ -60,12 +60,12 @@ test("displayed, copied, and downloaded starters match with CDN or local assets"
     await playground.route("**/*", async (route) => {
       if (route.request().url() === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
       const url = new URL(route.request().url());
-      if ([`${codeCDNBase}code.css`, `${codeCDNBase}code.js`].includes(url.href)) {
-        const file = path.basename(url.pathname);
+      if ([`${codeCDNBase}code.min.css`, `${codeCDNBase}code.min.js`].includes(url.href)) {
+        const file = path.basename(url.pathname).replace(/\.min(?=\.(?:css|js)$)/, "");
         return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
       }
       if (url.origin !== "https://viewer.test") return route.abort();
-      const file = path.basename(url.pathname);
+      const file = path.basename(url.pathname).replace(/\.min(?=\.(?:css|js)$)/, "");
       if (/^md\.(light|dark)\.css$/.test(file)) return route.fulfill({ body: legacyThemeCSS(file.includes(".dark.css") ? "dark" : "light"), contentType: "text/css" });
       const body = await fs.readFile(path.join(__dirname, "..", file));
       await route.fulfill({ body, contentType: file.endsWith(".html") ? "text/html" : file.endsWith(".js") ? "text/javascript" : "text/css" });
@@ -106,14 +106,14 @@ test("displayed, copied, and downloaded starters match with CDN or local assets"
     );
     await playground.locator("#site-theme").click();
     const readme = require("node:fs").readFileSync(path.join(__dirname, "../README.md"), "utf8");
-    for (const extension of ["css", "js"]) assert.ok(readme.includes(`${cdnBase}md.${extension}`), "README assets must match the CDN starter");
+    for (const extension of ["css", "js"]) assert.ok(readme.includes(`${cdnBase}md.min.${extension}`), "README assets must match the CDN starter");
     assert.equal(await playground.locator("#integration-note").textContent(), "CDN follows the latest release; updates may take time to reach caches.");
-    assert.ok((await readStarter(playground)).includes(`href="${cdnBase}md.css"`));
+    assert.ok((await readStarter(playground)).includes(`href="${cdnBase}md.min.css"`));
     const codeRelease = await playground
       .frameLocator("#preview-frame")
       .locator(".byVIEWtoolbar")
       .evaluate(() => byCODEviewer.VERSION);
-    for (const extension of ["css", "js"]) assert.ok(readme.includes(`easy-code-viewer@latest/code.${extension}`), "Markdown highlighting docs must use latest");
+    for (const extension of ["css", "js"]) assert.ok(readme.includes(`easy-code-viewer@latest/code.min.${extension}`), "Markdown highlighting docs must use latest");
     const workflow = require("node:fs").readFileSync(path.join(__dirname, "../.github/workflows/rendering.yml"), "utf8");
     assert.ok(workflow.includes(`ref: v${codeRelease}`), "CI must test the same CODE release as the playground");
     assert.match(codeRelease, /^\d+(?:\.\d+)*$/);
@@ -201,7 +201,7 @@ test("displayed, copied, and downloaded starters match with CDN or local assets"
     const exported = await browser.newPage();
     exported.on("pageerror", (error) => errors.push(error.message));
     await exported.route("https://cdn.jsdelivr.net/**", async (route) => {
-      const file = path.basename(new URL(route.request().url()).pathname);
+      const file = path.basename(new URL(route.request().url()).pathname).replace(/\.min(?=\.(?:css|js)$)/, "");
       const body = await fs.readFile(path.join(__dirname, "..", file));
       if (file.endsWith(".js")) await new Promise((resolve) => setTimeout(resolve, 75));
       await route.fulfill({ body, contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
@@ -232,7 +232,8 @@ test("displayed, copied, and downloaded starters match with CDN or local assets"
         assert.equal(await exported.locator("#document").getAttribute("data-theme"), "light");
         assert.equal(await exported.locator("#byVIEWtheme").count(), 0);
         assert.equal(await exported.locator('head link[rel="stylesheet"]').count(), 1);
-        assert.doesNotMatch(html, /\.(light|dark)\.css|\.min\.(css|js)/);
+        assert.doesNotMatch(html, /\.(light|dark)\.css/);
+        for (const extension of ["css", "js"]) assert.ok(html.includes(`md${mode === "cdn" ? ".min" : ""}.${extension}`));
         const background = await exported.locator("#document").evaluate((element) => getComputedStyle(element).backgroundColor);
         await exported.locator(".byVIEWthemeToggle").click();
         await exported.waitForFunction((before) => getComputedStyle(document.getElementById("document")).backgroundColor !== before, background);
@@ -277,12 +278,12 @@ test("family customization, navigation and monospace controls", async () => {
     await page.route("**/*", async (route) => {
       if (route.request().url() === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
       const url = new URL(route.request().url());
-      if ([`${codeCDNBase}code.css`, `${codeCDNBase}code.js`].includes(url.href)) {
-        const file = path.basename(url.pathname);
+      if ([`${codeCDNBase}code.min.css`, `${codeCDNBase}code.min.js`].includes(url.href)) {
+        const file = path.basename(url.pathname).replace(/\.min(?=\.(?:css|js)$)/, "");
         return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
       }
       if (url.origin !== "https://viewer.test") return route.abort();
-      const file = path.basename(url.pathname);
+      const file = path.basename(url.pathname).replace(/\.min(?=\.(?:css|js)$)/, "");
       if (/^md\.(light|dark)\.css$/.test(file)) return route.fulfill({ body: legacyThemeCSS(file.includes(".dark.css") ? "dark" : "light"), contentType: "text/css" });
       return route.fulfill({ path: path.join(__dirname, "..", file), contentType: file.endsWith(".html") ? "text/html" : file.endsWith(".js") ? "text/javascript" : "text/css" });
     });
@@ -555,12 +556,12 @@ test("playground palettes and editable two-mode custom themes stay synchronized"
     await page.route("**/*", async (route) => {
       const url = new URL(route.request().url());
       if (url.href === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
-      if ([`${codeCDNBase}code.css`, `${codeCDNBase}code.js`].includes(url.href)) {
-        const file = path.basename(url.pathname);
+      if ([`${codeCDNBase}code.min.css`, `${codeCDNBase}code.min.js`].includes(url.href)) {
+        const file = path.basename(url.pathname).replace(/\.min(?=\.(?:css|js)$)/, "");
         return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
       }
       if (url.origin !== "https://viewer.test") return route.abort();
-      const file = path.basename(url.pathname);
+      const file = path.basename(url.pathname).replace(/\.min(?=\.(?:css|js)$)/, "");
       return route.fulfill({ path: path.join(__dirname, "..", file), contentType: file.endsWith(".html") ? "text/html" : file.endsWith(".js") ? "text/javascript" : "text/css" });
     });
     await page.goto("https://viewer.test/index.html");
@@ -569,7 +570,11 @@ test("playground palettes and editable two-mode custom themes stay synchronized"
     const root = frame.locator(".byMDdocument");
     const editor = page.locator("#custom-theme-css");
     const palette = page.locator("#preview-palette");
-    const background = () => root.evaluate((element) => { for (const animation of element.getAnimations()) if (animation.transitionProperty === "background-color") animation.finish(); return getComputedStyle(element).backgroundColor; });
+    const background = () =>
+      root.evaluate((element) => {
+        for (const animation of element.getAnimations()) if (animation.transitionProperty === "background-color") animation.finish();
+        return getComputedStyle(element).backgroundColor;
+      });
     const headerSettings = page.locator('#credits, #themeToggle, #fontSizeControls, #copyButton, #controlsCompact, [name="controlsSize"], [name="controlsPosition"]');
     const selectedSettings = await headerSettings.evaluateAll((controls) => controls.map((control) => [control.value, control.checked]));
     await page.locator("#toolbar").uncheck();
@@ -671,12 +676,12 @@ test("playground code examples pin sibling releases and switch presentation with
     await page.route("**/*", async (route) => {
       const url = new URL(route.request().url());
       if (url.href === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
-      if ([`${codeCDNBase}code.css`, `${codeCDNBase}code.js`].includes(url.href)) {
-        const file = path.basename(url.pathname);
+      if ([`${codeCDNBase}code.min.css`, `${codeCDNBase}code.min.js`].includes(url.href)) {
+        const file = path.basename(url.pathname).replace(/\.min(?=\.(?:css|js)$)/, "");
         return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
       }
       if (url.origin !== "https://viewer.test") return route.abort();
-      const file = path.basename(url.pathname);
+      const file = path.basename(url.pathname).replace(/\.min(?=\.(?:css|js)$)/, "");
       return route.fulfill({ path: path.join(__dirname, "..", file), contentType: file.endsWith(".html") ? "text/html" : file.endsWith(".js") ? "text/javascript" : "text/css" });
     });
     await page.goto("https://viewer.test/index.html");
@@ -684,8 +689,8 @@ test("playground code examples pin sibling releases and switch presentation with
     const frame = page.frameLocator("#preview-frame");
     await frame.locator(".byCODEkeyword").first().waitFor();
     assert.deepEqual(await frame.locator('head [href*="easy-code-viewer"], head [src*="easy-code-viewer"]').evaluateAll((assets) => assets.map((asset) => asset.href || asset.src).sort()), [
-      `${codeCDNBase}code.css`,
-      `${codeCDNBase}code.js`
+      `${codeCDNBase}code.min.css`,
+      `${codeCDNBase}code.min.js`
     ]);
     const markdown = await page.locator("#markdown-source").inputValue();
     assert.equal(await frame.locator(".byCODEhighlight").count(), 2);

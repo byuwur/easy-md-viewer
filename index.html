@@ -28,7 +28,7 @@
     <meta name="twitter:description" content="Render Markdown with tables, checklists, safe links, code highlighting, and themes. A free, lightweight JavaScript Markdown viewer by BONYUR." />
     <meta name="twitter:image" content="https://byuwur.github.io/easy-md-viewer/prev.jpg" />
     <meta name="twitter:image:alt" content="easy-md-viewer by BONYUR: Markdown playground, options, source editor, and live preview." />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/shards.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/shards.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/pickr.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/fontawesome.min.css" />
@@ -36,8 +36,8 @@
     <script src="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/js/popper.min.js" defer=""></script>
     <script src="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/js/bootstrap.min.js" defer=""></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/animate.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v1.5/code.css" />
-    <script src="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v1.5/code.js" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v1.5/code.min.css" />
+    <script src="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v1.5/code.min.js" defer></script>
   </head>
 
   <body class="byVIEWmotion">
@@ -1209,7 +1209,7 @@ Write Markdown here…"></textarea>
                 <base href="${base}" />
                 <link rel="stylesheet" href="md.css" />
                 <link rel="stylesheet" href="md.themes.css" />
-                <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v1.5/code.css" />
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v1.5/code.min.css" />
                 <style>
                   body {
                     margin: 0;
@@ -1218,7 +1218,7 @@ Write Markdown here…"></textarea>
                     min-height: 100vh;
                   }
                 </style>
-                ${'<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v1.5/code.js"><\/script>'} ${'<script src="md.js"><\/script>'}
+                ${'<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v1.5/code.min.js"><\/script>'} ${'<script src="md.js"><\/script>'}
               </head>
               <body>
                 <main id="document" data-theme="light" aria-label="Rendered Markdown"></main>
@@ -1319,6 +1319,7 @@ Write Markdown here…"></textarea>
           document.getElementById("appearAnimation").disabled = state.options.animations === false;
           document.getElementById("options-json").value = settingsJSON(state.options);
           const cdn = state.integrationMode === "cdn";
+          const min = cdn ? ".min" : "";
           const path = cdn ? "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@latest/" : "";
           const endScript = "</" + "script>";
           // Explicit lines preserve export indentation when the page is formatted.
@@ -1329,8 +1330,8 @@ Write Markdown here…"></textarea>
             '    <meta charset="utf-8" />',
             '    <meta name="viewport" content="width=device-width, initial-scale=1" />',
             "    <title>easy-md-viewer</title>",
-            `    <link rel="stylesheet" href="${path}md.css" />`,
-            `    <script src="${path}md.js" defer>${endScript}`,
+            `    <link rel="stylesheet" href="${path}md${min}.css" />`,
+            `    <script src="${path}md${min}.js" defer>${endScript}`,
             "  </head>",
             "  <body>",
             '    <div id="document" data-theme="light"></div>',
@@ -1656,7 +1657,11 @@ Write Markdown here…"></textarea>
           const loadPalette = () => {
             clearTimeout(themeTimer);
             if (!target()) return;
-            if (!["monokai", "github", "solarized", "high-contrast", "custom"].includes(palette.value) && !themesWarned && frame.contentWindow.getComputedStyle(frame.contentDocument.documentElement).getPropertyValue("--by-md-themes-loaded").trim() !== "1") {
+            if (
+              !["monokai", "github", "solarized", "high-contrast", "custom"].includes(palette.value) &&
+              !themesWarned &&
+              frame.contentWindow.getComputedStyle(frame.contentDocument.documentElement).getPropertyValue("--by-md-themes-loaded").trim() !== "1"
+            ) {
               themesWarned = true;
               console.warn(`easy-md-viewer: Import md.themes.css after md.css to use "${palette.value}".`);
             }
