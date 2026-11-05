@@ -17,6 +17,12 @@ const codeVersion = require("node:fs")
   .match(/byCODEviewer\.VERSION = "([^"]+)"/)[1];
 const codeCDNBase = `https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v${codeVersion}/`;
 
+// Read the displayed source without line numbers or status text.
+const readStarter = async (page) => {
+  await page.locator('#integration-code[aria-busy="false"]').waitFor();
+  return (await page.locator("#integration-code .byCODEtext").allTextContents()).join("\n");
+};
+
 /* --- THEME FIXTURES --- */
 // Caller-provided legacy stylesheets reuse the canonical palettes without distribution files.
 const legacyThemeCSS = (theme) => {
@@ -71,10 +77,38 @@ test("displayed, copied, and downloaded starters match with CDN or local assets"
       .evaluate(() => byMDviewer.VERSION);
     assert.ok((await playground.frameLocator("#preview-frame").locator(".byVIEWinfo").textContent()).includes(` v${release} `), "Credits must match the runtime release");
     const cdnBase = "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@latest/";
+    const starterViewer = playground.locator("#integration-code.byCODEdocument");
+    assert.equal(await playground.evaluate(() => byCODEviewer.VERSION), "1.5");
+    assert.equal(await starterViewer.getAttribute("data-theme"), "dark");
+    await starterViewer.locator(".byCODEtext").first().waitFor();
+    assert.ok((await starterViewer.locator(".byCODElineNumber").count()) > 0);
+    assert.equal(await starterViewer.locator(".byVIEWtoolbar, button, input, select").count(), 0);
+    assert.equal(await starterViewer.locator(".byVIEWstatus:visible").count(), 0);
+    assert.deepEqual(await starterViewer.evaluate((element) => [element, element.querySelector(".byVIEWpanel"), element.querySelector(".byCODElineNumber")].map((node) => getComputedStyle(node).backgroundColor)), [
+      "rgba(0, 0, 0, 0)",
+      "rgba(0, 0, 0, 0)",
+      "rgba(0, 0, 0, 0)"
+    ]);
+    assert.ok((await starterViewer.locator(".byCODEtag").count()) > 0);
+    assert.equal(await playground.locator("#integration-code script").count(), 0);
+    const starterTagColor = await starterViewer
+      .locator(".byCODEtag")
+      .first()
+      .evaluate((token) => getComputedStyle(token).color);
+    await playground.locator("#site-theme").click();
+    assert.equal(await starterViewer.getAttribute("data-theme"), "light");
+    assert.notEqual(
+      await starterViewer
+        .locator(".byCODEtag")
+        .first()
+        .evaluate((token) => getComputedStyle(token).color),
+      starterTagColor
+    );
+    await playground.locator("#site-theme").click();
     const readme = require("node:fs").readFileSync(path.join(__dirname, "../README.md"), "utf8");
     for (const extension of ["css", "js"]) assert.ok(readme.includes(`${cdnBase}md.${extension}`), "README assets must match the CDN starter");
     assert.equal(await playground.locator("#integration-note").textContent(), "CDN follows the latest release; updates may take time to reach caches.");
-    assert.ok((await playground.locator("#integration-code").inputValue()).includes(`href="${cdnBase}md.css"`));
+    assert.ok((await readStarter(playground)).includes(`href="${cdnBase}md.css"`));
     const codeRelease = await playground
       .frameLocator("#preview-frame")
       .locator(".byVIEWtoolbar")
@@ -85,7 +119,7 @@ test("displayed, copied, and downloaded starters match with CDN or local assets"
     assert.match(codeRelease, /^\d+(?:\.\d+)*$/);
     assert.equal(await playground.locator("#integration-cdn").isChecked(), true);
     await playground.locator('label[for="integration-cdn"]').click();
-    const cdnCode = await playground.locator("#integration-code").inputValue();
+    const cdnCode = await readStarter(playground);
     assert.ok(cdnCode.includes(cdnBase));
     const renderer = playground.frameLocator("#preview-frame").locator("#document");
     await renderer.locator(".byVIEWtoolbar").waitFor();
@@ -141,15 +175,15 @@ test("displayed, copied, and downloaded starters match with CDN or local assets"
     assert.equal(await playground.locator("#controlsSize-regular").isChecked(), true);
     assert.equal(await playground.locator("#controlsCompact").isChecked(), true);
     assert.equal(await playground.locator("#controlsPosition-top").isChecked(), true);
-    assert.equal(await playground.locator("#integration-code").inputValue(), cdnCode);
+    assert.equal(await readStarter(playground), cdnCode);
     const markdown = "# Downloaded document\n\n**Unicode: á 👋**\n\n</script><script>window.injected=true</script>\n\n`backticks` and ${literal}";
     await playground.locator("#markdown-source").fill(markdown);
     await playground.locator("#withLinks").uncheck();
     await playground.locator('label[for="preview-dark"]').click();
     assert.equal(await renderer.locator(".byVIEWthemeToggle svg").count(), 2);
-    assert.equal(await playground.locator("#integration-code").inputValue(), cdnCode);
+    assert.equal(await readStarter(playground), cdnCode);
     await playground.locator('label[for="integration-local"]').click();
-    const code = await playground.locator("#integration-code").inputValue();
+    const code = await readStarter(playground);
     assert.ok(code.includes('document.addEventListener("DOMContentLoaded"'));
     assert.ok(!code.includes('"withLinks": false'));
     assert.ok(code.includes('src="md.js" defer'));
@@ -173,7 +207,7 @@ test("displayed, copied, and downloaded starters match with CDN or local assets"
       for (const mode of ["cdn", "local"]) {
         await playground.locator("#markdown-source").fill("# Edited document\n\nThis should not change the starter.");
         await playground.locator(`label[for="integration-${mode}"]`).click();
-        const displayed = await playground.locator("#integration-code").inputValue();
+        const displayed = await readStarter(playground);
         assert.equal(displayed, mode === "cdn" ? cdnCode : code);
         await playground.locator("#copy-integration").click();
         assert.equal(await playground.evaluate(() => window.copiedHTML), displayed);
@@ -210,7 +244,7 @@ test("displayed, copied, and downloaded starters match with CDN or local assets"
     await playground.waitForFunction(() => document.getElementById("render-status").textContent === "Source unavailable");
     assert.equal(await playground.locator("#copy-integration").isDisabled(), false);
     assert.equal(await playground.locator("#download-html").isDisabled(), false);
-    assert.equal(await playground.locator("#integration-code").inputValue(), code);
+    assert.equal(await readStarter(playground), code);
     await playground.locator("#copy-integration").click();
     assert.equal(await playground.evaluate(() => window.copiedHTML), code);
     assert.deepEqual(errors, []);

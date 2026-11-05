@@ -36,6 +36,8 @@
     <script src="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/js/popper.min.js" defer=""></script>
     <script src="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/js/bootstrap.min.js" defer=""></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/animate.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v1.5/code.css" />
+    <script src="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v1.5/code.js" defer></script>
   </head>
 
   <body class="byVIEWmotion">
@@ -312,8 +314,8 @@ Write Markdown here…"></textarea>
           ></a>
         </div>
         <div class="col-lg-9">
-          <div class="code-box bg-body-tertiary border">
-            <div class="code-toolbar px-4 py-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2">
+          <div class="code-box border">
+            <div class="code-toolbar bg-body-tertiary px-4 py-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2">
               <fieldset class="m-0">
                 <legend class="visually-hidden">Integration assets</legend>
                 <div class="btn-group" role="group" aria-label="Integration assets">
@@ -328,13 +330,7 @@ Write Markdown here…"></textarea>
                 <button id="download-html" class="btn btn-accent btn-sm px-3 fw-semibold" type="button"><i class="fa-solid fa-download me-1" aria-hidden="true"></i> Download HTML</button>
               </div>
             </div>
-            <textarea
-              id="integration-code"
-              class="integration-code m-0 form-control font-monospace d-block w-100 border-0 px-4 py-3 overflow-auto bg-body"
-              readonly=""
-              spellcheck="false"
-              wrap="soft"
-              aria-label="Complete HTML integration"></textarea>
+            <div id="integration-code" class="integration-code m-0 font-monospace d-block w-100 px-4 py-3 overflow-auto" data-theme="dark" tabindex="0" role="region" aria-label="Complete HTML integration"></div>
             <p id="integration-feedback" class="small text-body-secondary mx-4 my-0" role="status" aria-live="polite"></p>
           </div>
         </div>
@@ -587,9 +583,19 @@ Write Markdown here…"></textarea>
         outline-offset: -0.125rem;
       }
       .integration-code {
+        --by-view-document-bg: #0000;
+        --by-view-container-bg: #0000;
+        border: 0;
+        border-radius: 0;
         height: 28rem;
         white-space: pre-wrap;
         overflow-wrap: anywhere;
+      }
+      .integration-code > .byVIEWcontent:first-child {
+        padding-top: 0;
+      }
+      .integration-code .byCODElineNumber {
+        background: #0000;
       }
       .accordion {
         --bs-accordion-bg: var(--bs-tertiary-bg);
@@ -1234,6 +1240,22 @@ Write Markdown here…"></textarea>
           );
         }
 
+        let integrationHTML = "";
+        function renderIntegration(html) {
+          if (html === integrationHTML) return;
+          integrationHTML = html;
+          const code = document.getElementById("integration-code");
+          if (typeof window.byCODEviewer === "function") {
+            byCODEviewer(code, html, {
+              language: "html",
+              theme: document.documentElement.dataset.bsTheme,
+              fontSize: 1,
+              toolbar: false,
+              displayContainer: false
+            });
+          } else code.textContent = html;
+        }
+
         function generateIntegration() {
           document.body.classList.toggle("byVIEWmotion", state.options.animations !== false);
           document.getElementById("options-json").value = settingsJSON(state.options);
@@ -1256,7 +1278,7 @@ Write Markdown here…"></textarea>
               </body>
             </html>
           `);
-          document.getElementById("integration-code").value = html;
+          renderIntegration(html);
           document.getElementById("integration-note").textContent = cdn ? "CDN follows the latest release; updates may take time to reach caches." : "Place the HTML beside md.js and md.css.";
           return html;
         }
@@ -1283,7 +1305,8 @@ Write Markdown here…"></textarea>
             button.removeAttribute("title");
           } catch {
             selectable.focus();
-            selectable.select();
+            if (typeof selectable.select === "function") selectable.select();
+            else document.getSelection()?.selectAllChildren(selectable);
             caption.textContent = "Failed";
             button.title = "Clipboard unavailable. Press Ctrl+C or ⌘C to copy the selected text.";
           }
@@ -1405,7 +1428,7 @@ Write Markdown here…"></textarea>
         document.getElementById("copy-integration").addEventListener("click", (event) => {
           generateIntegration();
           const code = document.getElementById("integration-code");
-          copyText(code.value, code, event.currentTarget);
+          copyText(integrationHTML, code, event.currentTarget);
         });
         document.getElementById("download-html").addEventListener("click", downloadHTML);
         document.getElementById("site-theme").addEventListener("click", (event) => {
@@ -1417,6 +1440,7 @@ Write Markdown here…"></textarea>
           button.querySelector("i").className = `fa-solid fa-${next === "light" ? "sun" : "moon"} me-1`;
           button.setAttribute("aria-label", `Switch website to ${next} theme`);
           document.querySelector('meta[name="theme-color"]').content = getComputedStyle(document.documentElement).getPropertyValue("--bs-body-bg").trim();
+          document.getElementById("integration-code").dataset.theme = document.documentElement.dataset.bsTheme;
         });
         // --- INITIALIZATION ---
         document.getElementById("year-txt").textContent = new Date().getFullYear();
