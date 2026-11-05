@@ -12,7 +12,7 @@
   if (global.byMDviewer?.initialized) return;
 
   /* --- METADATA --- */
-  byMDviewer.VERSION = "2.4"; // 2026-11-04
+  byMDviewer.VERSION = "2.5"; // 2026-11-04
 
   /* --- CONSTANTS --- */
   const ESCAPABLE = /[\\`*{}\[\]()#+\-.!_>~|]/;

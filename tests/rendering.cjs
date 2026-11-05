@@ -21,7 +21,7 @@ let bootstrapCSS;
 const getBootstrapCSS = () =>
   (bootstrapCSS ??= (async () => {
     if (process.env.BOOTSTRAP_CSS_PATH) return require("node:fs/promises").readFile(process.env.BOOTSTRAP_CSS_PATH, "utf8");
-    const response = await fetch("https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/css/bootstrap.min.css");
+    const response = await fetch("https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/bootstrap.min.css");
     assert.ok(response.ok, "Unable to load pinned Bootstrap CSS");
     return response.text();
   })());
@@ -584,7 +584,7 @@ test("Markdown rendering", async (t) => {
         });
       });
       await playground.route("**/*", async (route) => {
-        if (route.request().url() === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
+        if (route.request().url() === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
         const url = new URL(route.request().url());
         if ([`${codeCDNBase}code.css`, `${codeCDNBase}code.js`].includes(url.href)) {
           const file = path.basename(url.pathname);
@@ -770,7 +770,7 @@ test("family customization, navigation and monospace controls", async () => {
       })
     );
     await page.route("**/*", async (route) => {
-      if (route.request().url() === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
+      if (route.request().url() === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
       const url = new URL(route.request().url());
       if ([`${codeCDNBase}code.css`, `${codeCDNBase}code.js`].includes(url.href)) {
         const file = path.basename(url.pathname);
@@ -1227,7 +1227,7 @@ test("playground palettes and editable two-mode custom themes stay synchronized"
     );
     await page.route("**/*", async (route) => {
       const url = new URL(route.request().url());
-      if (url.href === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
+      if (url.href === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
       if ([`${codeCDNBase}code.css`, `${codeCDNBase}code.js`].includes(url.href)) {
         const file = path.basename(url.pathname);
         return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
@@ -1625,7 +1625,7 @@ test("playground code examples pin sibling releases and switch presentation with
     const page = await browser.newPage();
     await page.route("**/*", async (route) => {
       const url = new URL(route.request().url());
-      if (url.href === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.6/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
+      if (url.href === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
       if ([`${codeCDNBase}code.css`, `${codeCDNBase}code.js`].includes(url.href)) {
         const file = path.basename(url.pathname);
         return route.fulfill({ path: path.join(__dirname, "../../easy-code-viewer", file), contentType: file.endsWith(".js") ? "text/javascript" : "text/css" });
