@@ -120,6 +120,9 @@ test("displayed, copied, and downloaded starters match with CDN or local assets"
     assert.equal(await playground.locator("#integration-cdn").isChecked(), true);
     await playground.locator('label[for="integration-cdn"]').click();
     const cdnCode = await readStarter(playground);
+    assert.match(cdnCode, /^ {2}<head>$/m);
+    assert.match(cdnCode, /^ {4}<script>$/m);
+    assert.match(cdnCode, /^ {6}document\.addEventListener\("DOMContentLoaded", \(\) => \{$/m);
     assert.ok(cdnCode.includes(cdnBase));
     const renderer = playground.frameLocator("#preview-frame").locator("#document");
     await renderer.locator(".byVIEWtoolbar").waitFor();

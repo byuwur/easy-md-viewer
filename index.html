@@ -1261,23 +1261,29 @@ Write Markdown here…"></textarea>
           document.getElementById("options-json").value = settingsJSON(state.options);
           const cdn = state.integrationMode === "cdn";
           const path = cdn ? "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@latest/" : "";
-          const html = dedent(/* HTML */ `
-            <!doctype html>
-            <html lang="en">
-              <head>
-                <meta charset="utf-8" />
-                <meta name="viewport" content="width=device-width, initial-scale=1" />
-                <title>easy-md-viewer</title>
-                <link rel="stylesheet" href="${path}md.css" />
-                ${`<script src="${path}md.js" defer><\/script>`}
-              </head>
-              <body>
-                <div id="document" data-theme="light"></div>
-                ${"<script>"} document.addEventListener("DOMContentLoaded", () => { const markdown = ${JSON.stringify("# A little Markdown. A real document.\n\nWrite something useful. Let **easy-md-viewer** handle the rendering.")};
-                byMDviewer(document.getElementById("document"), markdown); }); ${"<\/script>"}
-              </body>
-            </html>
-          `);
+          const endScript = "</" + "script>";
+          // Explicit lines preserve export indentation when the page is formatted.
+          const html = [
+            "<!doctype html>",
+            '<html lang="en">',
+            "  <head>",
+            '    <meta charset="utf-8" />',
+            '    <meta name="viewport" content="width=device-width, initial-scale=1" />',
+            "    <title>easy-md-viewer</title>",
+            `    <link rel="stylesheet" href="${path}md.css" />`,
+            `    <script src="${path}md.js" defer>${endScript}`,
+            "  </head>",
+            "  <body>",
+            '    <div id="document" data-theme="light"></div>',
+            "    <script>",
+            '      document.addEventListener("DOMContentLoaded", () => {',
+            `        const markdown = ${JSON.stringify("# A little Markdown. A real document.\n\nWrite something useful. Let **easy-md-viewer** handle the rendering.")};`,
+            '        byMDviewer(document.getElementById("document"), markdown);',
+            "      });",
+            `    ${endScript}`,
+            "  </body>",
+            "</html>"
+          ].join("\n");
           renderIntegration(html);
           document.getElementById("integration-note").textContent = cdn ? "CDN follows the latest release; updates may take time to reach caches." : "Place the HTML beside md.js and md.css.";
           return html;
