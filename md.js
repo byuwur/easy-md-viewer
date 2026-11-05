@@ -23,6 +23,27 @@
 
   const HEADING_IDS = Symbol("headingIds");
 
+  /* --- APPEARANCE --- */
+  /** Explicit appearance options override markup; omitted values preserve the container's state. */
+  const applyAppearance = (element, options) => {
+    const { theme, palette, fontSize } = options;
+    if (theme != null && !["light", "dark"].includes(theme)) throw new RangeError("Theme must be light or dark.");
+    if (palette != null && (typeof palette !== "string" || !/^[a-z][\w-]*$/i.test(palette) || ["light", "dark"].includes(palette))) throw new RangeError("Palette must be a CSS theme name; use theme for light or dark.");
+    const size = typeof fontSize === "number" ? `${Math.max(0.5, Math.min(3, fontSize))}rem` : typeof fontSize === "string" ? `clamp(0.5rem, ${fontSize}, 3rem)` : "";
+    if (fontSize != null && (typeof fontSize === "number" ? !Number.isFinite(fontSize) : typeof fontSize !== "string" || !CSS.supports("font-size", size))) throw new RangeError("Font size must be a finite multiplier or a CSS size.");
+    if (theme != null || palette != null) {
+      const mode = theme ?? (["light", "dark"].includes(element.dataset.theme) ? element.dataset.theme : element.classList.contains("dark") ? "dark" : "light");
+      element.classList.toggle("light", mode === "light");
+      element.classList.toggle("dark", mode === "dark");
+      if (palette != null) element.dataset.theme = palette;
+      else if (["light", "dark"].includes(element.dataset.theme)) element.dataset.theme = mode;
+    }
+    if (fontSize != null) {
+      element.style.fontSize = size;
+      element.dataset.byViewDefaultFontSize = element.style.fontSize;
+    }
+  };
+
   /* --- CONTROLS --- */
   // Mirrored across the family so each viewer can run without a shared runtime.
   // Mirrored across the family so each viewer can run without a shared runtime.
@@ -1455,6 +1476,9 @@
    * @param {string|false} [options.linkTarget="_blank"]
    * @param {boolean} [options.toolbar=true] - Show the viewer header.
    * @param {boolean} [options.credits=true] - Show attribution in the header.
+   * @param {"light"|"dark"} [options.theme] - Initial mode; overrides the container.
+   * @param {string} [options.palette] - Named CSS palette for data-theme.
+   * @param {number|string} [options.fontSize] - Number in rem or CSS size, bounded to 0.5rem through 3rem.
    * @param {boolean} [options.themeToggle=true] - Adds the theme toggle.
    * @param {boolean} [options.fontSizeControls=true] - Adds viewer-local text size controls.
    * @param {boolean} [options.copyButton=true] - Adds a clipboard copy button.
@@ -1462,7 +1486,7 @@
    * @param {boolean} [options.controlsCompact=true] - Places attribution beside the controls, wrapping as needed.
    * @param {"top"|"bottom"} [options.controlsPosition="top"] - Keeps the toolbar at the scroll area's top or bottom while the viewer is visible; invalid values use top.
    * @returns {void}
-   * @throws {TypeError}
+   * @throws {TypeError|RangeError}
    */
   function byMDviewer(element, markdown, options = {}) {
     if (!(element instanceof HTMLElement)) throw new TypeError("byMDviewer: element must be an HTMLElement.");
@@ -1494,6 +1518,7 @@
       ...options,
       [HEADING_IDS]: Object.create(null)
     };
+    applyAppearance(element, options);
     // Clear the target safely.
     element.textContent = "";
     element.classList.add("byMDdocument");
