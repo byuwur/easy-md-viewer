@@ -172,7 +172,7 @@ test("Markdown rendering", async (t) => {
         version,
         text: `easy-md-viewer · v${version} · @byUwUr`,
         opacity: "0.25",
-        relativeSize: 0.75,
+        relativeSize: 0.875,
         muted: true,
         count: 1,
         independent: true,
@@ -320,7 +320,9 @@ test("Markdown rendering", async (t) => {
             [360, ""],
             [360, "monospace"],
             [640, "monospace"],
-            [640, ""]
+            [640, ""],
+            [768, "monospace"],
+            [768, ""]
           ]) {
             root.style.width = `${width}px`;
             for (const controlsSize of ["xs", "small", "regular", "large", "xl"]) {
@@ -354,7 +356,7 @@ test("Markdown rendering", async (t) => {
                   const sameRow = info.top < controls.bottom && info.bottom > controls.top;
                   const ordered = controlsPosition === "bottom" ? controls.bottom <= info.top : info.bottom <= controls.top;
                   const aligned = controlsCompact && sameRow ? info.right <= controls.left + 1 : ordered;
-                  const compactWhenWide = !controlsCompact || width < 640 || sameRow;
+                  const compactWhenWide = !controlsCompact || width < (controlsSize === "xl" ? 768 : 640) || sameRow;
                   if (!fits || !separated || !aligned || !compactWhenWide || !equalHeight || !themeFits)
                     failures.push({ width, fontFamily, controlsSize, controlsCompact, controlsPosition, fits, separated, aligned, compactWhenWide, equalHeight, themeFits });
                   sizes[controlsSize] = buttons[1].getBoundingClientRect().width;
