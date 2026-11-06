@@ -86,7 +86,7 @@ test("displayed, copied, and downloaded starters match with CDN or local assets"
     assert.ok((await playground.frameLocator("#preview-frame").locator(".byVIEWinfo").textContent()).includes(` v${release} `), "Credits must match the runtime release");
     const cdnBase = "https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@latest/";
     const starterViewer = playground.locator("#integration-code.byCODEdocument");
-    assert.equal(await playground.evaluate(() => byCODEviewer.VERSION), "1.6");
+    assert.equal(await playground.evaluate(() => byCODEviewer.VERSION), "1.7");
     assert.equal(await starterViewer.getAttribute("data-theme"), "dark");
     await starterViewer.locator(".byCODEtext").first().waitFor();
     assert.ok((await starterViewer.locator(".byCODElineNumber").count()) > 0);
