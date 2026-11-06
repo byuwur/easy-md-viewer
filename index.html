@@ -867,109 +867,27 @@ Write Markdown here…"></textarea>
           previewReady: false
         };
 
-        const showcase =
-          dedent(`
-          # A little Markdown. A real document.
-
-          Write something useful. Let **easy-md-viewer** handle the rendering.
-
-          ## Start small
-
-          No packages to install. No build step to configure.
-
-          ~~~js
-          byMDviewer(container, "# Hello **world**");
-          ~~~
-
-          ## Make yourself at home
-
-          - [x] Edit this Markdown
-          - [x] Try the options on the left
-          - [ ] Drop the viewer into your website
-
-          | You bring | The viewer brings |
-          | :--- | :--- |
-          | Plain Markdown | A readable document |
-          | Your website | Light & dark themes |
-          | A few lines of JS | No dependencies |
-
-          > Simple is complicated enough.
-
-          [Read the docs](https://github.com/byuwur/easy-md-viewer#readme) = [Back to the start](#a-little-markdown-a-real-document)
-        `) + "\n";
-        const examples = {
-          headings: {
-            label: "Headings & anchors",
-            markdown:
-              "# Your document\n\n[Jump to installation](#installation)\n\n## Installation\n\nHeadings get automatic IDs.\n\n### A smaller heading\n\n## Installation\n\nRepeated headings get unique IDs: installation-1.\n\n[Jump to the second one](#installation-1)"
-          },
-          formatting: {
-            label: "Inline formatting",
-            markdown: "# A few well-chosen words\n\n**Bold**, *italic*, ***both***, and ~~a change of plan~~.\n\nA little `inline code` goes a long way."
-          },
-          code: {
-            label: "Code blocks",
-            markdown:
-              '# Code, as written\n\nInline: `const ready = true;`\n\n~~~javascript\nconst container = document.getElementById("document");\nbyMDviewer(container, "# Hello **world**");\n~~~\n\nFenced blocks use easy-code-viewer for syntax highlighting. Inline code stays simple.\n\n~~~html\n<!-- Comments inside code stay visible. -->\n<div>Raw code stays code.</div>\n~~~'
-          },
-          lists: {
-            label: "Lists & nested quotes",
-            markdown:
-              "# A place for everything\n\n- Project\n  - Source\n    - md.js\n  - Styles\n    - md.css\n\n5. Pick a container\n6. Render your Markdown\n\n> A blockquote can contain Markdown.\n>\n> - **Even lists.**\n>   - And nested items.\n>\n> > Or another quote."
-          },
-          tasks: {
-            label: "Task lists",
-            markdown:
-              "# A tiny checklist\n\n- [x] Keep it simple\n- [x] Render a real document\n- [ ] Write the next thing\n\nThese are document checkboxes, not editable form inputs.\n\n1. [x] Ordered tasks work too\n2. [ ] Ship when ready"
-          },
-          tables: {
-            label: "Tables & alignment",
-            markdown:
-              "# Everything lines up\n\n| Feature | Status | Lines of glue |\n| :--- | :---: | ---: |\n| Tables | **Ready** | 1 |\n| Themes | Ready | 2 |\n| Escaped pipes | A \\| B | `x|y` |\n\nLeft, center, and right alignment. Wide tables scroll inside the document."
-          },
-          links: {
-            label: "Links & autolinks",
-            markdown:
-              '# A connected document\n\n[The repository](https://github.com/byuwur/easy-md-viewer "easy-md-viewer on GitHub")\n\n<https://example.com>\n\nhttps://example.com/docs\n\nhello@example.com\n\n[Jump within this document](#next-step)\n\n## Next step\n\nHeading anchors stay in this document, whatever the link target.'
-          },
-          images: {
-            label: "Images",
-            markdown: '# A picture, included\n\n![Markdown viewer sample image](test.png "Bundled test.png")\n\nImages are responsive and lazy-loaded. This image comes from the repository.'
-          },
-          escapes: {
-            label: "Escapes & entities",
-            markdown:
-              "# The literal details\n\n\\*These asterisks stay visible.\\*\n\n\\# This is not a heading.\n\nAT&amp;T = &quot;quoted&quot; = &#9733; = &#x2665;\n\n`&amp; stays literal inside code`\n\n<!-- This comment is intentionally hidden. -->\n\nThe HTML comment above is hidden."
-          },
-          safety: {
-            label: "Raw HTML & URL handling",
-            markdown:
-              '# Text stays text\n\n<strong>This is literal HTML, not a bold element.</strong>\n\n<script>alert("This stays text.")<\/script>\n\n[An allowed HTTPS link](https://example.com)\n\n[An executable URL](javascript:alert(1))\n\n![A rejected data URL](data:text/plain,example)\n\nExecutable URL schemes are rejected. This demonstrates the current renderer; it is not a general-purpose HTML sanitizer.'
-          },
-          breaks: {
-            label: "Soft line breaks",
-            markdown: "# One paragraph, two lines\n\nThis is the first line.\nThis is the second line.\n\nEnable Soft line breaks to keep that break.\n\nThis line has two trailing spaces.  \nThat hard break works with either setting."
-          },
-          controls: {
-            label: "Native viewer controls",
-            markdown:
-              "# Settle in for a read\n\nTry the theme switch and **A− / A / A+** in the document toolbar.\n\n## Your reading space\n\nText size belongs to this viewer. It stays put when you edit the source or change a rendering option.\n\nThe document theme and the website theme are independent."
-          }
+        // prettier-ignore
+        const samples = {
+          showcase: {"name": "Default showcase", "source": "# A little Markdown. A real document.\n\nWrite something useful. Let **easy-md-viewer** handle the rendering.\n\n## Start small\n\nNo packages to install. No build step to configure.\n\n~~~js\nbyMDviewer(container, \"# Hello **world**\");\n~~~\n\n## Make yourself at home\n\n- [x] Edit this Markdown\n- [x] Try the options on the left\n- [ ] Drop the viewer into your website\n\n| You bring | The viewer brings |\n| :--- | :--- |\n| Plain Markdown | A readable document |\n| Your website | Light & dark themes |\n| A few lines of JS | No dependencies |\n\n> Simple is complicated enough.\n\n[Read the docs](https://github.com/byuwur/easy-md-viewer#readme) = [Back to the start](#a-little-markdown-a-real-document)\n"},
+          headings: {"name": "Headings & anchors", "source": "# Your document\n\n[Jump to installation](#installation)\n\n## Installation\n\nHeadings get automatic IDs.\n\n### A smaller heading\n\n## Installation\n\nRepeated headings get unique IDs: installation-1.\n\n[Jump to the second one](#installation-1)"},
+          formatting: {"name": "Inline formatting", "source": "# A few well-chosen words\n\n**Bold**, *italic*, ***both***, and ~~a change of plan~~.\n\nA little `inline code` goes a long way."},
+          code: {"name": "Code blocks", "source": "# Code, as written\n\nInline: `const ready = true;`\n\n~~~javascript\nconst container = document.getElementById(\"document\");\nbyMDviewer(container, \"# Hello **world**\");\n~~~\n\nFenced blocks use easy-code-viewer for syntax highlighting. Inline code stays simple.\n\n~~~html\n\u003c!-- Comments inside code stay visible. -->\n\u003cdiv>Raw code stays code.\u003c/div>\n~~~"},
+          lists: {"name": "Lists & nested quotes", "source": "# A place for everything\n\n- Project\n  - Source\n    - md.js\n  - Styles\n    - md.css\n\n5. Pick a container\n6. Render your Markdown\n\n> A blockquote can contain Markdown.\n>\n> - **Even lists.**\n>   - And nested items.\n>\n> > Or another quote."},
+          tasks: {"name": "Task lists", "source": "# A tiny checklist\n\n- [x] Keep it simple\n- [x] Render a real document\n- [ ] Write the next thing\n\nThese are document checkboxes, not editable form inputs.\n\n1. [x] Ordered tasks work too\n2. [ ] Ship when ready"},
+          tables: {"name": "Tables & alignment", "source": "# Everything lines up\n\n| Feature | Status | Lines of glue |\n| :--- | :---: | ---: |\n| Tables | **Ready** | 1 |\n| Themes | Ready | 2 |\n| Escaped pipes | A \\| B | `x|y` |\n\nLeft, center, and right alignment. Wide tables scroll inside the document."},
+          links: {"name": "Links & autolinks", "source": "# A connected document\n\n[The repository](https://github.com/byuwur/easy-md-viewer \"easy-md-viewer on GitHub\")\n\n\u003chttps://example.com>\n\nhttps://example.com/docs\n\nhello@example.com\n\n[Jump within this document](#next-step)\n\n## Next step\n\nHeading anchors stay in this document, whatever the link target."},
+          images: {"name": "Images", "source": "# A picture, included\n\n![Markdown viewer sample image](test.png \"Bundled test.png\")\n\nImages are responsive and lazy-loaded. This image comes from the repository."},
+          escapes: {"name": "Escapes & entities", "source": "# The literal details\n\n\\*These asterisks stay visible.\\*\n\n\\# This is not a heading.\n\nAT&amp;T = &quot;quoted&quot; = &#9733; = &#x2665;\n\n`&amp; stays literal inside code`\n\n\u003c!-- This comment is intentionally hidden. -->\n\nThe HTML comment above is hidden."},
+          safety: {"name": "Raw HTML & URL handling", "source": "# Text stays text\n\n\u003cstrong>This is literal HTML, not a bold element.\u003c/strong>\n\n\u003cscript>alert(\"This stays text.\")\u003c/script>\n\n[An allowed HTTPS link](https://example.com)\n\n[An executable URL](javascript:alert(1))\n\n![A rejected data URL](data:text/plain,example)\n\nExecutable URL schemes are rejected. This demonstrates the current renderer; it is not a general-purpose HTML sanitizer."},
+          breaks: {"name": "Soft line breaks", "source": "# One paragraph, two lines\n\nThis is the first line.\nThis is the second line.\n\nEnable Soft line breaks to keep that break.\n\nThis line has two trailing spaces.  \nThat hard break works with either setting."},
+          controls: {"name": "Native viewer controls", "source": "# Settle in for a read\n\nTry the theme switch and **A− / A / A+** in the document toolbar.\n\n## Your reading space\n\nText size belongs to this viewer. It stays put when you edit the source or change a rendering option.\n\nThe document theme and the website theme are independent."},
+          features: {"name": "Full feature showcase", "source": "# The full feature showcase\n\nA practical Markdown subset. Explore each example above, or read through them here.\n\n## Your document\n\n[Jump to installation](#installation)\n\n## Installation\n\nHeadings get automatic IDs.\n\n### A smaller heading\n\n## Installation\n\nRepeated headings get unique IDs: installation-1.\n\n[Jump to the second one](#installation-1)\n\n---\n\n## A few well-chosen words\n\n**Bold**, *italic*, ***both***, and ~~a change of plan~~.\n\nA little `inline code` goes a long way.\n\n---\n\n## Code, as written\n\nInline: `const ready = true;`\n\n~~~javascript\nconst container = document.getElementById(\"document\");\nbyMDviewer(container, \"# Hello **world**\");\n~~~\n\nFenced blocks use easy-code-viewer for syntax highlighting. Inline code stays simple.\n\n~~~html\n\u003c!-- Comments inside code stay visible. -->\n\u003cdiv>Raw code stays code.\u003c/div>\n~~~\n\n---\n\n## A place for everything\n\n- Project\n  - Source\n    - md.js\n  - Styles\n    - md.css\n\n5. Pick a container\n6. Render your Markdown\n\n> A blockquote can contain Markdown.\n>\n> - **Even lists.**\n>   - And nested items.\n>\n> > Or another quote.\n\n---\n\n## A tiny checklist\n\n- [x] Keep it simple\n- [x] Render a real document\n- [ ] Write the next thing\n\nThese are document checkboxes, not editable form inputs.\n\n1. [x] Ordered tasks work too\n2. [ ] Ship when ready\n\n---\n\n## Everything lines up\n\n| Feature | Status | Lines of glue |\n| :--- | :---: | ---: |\n| Tables | **Ready** | 1 |\n| Themes | Ready | 2 |\n| Escaped pipes | A \\| B | `x|y` |\n\nLeft, center, and right alignment. Wide tables scroll inside the document.\n\n---\n\n## A connected document\n\n[The repository](https://github.com/byuwur/easy-md-viewer \"easy-md-viewer on GitHub\")\n\n\u003chttps://example.com>\n\nhttps://example.com/docs\n\nhello@example.com\n\n[Jump within this document](#next-step)\n\n## Next step\n\nHeading anchors stay in this document, whatever the link target.\n\n---\n\n## A picture, included\n\n![Markdown viewer sample image](test.png \"Bundled test.png\")\n\nImages are responsive and lazy-loaded. This image comes from the repository.\n\n---\n\n## The literal details\n\n\\*These asterisks stay visible.\\*\n\n\\# This is not a heading.\n\nAT&amp;T = &quot;quoted&quot; = &#9733; = &#x2665;\n\n`&amp; stays literal inside code`\n\n\u003c!-- This comment is intentionally hidden. -->\n\nThe HTML comment above is hidden.\n\n---\n\n## Text stays text\n\n\u003cstrong>This is literal HTML, not a bold element.\u003c/strong>\n\n\u003cscript>alert(\"This stays text.\")\u003c/script>\n\n[An allowed HTTPS link](https://example.com)\n\n[An executable URL](javascript:alert(1))\n\n![A rejected data URL](data:text/plain,example)\n\nExecutable URL schemes are rejected. This demonstrates the current renderer; it is not a general-purpose HTML sanitizer.\n\n---\n\n## One paragraph, two lines\n\nThis is the first line.\nThis is the second line.\n\nEnable Soft line breaks to keep that break.\n\nThis line has two trailing spaces.  \nThat hard break works with either setting.\n\n---\n\n## Settle in for a read\n\nTry the theme switch and **A− / A / A+** in the document toolbar.\n\n## Your reading space\n\nText size belongs to this viewer. It stays put when you edit the source or change a rendering option.\n\nThe document theme and the website theme are independent."},
+          custom: {"name": "Custom document", "source": "# Hello, world\n\nMake this document **yours**.\n"},
         };
-        state.originals = {
-          showcase,
-          features: dedent(`
-          # The full feature showcase
+        const showcase = samples.showcase.source;
 
-          A practical Markdown subset. Explore each example above, or read through them here.
-
-          ${Object.values(examples)
-            .map((example) => example.markdown.replace(/^# /, "## "))
-            .join("\n\n---\n\n")
-            .replaceAll("\n", "\n          ")}
-        `),
-          custom: "# Hello, world\n\nMake this document **yours**.\n"
-        };
+        state.originals = { showcase, features: samples.features.source, custom: samples.custom.source };
         state.drafts = { ...state.originals };
 
         // --- CONFIGURATION ---
@@ -1252,15 +1170,15 @@ Write Markdown here…"></textarea>
         // --- FEATURE EXAMPLES ---
         // Feature demonstrations preserve the other document drafts and the selected options.
         function showExample(name) {
-          const example = examples[name];
+          const example = samples[name];
           if (!example) return;
-          state.originals.example = example.markdown;
-          state.drafts.example = example.markdown;
+          state.originals.example = example.source;
+          state.drafts.example = example.source;
           selectSource("example");
-          sourceSelect.querySelector('[value="example"]').textContent = example.label;
+          sourceSelect.querySelector('[value="example"]').textContent = example.name;
           document.querySelectorAll(".feature-chip").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.example === name)));
           setMobilePanel("preview");
-          document.getElementById("feedback").textContent = `${example.label}. Your other document drafts are kept.`;
+          document.getElementById("feedback").textContent = `${example.name}. Your other document drafts are kept.`;
         }
 
         // --- INTEGRATION ---
