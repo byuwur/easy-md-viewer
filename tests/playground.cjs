@@ -3,7 +3,7 @@
  * Desc: MD playground configuration, previews, and exports; library checks live in rendering.cjs.
  */
 
-/* --- DEPENDENCIES --- */
+// --- DEPENDENCIES ---
 const assert = require("node:assert/strict");
 const path = require("node:path");
 const os = require("node:os");
@@ -22,7 +22,7 @@ const readStarter = async (page) => {
   return (await page.locator("#integration-code .byCODEtext").allTextContents()).join("\n");
 };
 
-/* --- THEME FIXTURES --- */
+// --- THEME FIXTURES ---
 // Caller-provided legacy stylesheets reuse the canonical palettes without distribution files.
 const legacyThemeCSS = (theme) => {
   const css = require("node:fs").readFileSync(path.join(__dirname, "../md.css"), "utf8");
@@ -30,7 +30,7 @@ const legacyThemeCSS = (theme) => {
   return `.byMDdocument {${section.match(/\{([\s\S]*?)\}/)[1]}}`;
 };
 
-/* --- PLAYGROUND ASSETS --- */
+// --- PLAYGROUND ASSETS ---
 let bootstrapCSS;
 const getBootstrapCSS = () =>
   (bootstrapCSS ??= (async () => {
@@ -50,7 +50,7 @@ const getCodeAsset = (url) => {
   return codeAssets.get(url);
 };
 
-/* --- PLAYGROUND AND STARTER EXPORTS --- */
+// --- PLAYGROUND AND STARTER EXPORTS ---
 test("displayed, copied, and downloaded starters match with CDN or local assets", async () => {
   const browser = await chromium.launch({ channel: process.env.BROWSER_CHANNEL || undefined, executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined });
   try {
@@ -266,7 +266,7 @@ test("displayed, copied, and downloaded starters match with CDN or local assets"
   }
 });
 
-/* --- CONFIGURATION AND FAMILY NAVIGATION --- */
+// --- CONFIGURATION AND FAMILY NAVIGATION ---
 test("family customization, navigation and monospace controls", async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined, channel: process.env.BROWSER_CHANNEL || undefined });
   try {
@@ -543,7 +543,7 @@ test("family customization, navigation and monospace controls", async () => {
   }
 });
 
-/* --- PALETTES AND CUSTOM THEME EDITING --- */
+// --- PALETTES AND CUSTOM THEME EDITING ---
 test("playground palettes and editable two-mode custom themes stay synchronized", async () => {
   const browser = await chromium.launch({ channel: process.env.BROWSER_CHANNEL || undefined, executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined });
   try {
@@ -674,7 +674,7 @@ test("playground palettes and editable two-mode custom themes stay synchronized"
   }
 });
 
-/* --- CODE VIEWER PLAYGROUND INTEGRATION --- */
+// --- CODE VIEWER PLAYGROUND INTEGRATION ---
 test("playground code examples pin sibling releases and switch presentation without changing Markdown", async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined, channel: process.env.BROWSER_CHANNEL || undefined });
   try {

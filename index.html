@@ -977,7 +977,8 @@ Write Markdown here…"></textarea>
           for (const option of optionDefinitions) {
             const row = document.createElement("div");
             row.className = "option-row d-flex align-items-center form-switch gap-3 ps-0 m-0";
-            row.innerHTML = dedent(/* HTML */ `
+            row.innerHTML = dedent(// HTML
+             `
               <input class="form-check-input order-2 float-none flex-shrink-0 ms-0 my-0" type="checkbox" role="switch" id="${option.name}" name="${option.name}" ${option.default ? "checked" : ""} />
               <label class="form-check-label flex-grow-1 py-2" for="${option.name}" title="${option.description}">${option.label}</label>
               <button class="btn btn-link btn-sm p-1 flex-shrink-0 font-monospace text-decoration-none fw-semibold" type="button" data-example="${option.example}" aria-label="Show ${option.label.toLowerCase()} example" title="Show example">
@@ -988,7 +989,8 @@ Write Markdown here…"></textarea>
           }
           document.getElementById("viewer-options").insertAdjacentHTML(
             "beforeend",
-            dedent(/* HTML */ `
+            dedent(// HTML
+             `
               <div class="row g-2 mt-3 align-items-end">
                 <fieldset class="col-8" id="controlsSize">
                   <legend class="small mb-2 form-label">Controls Size</legend>
@@ -1023,7 +1025,8 @@ Write Markdown here…"></textarea>
           );
           document.getElementById("render-options").insertAdjacentHTML(
             "beforeend",
-            dedent(/* HTML */ `
+            dedent(// HTML
+             `
               <div class="mt-3">
                 <fieldset id="linkTarget" class="mb-3">
                   <legend class="small mb-2 form-label">Open links in</legend>
@@ -1187,7 +1190,7 @@ Write Markdown here…"></textarea>
                 try {
                   decoded = decodeURIComponent(id);
                 } catch {
-                  /* Malformed percent escapes can be literal heading IDs. */
+                  // Malformed percent escapes can be literal heading IDs.
                 }
                 const heading = frame.contentDocument.getElementById(decoded);
                 heading?.scrollIntoView();
@@ -1202,7 +1205,8 @@ Write Markdown here…"></textarea>
             }
           });
           // Interpolate scripts so escaped closing tags do not confuse HTML highlighting.
-          frame.srcdoc = dedent(/* HTML */ `
+          frame.srcdoc = dedent(// HTML
+           `
             <!doctype html>
             <html lang="en">
               <head>

@@ -8,13 +8,13 @@
  */
 
 (function (global) {
-  /* --- INITIALIZATION --- */
+  // --- INITIALIZATION ---
   if (global.byMDviewer?.initialized) return;
 
-  /* --- METADATA --- */
+  // --- METADATA ---
   byMDviewer.VERSION = "2.7"; // 2026-11-05
 
-  /* --- CONSTANTS --- */
+  // --- CONSTANTS ---
   const ESCAPABLE = /[\\`*{}\[\]()#+\-.!_>~|]/;
 
   const SAFE_LINK_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:", "ftp:", "ftps:"]);
@@ -23,7 +23,7 @@
 
   const HEADING_IDS = Symbol("headingIds");
 
-  /* --- APPEARANCE --- */
+  // --- APPEARANCE ---
   const extraPalettes = new Set([
     "dracula",
     "darcula",
@@ -79,7 +79,7 @@
     console.warn(`easy-md-viewer: Palette "${palette}" requires md.themes.css. Import it after md.css. https://byuwur.github.io/easy-md-viewer/`);
   };
 
-  /** Explicit appearance options override markup; omitted values preserve the container's state. */
+  // Explicit appearance options override markup; omitted values preserve the container's state.
   const applyAppearance = (element, options) => {
     const { theme, palette, fontSize } = options;
     if (theme != null && !["light", "dark"].includes(theme)) throw new RangeError("Theme must be light or dark.");
@@ -100,7 +100,7 @@
     }
   };
 
-  /* --- CONTROLS --- */
+  // --- CONTROLS ---
   // Mirrored across the family so each viewer can run without a shared runtime.
   // Mirrored across the family so each viewer can run without a shared runtime.
   /**
@@ -302,7 +302,8 @@
     controls.setAttribute("aria-label", "Viewer controls");
     const info = document.createElement("small");
     info.className = "byVIEWinfo";
-    info.innerHTML = /* HTML */ `<a href="https://github.com/byuwur/easy-md-viewer" target="_blank" rel="noopener noreferrer">easy-md-viewer</a> · v${byMDviewer.VERSION} ·
+    info.innerHTML = // HTML
+     `<a href="https://github.com/byuwur/easy-md-viewer" target="_blank" rel="noopener noreferrer">easy-md-viewer</a> · v${byMDviewer.VERSION} ·
       <a href="https://byuwur.co" target="_blank" rel="noopener noreferrer">@byUwUr</a>`;
     if (options.credits !== false) toolbar.appendChild(info);
     if (options.themeToggle) appendThemeToggle(element, controls, filename);
@@ -317,7 +318,7 @@
     else element.prepend(toolbar);
   };
 
-  /* --- PARSING --- */
+  // --- PARSING ---
   /**
    * Returns the amount of leading indentation, treating tabs as four spaces.
    * @param {string} line - Source line.
@@ -1178,7 +1179,7 @@
     return result;
   };
 
-  /* --- RENDERING --- */
+  // --- RENDERING ---
   /**
    * Appends a text node to an element.
    * @param {Node} parent - Parent DOM node.
@@ -1202,9 +1203,9 @@
     if (options.linkTarget === "_blank") anchor.rel = "noopener noreferrer";
   };
 
-  /** Render the shared inline tokens with DOM methods; source is never interpreted as HTML. */
+  // Render the shared inline tokens with DOM methods; source is never interpreted as HTML.
   const appendInline = (parent, text, options) => {
-    /** Queue one atomic batch. Parsing must finish before retained entries and parser indices advance. */
+    // Queue one atomic batch. Parsing must finish before retained entries and parser indices advance.
     const append = (target, tokens) => {
       for (const token of tokens) {
         if (["text", "escape", "entity"].includes(token.type)) {
@@ -1506,7 +1507,7 @@
     }
   }
 
-  /* --- PUBLIC API --- */
+  // --- PUBLIC API ---
   /**
    * Main API.
    * Renders Markdown into an HTMLElement.
@@ -1620,7 +1621,7 @@
     if (typeof source !== "string" || typeof next !== "string") throw new TypeError("byMDviewer.scanLine: lines must be strings.");
     return scanLine(source, context, next);
   };
-  /* --- EXPORT --- */
+  // --- EXPORT ---
   global.byMDviewer = byMDviewer;
   byMDviewer.initialized = true;
 })(typeof window !== "undefined" ? window : this);

@@ -3,14 +3,14 @@
  * Desc: MD library contracts using local renderer assets; playground checks live in playground.cjs.
  */
 
-/* --- DEPENDENCIES --- */
+// --- DEPENDENCIES ---
 const assert = require("node:assert/strict");
 const path = require("node:path");
 const fs = require("node:fs/promises");
 const test = require("node:test");
 const { chromium } = require("playwright");
 
-/* --- THEME FIXTURES --- */
+// --- THEME FIXTURES ---
 // Caller-provided legacy stylesheets reuse the canonical palettes without distribution files.
 const legacyThemeCSS = (theme) => {
   const css = require("node:fs").readFileSync(path.join(__dirname, "../md.css"), "utf8");
@@ -18,7 +18,7 @@ const legacyThemeCSS = (theme) => {
   return `.byMDdocument {${section.match(/\{([\s\S]*?)\}/)[1]}}`;
 };
 
-/* --- STANDALONE RENDERER --- */
+// --- STANDALONE RENDERER ---
 test("Markdown rendering", async (t) => {
   const browser = await chromium.launch({
     executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined
@@ -570,7 +570,7 @@ test("Markdown rendering", async (t) => {
   }
 });
 
-/* --- CONTAINER THEMES --- */
+// --- CONTAINER THEMES ---
 test("container themes are scoped, independent, and compatible with legacy links", async () => {
   const browser = await chromium.launch({ channel: process.env.BROWSER_CHANNEL || undefined, executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined });
   try {
@@ -658,7 +658,7 @@ test("container themes are scoped, independent, and compatible with legacy links
   }
 });
 
-/* --- PALETTES AND CONTRAST --- */
+// --- PALETTES AND CONTRAST ---
 test("named palettes retain mode, isolate custom CSS, and meet High Contrast targets", async () => {
   const browser = await chromium.launch({ channel: process.env.BROWSER_CHANNEL || undefined, executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined });
   try {
@@ -843,7 +843,7 @@ test("named palettes retain mode, isolate custom CSS, and meet High Contrast tar
   }
 });
 
-/* --- CONTROLS AND CLIPBOARD FEEDBACK --- */
+// --- CONTROLS AND CLIPBOARD FEEDBACK ---
 test("viewer defaults, optional tools, and copy feedback", async () => {
   const browser = await chromium.launch({ channel: process.env.BROWSER_CHANNEL || undefined, executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined });
   try {
@@ -960,7 +960,7 @@ test("viewer defaults, optional tools, and copy feedback", async () => {
   }
 });
 
-/* --- OPTIONAL CODE VIEWER INTEGRATION --- */
+// --- OPTIONAL CODE VIEWER INTEGRATION ---
 // This optional integration uses the real sibling CODE library, without either playground.
 test("optional code highlighting preserves Markdown and follows document themes", async (t) => {
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined, channel: process.env.BROWSER_CHANNEL || undefined });
@@ -1175,7 +1175,7 @@ test("optional code highlighting preserves Markdown and follows document themes"
   }
 });
 
-/* --- DOCUMENT AND CONTENT SURFACES --- */
+// --- DOCUMENT AND CONTENT SURFACES ---
 test("document and content backgrounds stay independent through theme and toolbar changes", async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined, channel: process.env.BROWSER_CHANNEL || "chrome" });
   try {
@@ -1225,7 +1225,7 @@ test("document and content backgrounds stay independent through theme and toolba
   }
 });
 
-/* --- INTERACTION MOTION --- */
+// --- INTERACTION MOTION ---
 test("animation options preserve initial visibility and override system motion preferences", async () => {
   const browser = await chromium.launch({ channel: process.env.BROWSER_CHANNEL || "chrome", executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined });
   try {
@@ -1326,7 +1326,7 @@ test("animation options preserve initial visibility and override system motion p
   }
 });
 
-/* --- INITIAL APPEARANCE --- */
+// --- INITIAL APPEARANCE ---
 test("appearance options override markup and preserve independent viewer state", async () => {
   const browser = await chromium.launch({ channel: process.env.BROWSER_CHANNEL || undefined, executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined });
   try {
