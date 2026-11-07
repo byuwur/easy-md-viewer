@@ -149,8 +149,8 @@
                         <label class="form-label mt-3" for="preview-palette">Color palette</label>
                         <select id="preview-palette" class="form-select">
                           <optgroup label="Essentials">
-                            <option value="monokai">Monokai (default)</option>
-                            <option value="github">GitHub</option>
+                            <option value="monokai">Monokai</option>
+                            <option value="github" selected>GitHub (default)</option>
                             <option value="solarized">Solarized</option>
                             <option value="high-contrast">High Contrast</option>
                           </optgroup>
@@ -1188,7 +1188,7 @@ Write Markdown here…"></textarea>
           return JSON.stringify(
             {
               theme: document.querySelector('[name="previewTheme"]:checked').value,
-              palette: field("preview-palette") || "monokai",
+              palette: field("preview-palette") || "github",
               fontFamily: field("preview-font"),
               fontSize: field("preview-size") === null ? null : Number(field("preview-size")),
               lineHeight: field("preview-leading") === null ? null : Number(field("preview-leading")),
@@ -1252,7 +1252,7 @@ Write Markdown here…"></textarea>
             `    <script src="${path}md${min}.js" defer>${endScript}`,
             "  </head>",
             "  <body>",
-            '    <div id="document" data-theme="light"></div>',
+            '    <div id="document" class="light" data-theme="github"></div>',
             "    <script>",
             '      document.addEventListener("DOMContentLoaded", () => {',
             `        const markdown = ${JSON.stringify("# A little Markdown. A real document.\n\nWrite something useful. Let **easy-md-viewer** handle the rendering.")};`,
@@ -1496,7 +1496,7 @@ Write Markdown here…"></textarea>
         for (const value of ["light", "dark"]) {
           if (target.classList.contains(value) !== (value === mode)) target.classList.toggle(value, value === mode);
         }
-        const theme = palette === "monokai" ? mode : palette;
+        const theme = palette === "github" ? mode : palette;
         if (target.dataset.theme !== theme) target.dataset.theme = theme;
         target.ownerDocument.documentElement.style.colorScheme = mode;
         target.ownerDocument.body.style.background = target.ownerDocument.defaultView.getComputedStyle(target).backgroundColor;
@@ -1583,7 +1583,7 @@ Write Markdown here…"></textarea>
               themesWarned = true;
               console.warn(`easy-md-viewer: Import md.themes.css after md.css to use "${palette.value}".`);
             }
-            const css = palette.value === "custom" ? (customDraft ?? themeCSS("monokai")) : themeCSS(palette.value);
+            const css = palette.value === "custom" ? (customDraft ?? themeCSS("github")) : themeCSS(palette.value);
             if (editor.value !== css) editor.value = css;
             apply();
             themeStatus.textContent = "";
@@ -1618,7 +1618,7 @@ Write Markdown here…"></textarea>
                   field.setCustomValidity("");
                 }
               });
-              palette.value = "monokai";
+              palette.value = "github";
               palette.dispatchEvent(new Event("change", { bubbles: true }));
             })
           );

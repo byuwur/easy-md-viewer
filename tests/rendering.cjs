@@ -282,11 +282,11 @@ test("Markdown rendering", async (t) => {
             const credits = getComputedStyle(root.querySelector(".byVIEWinfo"));
             return { matched: getComputedStyle(root.querySelector(".byVIEWtoolbar")).backgroundColor === "rgba(0, 0, 0, 0)", opaque: !toolbar.backgroundColor.includes("rgba"), color: credits.color, opacity: credits.opacity };
           });
-        assert.deepEqual(await palette(), { matched: true, opaque: true, color: "rgb(138, 136, 117)", opacity: "0.25" });
+        assert.deepEqual(await palette(), { matched: true, opaque: true, color: "rgb(89, 99, 110)", opacity: "0.25" });
         const background = await themed.locator("#first").evaluate((root) => getComputedStyle(root).backgroundColor);
         await themed.locator("#first .byVIEWthemeToggle").click();
         await themed.waitForFunction((before) => getComputedStyle(document.getElementById("first")).backgroundColor !== before, background);
-        assert.deepEqual(await palette(), { matched: true, opaque: true, color: "rgb(117, 113, 94)", opacity: "0.25" });
+        assert.deepEqual(await palette(), { matched: true, opaque: true, color: "rgb(145, 152, 161)", opacity: "0.25" });
         assert.equal(await themed.locator("#viewer-theme").getAttribute("href"), "https://themes.test/md.light.css/archive/md.dark.css?keep=md.light.css#md.light.css");
         assert.equal(await themed.locator("#byVIEWtheme").getAttribute("href"), "https://themes.test/other.dark.css");
         assert.deepEqual(
@@ -591,13 +591,13 @@ test("container themes are scoped, independent, and compatible with legacy links
       ["# Local theme"]
     );
     const color = (id) => page.locator("#" + id).evaluate((element) => getComputedStyle(element).backgroundColor);
-    assert.equal(await color("first"), "rgb(39, 40, 34)");
-    assert.equal(await color("second"), "rgb(250, 250, 245)");
+    assert.equal(await color("first"), "rgb(13, 17, 23)");
+    assert.equal(await color("second"), "rgb(255, 255, 255)");
     assert.equal(await page.locator("#outside").evaluate((element) => getComputedStyle(element).getPropertyValue("--by-view-muted")), "");
-    assert.equal(await page.locator("#first .byVIEWtoolbar").evaluate((element) => getComputedStyle(element).getPropertyValue("--by-view-muted").trim()), "#75715e");
+    assert.equal(await page.locator("#first .byVIEWtoolbar").evaluate((element) => getComputedStyle(element).getPropertyValue("--by-view-muted").trim()), "#9198a1");
     await page.locator("#first .byVIEWthemeToggle").click();
     assert.equal(await page.locator("#first").getAttribute("data-theme"), "light");
-    assert.equal(await color("second"), "rgb(250, 250, 245)");
+    assert.equal(await color("second"), "rgb(255, 255, 255)");
     await page.locator("#second .byVIEWthemeToggle").click();
     assert.equal(
       await page
@@ -607,19 +607,19 @@ test("container themes are scoped, independent, and compatible with legacy links
       true
     );
     assert.equal(await page.locator("#second").getAttribute("data-theme"), null);
-    assert.equal(await color("second"), "rgb(39, 40, 34)");
+    assert.equal(await color("second"), "rgb(13, 17, 23)");
     await page.evaluate(async () => {
       const second = document.getElementById("second");
       second.dataset.theme = "light";
       await renderTheme(second);
     });
-    assert.equal(await color("second"), "rgb(250, 250, 245)");
+    assert.equal(await color("second"), "rgb(255, 255, 255)");
     await page.evaluate(() => {
       const first = document.getElementById("first");
       first.style.setProperty("--by-md-bg", "#123456");
     });
     assert.equal(await color("first"), "rgb(18, 52, 86)");
-    assert.equal(await color("second"), "rgb(250, 250, 245)");
+    assert.equal(await color("second"), "rgb(255, 255, 255)");
     await page.evaluate(() => document.getElementById("first").style.removeProperty("--by-md-bg"));
     assert.equal(requests.length, 0, "Container theme changes must not fetch stylesheets");
 
@@ -641,9 +641,9 @@ test("container themes are scoped, independent, and compatible with legacy links
       await renderTheme(document.getElementById("third"));
     });
     await page.locator("#second .byVIEWthemeToggle").click();
-    await page.waitForFunction(() => getComputedStyle(document.getElementById("second")).backgroundColor === "rgb(39, 40, 34)");
-    assert.equal(await color("third"), "rgb(39, 40, 34)");
-    assert.equal(await color("first"), "rgb(250, 250, 245)");
+    await page.waitForFunction(() => getComputedStyle(document.getElementById("second")).backgroundColor === "rgb(13, 17, 23)");
+    assert.equal(await color("third"), "rgb(13, 17, 23)");
+    assert.equal(await color("first"), "rgb(255, 255, 255)");
     assert.equal(await page.locator("#first .byVIEWthemeToggle").getAttribute("aria-label"), "Switch to dark theme");
     assert.equal(await page.locator("#byVIEWtheme").getAttribute("href"), "https://legacy.test/md.dark.css?cache=1#theme");
     await page.evaluate(async () => {
@@ -652,7 +652,7 @@ test("container themes are scoped, independent, and compatible with legacy links
     });
     await page.locator("#second .byVIEWthemeToggle").click();
     assert.equal(await page.locator("#second").getAttribute("data-theme"), "dark");
-    assert.equal(await color("third"), "rgb(250, 250, 245)");
+    assert.equal(await color("third"), "rgb(255, 255, 255)");
   } finally {
     await browser.close();
   }
@@ -683,7 +683,7 @@ test("named palettes retain mode, isolate custom CSS, and meet High Contrast tar
     );
     const root = page.locator("#viewer");
     const background = () => root.evaluate((element) => getComputedStyle(element).backgroundColor);
-    assert.equal(await background(), "rgb(250, 250, 245)", "Default remains Monokai Light");
+    assert.equal(await background(), "rgb(255, 255, 255)", "Default is GitHub Light");
     for (const [palette, colors] of Object.entries({
       monokai: ["rgb(250, 250, 245)", "rgb(39, 40, 34)"],
       github: ["rgb(255, 255, 255)", "rgb(13, 17, 23)"],
@@ -812,7 +812,7 @@ test("named palettes retain mode, isolate custom CSS, and meet High Contrast tar
     await root.evaluate((element) => {
       element.dataset.theme = "light";
     });
-    assert.equal(await background(), "rgb(250, 250, 245)", "Legacy mode aliases override classes");
+    assert.equal(await background(), "rgb(255, 255, 255)", "Legacy mode aliases use GitHub and override classes");
     await page.addStyleTag({ content: '.byMDdocument.light[data-theme="custom-ocean"] { --by-md-bg: #f3f8fc; } .byMDdocument.dark[data-theme="custom-ocean"] { --by-md-bg: #102a43; }' });
     await root.evaluate((element) => {
       element.dataset.theme = "custom-ocean";
@@ -831,12 +831,12 @@ test("named palettes retain mode, isolate custom CSS, and meet High Contrast tar
         })
     );
     await page.evaluate(() => renderPalette("viewer"));
-    assert.equal(await background(), "rgb(250, 250, 245)", "An unclassified custom palette starts in Light");
+    assert.equal(await background(), "rgb(255, 255, 255)", "An unclassified custom palette starts in Light");
     await root.locator(".byVIEWthemeToggle").click();
     assert.equal(await background(), "rgb(16, 42, 67)");
     assert.equal(await root.getAttribute("data-theme"), "custom-ocean");
     assert.equal(await page.locator("#byVIEWtheme").getAttribute("href"), "https://legacy.test/md.dark.css?cache=1#theme");
-    assert.equal(await page.locator("#other").evaluate((element) => getComputedStyle(element).backgroundColor), "rgb(39, 40, 34)");
+    assert.equal(await page.locator("#other").evaluate((element) => getComputedStyle(element).backgroundColor), "rgb(13, 17, 23)");
     assert.equal(await page.locator("#outside").evaluate((element) => getComputedStyle(element).getPropertyValue("--by-view-muted")), "");
   } finally {
     await browser.close();
@@ -1164,9 +1164,9 @@ test("optional code highlighting preserves Markdown and follows document themes"
           .locator("#viewer .byCODEkeyword")
           .first()
           .evaluate((token) => getComputedStyle(token).color);
-      assert.equal(await color(), "rgb(249, 38, 114)");
+      assert.equal(await color(), "rgb(255, 123, 114)");
       await page.locator("#viewer .byVIEWthemeToggle").click();
-      await page.waitForFunction(() => getComputedStyle(document.querySelector("#viewer .byCODEkeyword")).color === "rgb(183, 25, 86)");
+      await page.waitForFunction(() => getComputedStyle(document.querySelector("#viewer .byCODEkeyword")).color === "rgb(207, 34, 46)");
       assert.equal(await page.locator("#byVIEWtheme").getAttribute("href"), "https://legacy.test/md.light.css?cache=1#theme");
     });
     assert.deepEqual(errors, []);
@@ -1212,7 +1212,7 @@ test("document and content backgrounds stay independent through theme and toolba
     }
     assert.equal(await page.locator("#neighbor").evaluate((element) => getComputedStyle(element).backgroundColor), neighbor);
     await root.evaluate((element) => element.style.removeProperty("--by-view-container-bg"));
-    await page.waitForFunction(() => getComputedStyle(document.querySelector("#viewer .byVIEWcopy")).backgroundColor === "rgb(39, 40, 34)");
+    await page.waitForFunction(() => getComputedStyle(document.querySelector("#viewer .byVIEWcopy")).backgroundColor === "rgb(13, 17, 23)");
     assert.notEqual(
       await root
         .locator(".byVIEWcopy")

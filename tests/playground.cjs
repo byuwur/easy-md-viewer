@@ -237,7 +237,8 @@ test("displayed, copied, and downloaded starters match with CDN or local assets"
         assert.equal(await exported.locator("#document p strong").textContent(), "easy-md-viewer");
         assert.equal(await exported.locator("head script[src][defer]").count(), 1);
         assert.equal(await exported.locator("body script[src], body link[rel='stylesheet']").count(), 0);
-        assert.equal(await exported.locator("#document").getAttribute("data-theme"), "light");
+        assert.equal(await exported.locator("#document").getAttribute("data-theme"), "github");
+        assert.equal(await exported.locator("#document").evaluate((root) => root.classList.contains("light")), true);
         assert.equal(await exported.locator("#byVIEWtheme").count(), 0);
         assert.equal(await exported.locator('head link[rel="stylesheet"]').count(), 1);
         assert.doesNotMatch(html, /\.(light|dark)\.css/);
@@ -602,7 +603,7 @@ test("playground palettes and editable two-mode custom themes stay synchronized"
     await page.locator("#appearAnimation").uncheck();
     const initialBackground = await background();
     const hostBackground = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-    assert.equal(await palette.inputValue(), "monokai");
+    assert.equal(await palette.inputValue(), "github");
     await page.waitForFunction(() => document.getElementById("custom-theme-css").value.includes('.dark[data-theme="custom"]'));
     const defaults = await editor.inputValue();
     assert.ok(defaults.includes('.byMDdocument.light[data-theme="custom"]'));
@@ -664,7 +665,7 @@ test("playground palettes and editable two-mode custom themes stay synchronized"
     assert.equal(await editor.inputValue(), custom, "Preset changes retain the draft");
     assert.equal(await background(), "rgb(16, 42, 67)");
     await page.locator("#reset-settings, #reset-options").evaluate((button) => button.click());
-    await page.waitForFunction(() => document.getElementById("preview-palette").value === "monokai");
+    await page.waitForFunction(() => document.getElementById("preview-palette").value === "github");
     assert.equal(await editor.inputValue(), defaults);
     assert.equal(await background(), initialBackground);
     assert.equal(await page.evaluate(() => getComputedStyle(document.body).backgroundColor), hostBackground);

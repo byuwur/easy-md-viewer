@@ -35,7 +35,7 @@ The CDN example uses `@latest` and requires internet access. Use a published tag
 ## Usage
 
 ```html
-<div id="byMDrenderer" data-theme="light"></div>
+<div id="byMDrenderer" class="light" data-theme="github"></div>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const markdown = "# My project\n\nRender **Markdown** directly in your page.";
@@ -61,31 +61,31 @@ Exported HTML starters use default settings, independently of playground changes
 
 Pass options as the third argument, such as `byMDviewer(target, markdown, { breaks: true })`.
 
-| Option              | Default     | Meaning                                                                                                                             |
-| ------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `withLinks`         | `true`      | Render links, autolinks, bare URLs, and email addresses.                                                                            |
-| `withImages`        | `true`      | Render supported images.                                                                                                            |
-| `withTables`        | `true`      | Render GFM-style tables.                                                                                                            |
-| `withTasks`         | `true`      | Render task checkboxes.                                                                                                             |
-| `withStrikethrough` | `true`      | Render `~~strikethrough~~`.                                                                                                         |
-| `codeHighlighting`  | `true`      | Highlight fenced code when easy-code-viewer is loaded; `false` keeps plain code.                                                    |
-| `codeLineNumbers`   | `false`     | Show a framed code block with a line-number gutter.                                                                                 |
-| `codeStatusBar`     | `false`     | Show a framed code block with its language and line count.                                                                          |
-| `breaks`            | `false`     | Convert paragraph line breaks to `<br>`.                                                                                            |
-| `linkTarget`        | `"_blank"`  | Link target; `false` omits it. Same-document anchors stay in this tab.                                                              |
-| `animations`        | `true`      | Brief control/disclosure motion and background fades; overrides the system motion preference.                                       |
-| `appearAnimation`   | `false`     | Fade and gently move the viewer in when `animations` is enabled. Initial rendering remains immediate by default.                    |
-| `toolbar`           | `true`      | Show the viewer header; secondary tools are configured separately.                                                                  |
-| `credits`           | `true`      | Show attribution in the header.                                                                                                     |
-| `theme`             | Container   | Initial `"light"` or `"dark"` mode class.                                                                                           |
-| `palette`           | Container   | Initial `data-theme` palette, including custom CSS names.                                                                           |
-| `fontSize`          | Container   | Number in rem or a CSS size such as `"1.25em"` or `"20px"`; bounded to `0.5rem`–`3rem`.                                             |
-| `themeToggle`       | `true`      | Show the theme toggle.                                                                                                              |
-| `fontSizeControls`  | `true`      | Show text-size controls.                                                                                                            |
-| `copyButton`        | `true`      | Show Copy: click for rendered plain text; Shift+click for original Markdown.                                                        |
-| `controlsSize`      | `"regular"` | `"xs"` (0.5rem), `"small"` (0.7rem), `"regular"` (0.875rem), `"large"` (1rem), or `"xl"` (1.25rem); invalid values use `"regular"`. |
-| `controlsCompact`   | `true`      | Keep credits beside controls; `false` stacks them. Wraps as needed.                                                                 |
-| `controlsPosition`  | `"top"`     | Sticky `"top"` or `"bottom"` toolbar; invalid values use `"top"`.                                                                   |
+| Option              | Default             | Meaning                                                                                                                             |
+| ------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `withLinks`         | `true`              | Render links, autolinks, bare URLs, and email addresses.                                                                            |
+| `withImages`        | `true`              | Render supported images.                                                                                                            |
+| `withTables`        | `true`              | Render GFM-style tables.                                                                                                            |
+| `withTasks`         | `true`              | Render task checkboxes.                                                                                                             |
+| `withStrikethrough` | `true`              | Render `~~strikethrough~~`.                                                                                                         |
+| `codeHighlighting`  | `true`              | Highlight fenced code when easy-code-viewer is loaded; `false` keeps plain code.                                                    |
+| `codeLineNumbers`   | `false`             | Show a framed code block with a line-number gutter.                                                                                 |
+| `codeStatusBar`     | `false`             | Show a framed code block with its language and line count.                                                                          |
+| `breaks`            | `false`             | Convert paragraph line breaks to `<br>`.                                                                                            |
+| `linkTarget`        | `"_blank"`          | Link target; `false` omits it. Same-document anchors stay in this tab.                                                              |
+| `animations`        | `true`              | Brief control/disclosure motion and background fades; overrides the system motion preference.                                       |
+| `appearAnimation`   | `false`             | Fade and gently move the viewer in when `animations` is enabled. Initial rendering remains immediate by default.                    |
+| `toolbar`           | `true`              | Show the viewer header; secondary tools are configured separately.                                                                  |
+| `credits`           | `true`              | Show attribution in the header.                                                                                                     |
+| `theme`             | Container           | Initial `"light"` or `"dark"` mode class.                                                                                           |
+| `palette`           | Container or GitHub | Initial `data-theme` palette, including custom CSS names.                                                                           |
+| `fontSize`          | Container           | Number in rem or a CSS size such as `"1.25em"` or `"20px"`; bounded to `0.5rem`–`3rem`.                                             |
+| `themeToggle`       | `true`              | Show the theme toggle.                                                                                                              |
+| `fontSizeControls`  | `true`              | Show text-size controls.                                                                                                            |
+| `copyButton`        | `true`              | Show Copy: click for rendered plain text; Shift+click for original Markdown.                                                        |
+| `controlsSize`      | `"regular"`         | `"xs"` (0.5rem), `"small"` (0.7rem), `"regular"` (0.875rem), `"large"` (1rem), or `"xl"` (1.25rem); invalid values use `"regular"`. |
+| `controlsCompact`   | `true`              | Keep credits beside controls; `false` stacks them. Wraps as needed.                                                                 |
+| `controlsPosition`  | `"top"`             | Sticky `"top"` or `"bottom"` toolbar; invalid values use `"top"`.                                                                   |
 
 Plain-text copying preserves paragraph and code line breaks, excluding controls and credits. Copy requires clipboard permission in a secure context.
 
@@ -137,8 +137,8 @@ The picker groups palettes into Essentials, Editor classics, App inspired, Color
 
 | Palette              | `data-theme`           | What it looks like                             |
 | -------------------- | ---------------------- | ---------------------------------------------- |
-| Monokai (default)    | `monokai`              | Warm light and dark colors; the default.       |
-| GitHub               | `github`               | Neutral GitHub surfaces and syntax.            |
+| Monokai              | `monokai`              | Warm light and dark colors.                    |
+| GitHub (default)     | `github`               | Neutral GitHub surfaces and syntax.            |
 | Solarized            | `solarized`            | Warm paper and deep blue-green surfaces.       |
 | High Contrast        | `high-contrast`        | Strong text, borders, and focus indicators.    |
 | Dracula              | `dracula`              | Purple with vivid pink, green, and cyan.       |
@@ -198,7 +198,7 @@ Use a mode class and a palette name together:
 
 Rendering adds `.byMDdocument`; its variables affect only that container and its children. The theme switch changes mode while keeping the palette; re-rendering preserves both. A named palette without a mode class starts in Light; if both mode classes are present, Dark wins.
 
-`data-theme="light"` and `data-theme="dark"` select Monokai and override mode classes. A mode class alone, or no explicit theme, also uses Monokai.
+`data-theme="light"` and `data-theme="dark"` select GitHub and override mode classes. A mode class alone, or no explicit theme, also uses GitHub.
 
 ### High Contrast
 
