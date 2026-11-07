@@ -188,6 +188,24 @@
   box-sizing: content-box;
   background: var(--by-view-container-bg, var(--by-md-bg));
 }
+.byMDimage[data-size="original"] {
+  width: auto;
+}
+.byMDimage[data-size="xs"] {
+  width: 96px;
+}
+.byMDimage[data-size="small"] {
+  width: 160px;
+}
+.byMDimage[data-size="regular"] {
+  width: 320px;
+}
+.byMDimage[data-size="large"] {
+  width: 480px;
+}
+.byMDimage[data-size="xl"] {
+  width: 720px;
+}
 .byMDdocument hr {
   height: 0.25em;
   margin: 1.5em 0;

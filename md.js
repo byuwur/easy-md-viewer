@@ -12,7 +12,7 @@
   if (global.byMDviewer?.initialized) return;
 
   // --- METADATA ---
-  byMDviewer.VERSION = "2.7"; // 2026-11-05
+  byMDviewer.VERSION = "2.8"; // 2026-11-07
 
   // --- CONSTANTS ---
   const ESCAPABLE = /[\\`*{}\[\]()#+\-.!_>~|]/;
@@ -705,7 +705,13 @@
           const end = findClosingParen(text, close + 1);
           const destination = end === -1 ? null : parseDestination(text.slice(close + 2, end));
           if (destination && isSafeUrl(destination.url, image)) {
-            i = formatted(image ? "image" : "link", i, end + 1, open + 1, close, { url: destination.url, title: destination.title, text: plainText(text.slice(open + 1, close)) });
+            const size = image && text.startsWith("<!--", end + 1) && text.slice(end + 1).match(/^<!--[ \t]*bymd:size=(original|xs|small|regular|large|xl)[ \t]*-->/);
+            i = formatted(image ? "image" : "link", i, end + 1 + (size ? size[0].length : 0), open + 1, close, {
+              url: destination.url,
+              title: destination.title,
+              text: plainText(text.slice(open + 1, close)),
+              ...(size ? { size: size[1], sizeFrom: base + end + 1 } : {})
+            });
             continue;
           }
         }
@@ -782,8 +788,21 @@
     return match && (match[1][0] !== "`" || !match[2].includes("`")) ? match : null;
   };
 
+  // Preserve only metadata owned by a parsed image; unrelated comments keep their usual behavior.
+  const imageSizeComments = (text, options = {}) => {
+    const ranges = new Map();
+    if (!text.includes("bymd:size=")) return ranges;
+    const pending = inlineTokens(text, options);
+    while (pending.length) {
+      const token = pending.pop();
+      if (token.type === "image" && token.size) ranges.set(token.sizeFrom, token.to);
+      if (token.children) for (const child of token.children) pending.push(child);
+    }
+    return ranges;
+  };
+
   /**
-   * Removes HTML comments and hidden markers while preserving code content.
+   * Removes HTML comments and hidden markers while preserving code content and image sizes.
    * Raw HTML is not rendered by easy-md-viewer, but Markdown comments should remain invisible.
    *
    * @param {string[]} lines - Source lines at the current nesting level.
@@ -828,6 +847,7 @@
       }
       let cursor = 0;
       let visible = "";
+      const imageSizes = line.includes("bymd:size=") ? imageSizeComments(line, options) : null;
       while (cursor < line.length) {
         // Continue consuming a multiline HTML comment.
         if (inComment) {
@@ -862,6 +882,12 @@
         }
         // Hide HTML comments outside code spans.
         if (line.startsWith(`<!--`, cursor)) {
+          const imageEnd = imageSizes?.get(cursor);
+          if (imageEnd !== undefined) {
+            visible += line.slice(cursor, imageEnd);
+            cursor = imageEnd;
+            continue;
+          }
           inComment = true;
           cursor += 4;
           continue;
@@ -1120,7 +1146,9 @@
       return result;
     }
     // Complex containers retain exact source until visual editing can map them safely.
-    if (text.includes("<!--") || /^\s*\[\/\/\]:/.test(text) || /^(?: {4}|\t)/.test(text) || /^ {0,3}>\s*>/.test(text)) {
+    const imageSizes = text.includes("<!--") ? imageSizeComments(text) : null;
+    const otherComment = imageSizes && [...text.matchAll(/<!--/g)].some((match) => !imageSizes.has(match.index));
+    if (otherComment || /^\s*\[\/\/\]:/.test(text) || /^(?: {4}|\t)/.test(text) || /^ {0,3}>\s*>/.test(text)) {
       result.type = "source";
       return result;
     }
@@ -1222,6 +1250,7 @@
           element.alt = token.text;
           element.loading = "lazy";
           if (token.title) element.title = token.title;
+          if (token.size) element.dataset.size = token.size;
         } else if (token.type === "link") {
           element.className = "byMDlink";
           element.href = token.url;

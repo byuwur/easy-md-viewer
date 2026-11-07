@@ -19,6 +19,81 @@ const legacyThemeCSS = (theme) => {
 };
 
 // --- STANDALONE RENDERER ---
+test("Image size metadata preserves Markdown and responsive image proportions", async (t) => {
+  const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined });
+  try {
+    const page = await browser.newPage({ viewport: { width: 1100, height: 800 } });
+    await page.route("https://images.example/image.svg", (route) =>
+      route.fulfill({ contentType: "image/svg+xml", body: '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400"><rect width="800" height="400" fill="#0969da"/></svg>' })
+    );
+    await page.setContent('<div id="viewer" style="width:900px"></div>');
+    await page.addStyleTag({ path: path.join(__dirname, "../md.css") });
+    await page.addScriptTag({ path: path.join(__dirname, "../md.js") });
+    const image = '![A logo](https://images.example/image.svg "Original title")';
+    await t.test("all presets and Original use exact widths without changing the image attributes", async () => {
+      for (const [size, width] of [
+        ["default", 800],
+        ["original", 800],
+        ["xs", 96],
+        ["small", 160],
+        ["regular", 320],
+        ["large", 480],
+        ["xl", 720]
+      ]) {
+        await page.evaluate(({ image, size }) => byMDviewer(document.getElementById("viewer"), image + (size === "default" ? "" : `<!-- bymd:size=${size} -->`), { toolbar: false, animations: false }), { image, size });
+        await page.waitForFunction(() => document.querySelector("#viewer img")?.naturalWidth === 800);
+        const result = await page
+          .locator("#viewer img")
+          .evaluate((img) => ({ width: img.getBoundingClientRect().width, height: img.getBoundingClientRect().height, alt: img.alt, title: img.title, src: img.getAttribute("src"), size: img.dataset.size || "default" }));
+        assert.deepEqual(result, { width, height: width / 2, alt: "A logo", title: "Original title", src: "https://images.example/image.svg", size });
+        assert.equal(await page.locator("#viewer").textContent(), "");
+      }
+    });
+    await t.test("Original and large presets shrink to the available document width", async () => {
+      await page.locator("#viewer").evaluate((root) => {
+        root.style.width = "220px";
+      });
+      for (const size of ["original", "regular", "large", "xl"]) {
+        await page.evaluate(({ image, size }) => byMDviewer(document.getElementById("viewer"), `${image}<!-- bymd:size=${size} -->`, { toolbar: false, animations: false }), { image, size });
+        const available = await page.locator("#viewer .byMDparagraph").evaluate((paragraph) => paragraph.getBoundingClientRect().width);
+        const box = await page.locator("#viewer img").boundingBox();
+        assert.equal(box.width, available);
+        assert.equal(box.height, available / 2);
+      }
+    });
+    await t.test("source ranges include only the image's own adjacent valid size marker", async () => {
+      const result = await page.evaluate((image) => {
+        const source = `😀 **${image}<!-- bymd:size=small -->** after`;
+        const token = byMDviewer.parseInline(source).find((item) => item.type === "strong").children[0];
+        return {
+          source: source.slice(token.from, token.to),
+          metadata: source.slice(token.sizeFrom, token.to),
+          size: token.size,
+          alt: source.slice(token.bodyFrom, token.bodyTo),
+          heading: byMDviewer.scanLine(`# ${image}<!-- bymd:size=xl -->`).type,
+          bullet: byMDviewer.scanLine(`- ${image}<!-- bymd:size=xs -->`).type,
+          comment: byMDviewer.scanLine(`${image}<!-- bymd:size=small --><!-- unrelated -->`).type
+        };
+      }, image);
+      assert.deepEqual(result, { source: `${image}<!-- bymd:size=small -->`, metadata: "<!-- bymd:size=small -->", size: "small", alt: "A logo", heading: "heading", bullet: "bullet", comment: "source" });
+    });
+    await t.test("nested images render sizes while code, unsafe URLs, and unrelated comments stay unchanged", async () => {
+      const source = `> ${image}<!-- bymd:size=small -->\n\n- ${image}<!-- bymd:size=xs -->\n\n[${image}<!-- bymd:size=large -->](https://example.com)\n\n\`${image}<!-- bymd:size=xl -->\`\n\n~~~md\n${image}<!-- bymd:size=xl -->\n~~~\n\n${image}<!-- bymd:size=unknown -->\n\n<!-- bymd:size=small -->\n\n![Unsafe](javascript:alert(1))<!-- bymd:size=xl -->`;
+      await page.evaluate((source) => byMDviewer(document.getElementById("viewer"), source, { toolbar: false, animations: false }), source);
+      assert.deepEqual(await page.locator("#viewer img").evaluateAll((images) => images.map((img) => img.dataset.size || "default")), ["small", "xs", "large", "default"]);
+      assert.equal(await page.locator("#viewer code").first().textContent(), `${image}<!-- bymd:size=xl -->`);
+      assert.equal(await page.locator("#viewer pre code").textContent(), `${image}<!-- bymd:size=xl -->`);
+      assert.equal(await page.locator('#viewer img[src^="javascript:"]').count(), 0);
+      assert.equal(await page.locator("#viewer").evaluate((root) => [...root.childNodes].some((item) => item.textContent === "<!-- bymd:size=small -->")), false);
+      await page.evaluate((image) => byMDviewer(document.getElementById("viewer"), `${image}<!-- bymd:size=small -->`, { toolbar: false, withImages: false }), image);
+      assert.equal(await page.locator("#viewer img").count(), 0);
+      assert.equal((await page.locator("#viewer").textContent()).includes("bymd:size"), false);
+    });
+  } finally {
+    await browser.close();
+  }
+});
+
 test("Markdown rendering", async (t) => {
   const browser = await chromium.launch({
     executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined

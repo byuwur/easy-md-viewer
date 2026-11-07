@@ -248,6 +248,18 @@ Supports ATX headings, emphasis, strikethrough, code spans/fences, ordered/unord
 
 Rendering normalizes CR/LF/CRLF and removes a leading BOM; Shift+Copy retains the original Markdown. Full-document rendering is synchronous and has no document-size limit. Bound large documents in the calling application; the inline parser's limit below does not cap the renderer.
 
+### Images
+
+Images without size metadata keep their existing dimensions and responsive `max-width: 100%`. Append an optional size comment immediately after an inline image, on the same line:
+
+```markdown
+![A logo](logo.png "Original title")<!-- bymd:size=small -->
+```
+
+Presets are `xs` (96px), `small` (160px), `regular` (320px), `large` (480px), and `xl` (720px). `original` uses the image's natural width. All preserve aspect ratio and shrink to fit the document. Default sizing has no comment; unknown values are ignored. Alt text, URL, and title retain their normal meanings. Code spans and fenced code keep the metadata literal.
+
+The image remains standard Markdown. Other engines supporting HTML comments render it normally and ignore the size hint; engines that escape raw HTML may display the comment. The selected size is specific to renderers supporting this extension.
+
 ### Code blocks
 
 For syntax highlighting, load [easy-code-viewer](https://github.com/byuwur/easy-code-viewer)'s CSS and JavaScript before rendering Markdown:
@@ -289,6 +301,8 @@ Raw HTML is displayed as text. Comments and document markers such as `[//]: # "O
 ### Source ranges for editing
 
 `byMDviewer.parseInline(source, options = {})` exposes the renderer's inline tokens without creating DOM or changing the source. Token types are `text`, `escape`, `entity`, `code`, `image`, `link`, `strong`, `em`, `strongEm`, and `del`. Every token has `from` and `to`; formatted tokens also provide `bodyFrom`, `bodyTo`, and nested `children` where applicable. Ranges are half-open UTF-16 indexes into the supplied string, matching JavaScript slicing and DOM selections. `withLinks`, `withImages`, and `withStrikethrough` default to `true`, with the renderer's URL checks.
+
+An image with recognized size metadata also has `size` (the preset name) and `sizeFrom` (the comment's starting offset); its `to` includes that comment. Images without metadata retain their existing token shape. `scanLine()` keeps lines with attached image-size metadata visually editable; unrelated comments still use its source fallback.
 
 Non-string source throws `TypeError`; more than 65,536 characters throws `RangeError`. Inline nesting beyond 32 levels stays literal, in both parsing and rendering.
 
