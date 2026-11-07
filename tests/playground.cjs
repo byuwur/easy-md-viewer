@@ -42,11 +42,15 @@ const getBootstrapCSS = () =>
 
 const codeAssets = new Map();
 const getCodeAsset = (url) => {
-  if (!codeAssets.has(url)) codeAssets.set(url, (async () => {
-    const response = await fetch(url, { signal: AbortSignal.timeout(15000) });
-    assert.ok(response.ok, "Unable to load pinned CODE asset");
-    return { body: await response.text(), contentType: url.endsWith(".js") ? "text/javascript" : "text/css" };
-  })());
+  if (!codeAssets.has(url))
+    codeAssets.set(
+      url,
+      (async () => {
+        const response = await fetch(url, { signal: AbortSignal.timeout(15000) });
+        assert.ok(response.ok, "Unable to load pinned CODE asset");
+        return { body: await response.text(), contentType: url.endsWith(".js") ? "text/javascript" : "text/css" };
+      })()
+    );
   return codeAssets.get(url);
 };
 
@@ -79,6 +83,9 @@ test("displayed, copied, and downloaded starters match with CDN or local assets"
       await route.fulfill({ body, contentType: file.endsWith(".html") ? "text/html" : file.endsWith(".js") ? "text/javascript" : "text/css" });
     });
     await playground.goto("https://viewer.test/index.html");
+    assert.equal(await playground.locator(".playground-toolbar #open-file").count(), 1);
+    assert.equal(await playground.locator("#source-panel #render-source").count(), 1);
+    assert.equal(await playground.locator("#rerun-benchmark, #playground > .discovery").count(), 0);
     const release = await playground
       .frameLocator("#preview-frame")
       .locator(".byVIEWtoolbar")
@@ -269,6 +276,10 @@ test("displayed, copied, and downloaded starters match with CDN or local assets"
 
 // --- CONFIGURATION AND FAMILY NAVIGATION ---
 test("family customization, navigation and monospace controls", async () => {
+  const bootstrapJS = await fetch("https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/js/bootstrap.min.js").then((response) => {
+    assert.ok(response.ok, "Unable to load pinned Bootstrap JS");
+    return response.text();
+  });
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined, channel: process.env.BROWSER_CHANNEL || undefined });
   try {
     const page = await browser.newPage();
@@ -286,6 +297,7 @@ test("family customization, navigation and monospace controls", async () => {
     );
     await page.route("**/*", async (route) => {
       if (route.request().url() === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
+      if (route.request().url() === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/js/bootstrap.min.js") return route.fulfill({ body: bootstrapJS, contentType: "text/javascript" });
       const url = new URL(route.request().url());
       if ([`${codeCDNBase}code.min.css`, `${codeCDNBase}code.min.js`].includes(url.href)) {
         return route.fulfill(await getCodeAsset(url.href));
@@ -538,6 +550,22 @@ test("family customization, navigation and monospace controls", async () => {
         delete window.originalFileText;
       });
     }
+    await page.setViewportSize({ width: 1280, height: 900 });
+    assert.equal(await page.locator('#document-source [value="local"]').count(), 0);
+    const uploadedSource = "# Your uploaded document\n\nPreserve this draft.";
+    await page.locator("#local-file").setInputFiles({ name: "uploaded.md", mimeType: "text/markdown", buffer: Buffer.from(uploadedSource) });
+    await page.waitForFunction(() => document.getElementById("document-source").value === "local");
+    assert.equal(await page.locator('#document-source [value="local"]').textContent(), "uploaded.md");
+    assert.equal(await sourceEditor.inputValue(), uploadedSource);
+    await page.locator("#document-source").selectOption("features");
+    await page.locator("#document-source").selectOption("local");
+    assert.equal(await sourceEditor.inputValue(), uploadedSource);
+    const largeSource = "# Large live source\n\n" + "x".repeat(70000);
+    await sourceEditor.fill(largeSource);
+    await frame.waitForFunction(() => document.getElementById("document").textContent.includes("Large live source"));
+    await sourceEditor.fill(largeSource.replace("Large live source", "Latest live source"));
+    await frame.waitForFunction(() => document.getElementById("document").textContent.includes("Latest live source"));
+    assert.equal(await frame.locator("#document").evaluate((element) => element.textContent.includes("Large live source")), false);
     assert.deepEqual(errors, []);
   } finally {
     await browser.close();

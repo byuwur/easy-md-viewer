@@ -71,16 +71,19 @@
         <div class="playground border">
           <div class="playground-toolbar bg-body-tertiary px-4 py-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
             <h2 id="playground-title" class="h6 m-0 fw-semibold">Playground</h2>
-            <div class="source-picker">
-              <label class="small font-monospace text-body-secondary d-block mb-1" for="document-source">Sample</label>
-              <select id="document-source" class="form-select">
-                <option value="showcase">Default showcase</option>
-                <option value="features">Full feature showcase</option>
-                <option value="benchmark">Benchmark = test.md</option>
-                <option value="custom">Custom Markdown</option>
-                <option value="local">Local file…</option>
-                <option value="example" hidden="">Feature example</option>
-              </select>
+            <div class="d-flex flex-column flex-sm-row align-items-sm-end gap-3 mw-100">
+              <div class="source-picker">
+                <label class="visually-hidden" for="document-source">Sample</label>
+                <select id="document-source" class="form-select">
+                  <option value="showcase">Default showcase sample</option>
+                  <option value="features">Full feature showcase sample</option>
+                  <option value="benchmark">Benchmark = test.md sample</option>
+                  <option value="custom">Custom Markdown</option>
+                  <option value="example" hidden="">Feature example sample</option>
+                </select>
+              </div>
+              <button id="open-file" class="btn btn-outline-secondary fw-semibold flex-shrink-0" type="button"><i class="fa-solid fa-folder-open me-1" aria-hidden="true"></i> Upload your file</button>
+              <input id="local-file" type="file" accept=".md,.markdown,text/markdown,text/plain" hidden="" />
             </div>
           </div>
           <div id="source-error" class="alert alert-danger small m-0" role="alert" hidden="">
@@ -288,11 +291,12 @@
             </section>
 
             <section id="source-panel" class="tab-pane panel flex-column d-md-flex source-panel col-12 col-md-6 col-xl-4" aria-labelledby="source-heading">
-              <div class="panel-heading border-bottom d-flex flex-wrap flex-md-nowrap align-items-center justify-content-between gap-2 px-3 px-xxl-4 py-3">
+              <div class="panel-heading border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 px-3 px-xxl-4 py-3">
                 <h3 id="source-heading" class="h6 m-0 fw-semibold">
                   <label for="markdown-source"><span class="small font-monospace text-body-secondary me-2">02</span> Markdown source</label>
                 </h3>
                 <div class="d-flex gap-1 flex-shrink-0">
+                  <button id="render-source" class="btn btn-sm text-nowrap btn-outline-secondary fw-semibold" type="button"><i class="fa-solid fa-play me-1" aria-hidden="true"></i> Render</button>
                   <button id="restore-source" class="btn btn-sm text-nowrap btn-outline-secondary fw-semibold" type="button"><i class="fa-solid fa-rotate-left me-1" aria-hidden="true"></i> Restore</button>
                   <button id="copy-markdown" class="btn btn-sm copy-button text-nowrap btn-outline-secondary fw-semibold" type="button"><i class="fa-solid fa-copy me-1" aria-hidden="true"></i> <span aria-live="polite">Copy</span></button>
                 </div>
@@ -342,15 +346,6 @@ Write Markdown here…"></textarea>
               <dd class="m-0 font-monospace" id="metric-nodes">—</dd>
             </div>
           </dl>
-        </div>
-        <div class="discovery py-4 border-bottom d-flex flex-wrap align-items-center gap-2">
-          <span class="small font-monospace text-body-secondary me-2">Try it!</span>
-          <button id="open-file" class="btn btn-outline-secondary fw-semibold" type="button"><i class="fa-solid fa-folder-open me-1" aria-hidden="true"></i> Open .md file</button>
-          <input id="local-file" type="file" accept=".md,.markdown,text/markdown,text/plain" hidden="" />
-          <button id="rerun-benchmark" class="btn btn-outline-secondary fw-semibold" type="button" title="Time the synchronous byMDviewer() call; excludes browser paint and resource loading">
-            <i class="fa-solid fa-rotate-right me-1" aria-hidden="true"></i> <span>Rerun measurement</span>
-          </button>
-          <span id="document-state" class="font-monospace text-body-secondary small ms-sm-auto">Original</span>
         </div>
 
         <div id="feedback" class="small text-body-secondary mt-2" role="status" aria-live="polite"></div>
@@ -641,7 +636,7 @@ Write Markdown here…"></textarea>
         --by-view-container-bg: #0000;
         border: 0;
         border-radius: 0;
-        height: 28rem;
+        height: 30.8rem;
         white-space: pre-wrap;
         overflow-wrap: anywhere;
       }
@@ -969,7 +964,6 @@ Write Markdown here…"></textarea>
 
         function updateSourceState() {
           const edited = state.drafts[state.source] !== state.originals[state.source];
-          document.getElementById("document-state").textContent = edited ? "Edited" : "Original";
           document.getElementById("restore-source").disabled = !edited;
         }
 
@@ -1000,7 +994,7 @@ Write Markdown here…"></textarea>
               editor.value = "";
               document.getElementById("render-status").textContent = "Source unavailable";
               clearPreview();
-              const message = error.message === "file-protocol" ? "To fetch test.md, serve this folder over HTTP. You can also open test.md with Open .md file." : `Could not load test.md (${error.message}). Retry or open the file locally.`;
+              const message = error.message === "file-protocol" ? "To fetch test.md, serve this folder over HTTP. Use Upload your file to open test.md locally." : `Could not load test.md (${error.message}). Retry or open the file locally.`;
               showSourceError(message, location.protocol !== "file:");
               return;
             }
@@ -1026,7 +1020,9 @@ Write Markdown here…"></textarea>
             if (request !== state.sourceRequest) return;
             state.originals.local = markdown;
             state.drafts.local = markdown;
-            sourceSelect.querySelector('[value="local"]').textContent = file.name;
+            const localOption = sourceSelect.querySelector('[value="local"]');
+            if (localOption) localOption.textContent = file.name;
+            else sourceSelect.add(new Option(file.name, "local"));
             await selectSource("local");
             setMobilePanel("source");
             document.getElementById("feedback").textContent = `Opened ${file.name}.`;
@@ -1040,7 +1036,7 @@ Write Markdown here…"></textarea>
           clearTimeout(state.renderTimer);
           if (state.previewReady) frame.contentDocument.getElementById("document").textContent = "";
           for (const name of ["size", "lines", "time", "nodes"]) document.getElementById(`metric-${name}`).textContent = "—";
-          document.getElementById("rerun-benchmark").disabled = true;
+          document.getElementById("render-source").disabled = true;
         }
 
         function renderPreview(resetScroll = false) {
@@ -1066,8 +1062,7 @@ Write Markdown here…"></textarea>
             document.getElementById("metric-nodes").textContent = target.querySelectorAll("*").length.toLocaleString();
             document.getElementById("render-status").textContent = hasContent ? "Live" : "Empty document";
             previewWindow.document.getElementById("empty-document").hidden = hasContent;
-            document.getElementById("rerun-benchmark").disabled = false;
-            document.getElementById("rerun-benchmark").querySelector("span").textContent = state.source === "benchmark" ? "Rerun benchmark" : "Rerun measurement";
+            document.getElementById("render-source").disabled = false;
           } catch {
             document.getElementById("render-status").textContent = "Preview unavailable";
             showSourceError("The preview could not render. Choose another document or reload the page.");
@@ -1115,8 +1110,7 @@ Write Markdown here…"></textarea>
               state.previewReady = false;
               document.getElementById("render-status").textContent = "Preview unavailable";
               showSourceError("The preview left this document or md.js could not load. Reload the preview to continue.");
-              document.getElementById("rerun-benchmark").querySelector("span").textContent = "Reload preview";
-              document.getElementById("rerun-benchmark").disabled = false;
+              document.getElementById("render-source").disabled = false;
             }
           });
           // Interpolate scripts so escaped closing tags do not confuse HTML highlighting.
@@ -1175,7 +1169,7 @@ Write Markdown here…"></textarea>
           state.originals.example = example.source;
           state.drafts.example = example.source;
           selectSource("example");
-          sourceSelect.querySelector('[value="example"]').textContent = example.name;
+          sourceSelect.querySelector('[value="example"]').textContent = `${example.name} sample`;
           document.querySelectorAll(".feature-chip").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.example === name)));
           setMobilePanel("preview");
           document.getElementById("feedback").textContent = `${example.name}. Your other document drafts are kept.`;
@@ -1354,12 +1348,7 @@ Write Markdown here…"></textarea>
           setPreviewTheme("light");
           document.getElementById("feedback").textContent = "Default options, light preview, and default text size restored.";
         });
-        sourceSelect.addEventListener("change", () => {
-          if (sourceSelect.value === "local" && state.drafts.local === undefined) {
-            sourceSelect.value = state.source;
-            document.getElementById("local-file").click();
-          } else selectSource(sourceSelect.value);
-        });
+        sourceSelect.addEventListener("change", () => selectSource(sourceSelect.value));
         document.getElementById("open-file").addEventListener("click", () => document.getElementById("local-file").click());
         document.getElementById("local-file").addEventListener("change", (event) => {
           loadLocalFile(event.target.files[0]);
@@ -1392,7 +1381,7 @@ Write Markdown here…"></textarea>
           if (example) showExample(example.dataset.example);
         });
 
-        document.getElementById("rerun-benchmark").addEventListener("click", () => {
+        document.getElementById("render-source").addEventListener("click", () => {
           if (!state.previewReady) {
             showSourceError();
             // Reassigning srcdoc retries a failed iframe load.
