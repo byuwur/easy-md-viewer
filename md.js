@@ -87,6 +87,7 @@
     warnMissingThemes(element, palette ?? element.dataset.theme);
     const size = typeof fontSize === "number" ? `${Math.max(0.5, Math.min(3, fontSize))}rem` : typeof fontSize === "string" ? `clamp(0.5rem, ${fontSize}, 3rem)` : "";
     if (fontSize != null && (typeof fontSize === "number" ? !Number.isFinite(fontSize) : typeof fontSize !== "string" || !CSS.supports("font-size", size))) throw new RangeError("Font size must be a finite multiplier or a CSS size.");
+    // Keep palette identity in data-theme while light/dark classes select its mode.
     if (theme != null || palette != null) {
       const mode = theme ?? (["light", "dark"].includes(element.dataset.theme) ? element.dataset.theme : element.classList.contains("dark") ? "dark" : "light");
       element.classList.toggle("light", mode === "light");
@@ -171,6 +172,7 @@
    * @return {HTMLElement} The text size button group.
    */
   const appendFontSizeControls = (element, controls) => {
+    // Remember the caller's initial size so Reset also works after this toolbar is recreated.
     element.dataset.byViewDefaultFontSize ??= element.style.fontSize;
     const sizes = document.createElement("div");
     sizes.className = "byVIEWfontSizes";
@@ -373,6 +375,7 @@
     // Remove ASCII controls and whitespace only for protocol inspection.
     // This prevents strings such as "java\nscript:" from bypassing the protocol check.
     const protocolProbe = url.replace(/[\u0000-\u0020\u007f]+/g, "");
+    // Relative destinations are allowed; an explicit scheme must pass the link or image allowlist.
     const protocolMatch = protocolProbe.match(/^([a-zA-Z][a-zA-Z\d+.-]*):/);
     if (!protocolMatch) return true;
     const protocol = `${protocolMatch[1].toLowerCase()}:`;
@@ -627,6 +630,7 @@
     const occurrences = options[HEADING_IDS];
     const original = headingSlug(value);
     let result = original;
+    // Check every emitted slug so a literal heading such as title-1 cannot collide with a generated suffix.
     while (Object.prototype.hasOwnProperty.call(occurrences, result)) {
       occurrences[original] += 1;
       result = `${original}-${occurrences[original]}`;
@@ -673,7 +677,9 @@
     };
     const formatted = (type, from, to, bodyFrom, bodyTo, extra = {}) => {
       literal(from);
+      // Carry absolute UTF-16 ranges through nested tokens so the editor can map visible text back to source.
       const token = { type, from: base + from, to: base + to, bodyFrom: base + bodyFrom, bodyTo: base + bodyTo, ...extra };
+      // These token bodies are literal or already decoded; recursively parsing them would change their meaning.
       if (!["code", "image", "entity", "escape"].includes(type) && !extra.auto) token.children = inlineTokens(text.slice(bodyFrom, bodyTo), options, base + bodyFrom, depth + 1);
       tokens.push(token);
       start = to;
@@ -963,6 +969,7 @@
         i += 1;
         continue;
       }
+      // A pipe inside a code span belongs to that cell and must not split the table row.
       if (source[i] === "`") {
         const run = markerRun(source, i);
         const close = findClosingCodeRun(source, i + run, run);
@@ -1329,6 +1336,7 @@
       if (startsBlock(lines, index, { ...options, withTables: false })) break;
       const cells = splitTableRow(lines[index]);
       const row = document.createElement("tr");
+      // Keep extra body cells instead of silently dropping data from an uneven table row.
       const width = Math.max(headers.length, cells.length);
       for (let column = 0; column < width; column++) {
         const td = document.createElement("td");
@@ -1359,6 +1367,7 @@
     const minimumLength = opening[1].length;
     const info = opening[2].trim();
     const language = info ? info.split(/\s+/)[0] : "";
+    // A closing fence must use the same marker and be at least as long as the opening run.
     const closePattern = new RegExp(`^ {0,3}${marker === "`" ? "`" : "~"}{${minimumLength},}\\s*$`);
     const body = [];
     let index = start + 1;
@@ -1602,6 +1611,7 @@
       appearAnimation: false,
       controlsPosition: "top",
       ...options,
+      // Allocate slug ownership per render so duplicate headings never depend on another viewer's content.
       [HEADING_IDS]: Object.create(null)
     };
     applyAppearance(element, options);
@@ -1623,6 +1633,7 @@
     content.className = "byMDcontent";
     element.appendChild(content);
     renderBlocks(content, normalized.split("\n"), options);
+    // Copy uses the caller's original source, preserving line endings that were normalized only for display.
     appendViewerControls(element, options, "md", source);
   }
   /**
