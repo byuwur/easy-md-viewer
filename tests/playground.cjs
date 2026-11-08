@@ -10,7 +10,20 @@ const os = require("node:os");
 const fs = require("node:fs/promises");
 const test = require("node:test");
 const { pathToFileURL } = require("node:url");
-const { chromium } = require("playwright");
+const { chromium, firefox, webkit } = require("playwright");
+const browserEngine = process.env.BROWSER_ENGINE || "chromium";
+assert.ok(["chromium", "firefox", "webkit"].includes(browserEngine), "Unsupported BROWSER_ENGINE");
+const browserType = { chromium, firefox, webkit }[browserEngine];
+// Browser channels and executable overrides apply only to Chromium.
+const launchBrowser = () =>
+  browserType.launch(
+    browserEngine === "chromium"
+      ? {
+          channel: process.env.BROWSER_CHANNEL || undefined,
+          executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined
+        }
+      : {}
+  );
 // Match the published companion pin, independently of newer sibling source.
 const codeCDNBase = require("node:fs")
   .readFileSync(path.join(__dirname, "../index.html"), "utf8")
@@ -32,6 +45,7 @@ const legacyThemeCSS = (theme) => {
 
 // --- PLAYGROUND ASSETS ---
 let bootstrapCSS;
+// Use the playground's pinned stylesheet so responsive checks exercise its real layout.
 const getBootstrapCSS = () =>
   (bootstrapCSS ??= (async () => {
     if (process.env.BOOTSTRAP_CSS_PATH) return require("node:fs/promises").readFile(process.env.BOOTSTRAP_CSS_PATH, "utf8");
@@ -56,11 +70,12 @@ const getCodeAsset = (url) => {
 
 // --- PLAYGROUND AND STARTER EXPORTS ---
 test("displayed, copied, and downloaded starters match with CDN or local assets", async () => {
-  const browser = await chromium.launch({ channel: process.env.BROWSER_CHANNEL || undefined, executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined });
+  const browser = await launchBrowser();
   try {
     const playground = await browser.newPage();
     const errors = [];
     playground.on("pageerror", (error) => errors.push(error.message));
+    // Capture clipboard writes without depending on OS clipboard permissions.
     await playground.addInitScript(() => {
       Object.defineProperty(navigator, "clipboard", {
         value: {
@@ -70,6 +85,7 @@ test("displayed, copied, and downloaded starters match with CDN or local assets"
         }
       });
     });
+    // Keep the pinned CODE companion real while serving this viewer from local authored assets.
     await playground.route("**/*", async (route) => {
       if (route.request().url() === "https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/bootstrap.min.css") return route.fulfill({ body: await getBootstrapCSS(), contentType: "text/css" });
       const url = new URL(route.request().url());
@@ -173,7 +189,7 @@ test("displayed, copied, and downloaded starters match with CDN or local assets"
               const rect = button.getBoundingClientRect();
               return {
                 scrollable: scroller.scrollHeight > scroller.clientHeight,
-                visible: bounds.top >= 0 && bounds.bottom <= view.innerHeight,
+                visible: bounds.top >= -1 && bounds.bottom <= view.innerHeight + 1,
                 pinned: Math.abs(position === "top" ? bounds.top : view.innerHeight - bounds.bottom) < 1,
                 creditsOrdered: position !== "bottom" || credits.top >= controls.bottom || (credits.top < controls.bottom && credits.bottom > controls.top),
                 opaque: getComputedStyle(root.querySelector(".byVIEWcopy")).backgroundColor === getComputedStyle(root).backgroundColor,
@@ -213,6 +229,7 @@ test("displayed, copied, and downloaded starters match with CDN or local assets"
     }
     const directory = await fs.mkdtemp(path.join(os.tmpdir(), "viewer-starter-"));
     await Promise.all(["md.js", "md.css"].map((file) => fs.copyFile(path.join(__dirname, "..", file), path.join(directory, file))));
+    // Run the exported starter in a fresh page to catch missing assets or initialization.
     const exported = await browser.newPage();
     exported.on("pageerror", (error) => errors.push(error.message));
     await exported.route("https://cdn.jsdelivr.net/**", async (route) => {
@@ -280,7 +297,7 @@ test("family customization, navigation and monospace controls", async () => {
     assert.ok(response.ok, "Unable to load pinned Bootstrap JS");
     return response.text();
   });
-  const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined, channel: process.env.BROWSER_CHANNEL || undefined });
+  const browser = await launchBrowser();
   try {
     const page = await browser.newPage();
     const errors = [];
@@ -445,7 +462,8 @@ test("family customization, navigation and monospace controls", async () => {
     await page.keyboard.press("ArrowRight");
     assert.equal(JSON.parse(await page.locator("#options-json").inputValue()).linkTarget, false);
     await page.waitForFunction(() => !document.getElementById("preview-frame").contentDocument.querySelector('.byMDlink[href^="https://"]')?.hasAttribute("target"));
-    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowLeft");
+    await page.keyboard.press("ArrowLeft");
     assert.equal(await page.locator("#linkTarget-0").isChecked(), true);
     await page.waitForFunction(() => getComputedStyle(document.querySelector(".preview-appearance"), "::details-content").opacity === "1");
     await page.locator("#preview-controls-font-0").focus();
@@ -472,9 +490,9 @@ test("family customization, navigation and monospace controls", async () => {
     assert.deepEqual(
       await root.evaluate((element) => {
         const style = getComputedStyle(element);
-        return { font: style.fontFamily, size: style.fontSize, line: style.lineHeight, bg: style.backgroundColor, text: style.color };
+        return { font: style.fontFamily, size: style.fontSize, line: Math.round(parseFloat(style.lineHeight) * 1000) / 1000, bg: style.backgroundColor, text: style.color };
       }),
-      { font: "Georgia, serif", size: "24px", line: "43.2px", bg: "rgb(18, 52, 86)", text: "rgb(254, 220, 186)" }
+      { font: "Georgia, serif", size: "24px", line: 43.2, bg: "rgb(18, 52, 86)", text: "rgb(254, 220, 186)" }
     );
     assert.match(await frame.locator(".byVIEWtoolbar").evaluate((element) => getComputedStyle(element).fontFamily), /system-ui/);
     await page.locator("#copy-appearance").evaluate((button) => button.click());
@@ -574,7 +592,7 @@ test("family customization, navigation and monospace controls", async () => {
 
 // --- PALETTES AND CUSTOM THEME EDITING ---
 test("playground palettes and editable two-mode custom themes stay synchronized", async () => {
-  const browser = await chromium.launch({ channel: process.env.BROWSER_CHANNEL || undefined, executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined });
+  const browser = await launchBrowser();
   try {
     const page = await browser.newPage();
     const errors = [];
@@ -610,6 +628,7 @@ test("playground palettes and editable two-mode custom themes stay synchronized"
         for (const animation of element.getAnimations()) if (animation.transitionProperty === "background-color") animation.finish();
         return getComputedStyle(element).backgroundColor;
       });
+    // Hiding the header must disable dependent controls without erasing their configured values.
     const headerSettings = page.locator('#credits, #themeToggle, #fontSizeControls, #copyButton, #controlsCompact, [name="controlsSize"], [name="controlsPosition"]');
     const selectedSettings = await headerSettings.evaluateAll((controls) => controls.map((control) => [control.value, control.checked]));
     await page.locator("#toolbar").uncheck();
@@ -670,8 +689,12 @@ test("playground palettes and editable two-mode custom themes stay synchronized"
     await page.locator(".preview-appearance").evaluate((element) => {
       element.open = true;
     });
+    // Distinct light and dark values expose mode mixups and CSS leaking into the host page.
     const custom = '.byMDdocument.light[data-theme="custom"] { --by-md-bg: #f3f8fc; }\n.byMDdocument.dark[data-theme="custom"] { --by-md-bg: #102a43; }';
+    // fill() does not wait for the disclosure's opening transition.
+    await page.waitForFunction(() => getComputedStyle(document.querySelector(".preview-appearance"), "::details-content").opacity === "1");
     await editor.fill(custom);
+    assert.equal(await editor.inputValue(), custom);
     await page.waitForFunction(() => document.getElementById("preview-palette").value === "custom");
     assert.equal(await background(), "rgb(16, 42, 67)");
     await setMode("light");
@@ -705,7 +728,7 @@ test("playground palettes and editable two-mode custom themes stay synchronized"
 
 // --- CODE VIEWER PLAYGROUND INTEGRATION ---
 test("playground code examples pin sibling releases and switch presentation without changing Markdown", async () => {
-  const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined, channel: process.env.BROWSER_CHANNEL || undefined });
+  const browser = await launchBrowser();
   try {
     const page = await browser.newPage();
     await page.route("**/*", async (route) => {

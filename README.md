@@ -338,9 +338,11 @@ node --test tests/rendering.cjs   # Library
 node --test tests/playground.cjs  # Playground
 ```
 
-`CHROMIUM_EXECUTABLE_PATH` selects a Chromium executable for every test. Otherwise, install Playwright Chromium; `BROWSER_CHANNEL=chrome` applies only to the suites that support it.
+Tests default to Playwright Chromium. Set `BROWSER_ENGINE=firefox` or `BROWSER_ENGINE=webkit` for the other engines. Install matching engines with `npx playwright install chromium firefox webkit` from your external Playwright setup. `BROWSER_CHANNEL=chrome` uses installed Chrome; `CHROMIUM_EXECUTABLE_PATH` selects a Chromium executable. These overrides apply only to Chromium.
 
 [GitHub Actions](.github/workflows/rendering.yml) reports Library and Playground as independent jobs; a failed suite does not cancel the other. Library checks load the renderer directly; playground checks cover the landing page, configuration, and exports.
+
+CI runs library and playground suites independently in Chromium, Firefox, and WebKit. Touch/mobile-width checks cover Chromium and WebKit emulation, with a narrow touch viewport in Firefox. WebKit is not certification of shipping Safari or iOS devices. Synthetic editor composition checks do not reproduce an OS IME. Real mobile keyboards, VoiceOver/NVDA, clipboard permissions, and device-specific rendering still require manual testing; automated checks are not a complete WCAG audit.
 
 ## The easy viewers
 
