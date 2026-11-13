@@ -76,7 +76,8 @@
     const document = element.ownerDocument;
     if (document.defaultView.getComputedStyle(document.documentElement).getPropertyValue("--by-md-themes-loaded").trim() === "1") return;
     warnedPalettes.add(palette);
-    console.warn(`easy-md-viewer: Palette "${palette}" requires md.themes.css. Import it after md.css. https://byuwur.github.io/easy-md-viewer/`);
+    // console.warn(`easy-md-viewer: Palette "${palette}" requires md.themes.css. Import it after md.css. https://byuwur.github.io/easy-md-viewer/`);
+    console.warn(`easy-md-viewer: Palette "${palette}" requires md.themes.css. Import it after md.css. https://md.byuwur.co/`);
   };
 
   // Explicit appearance options override markup; omitted values preserve the container's state.
@@ -1386,7 +1387,8 @@
     code.textContent = body.join("\n");
     if (options.codeHighlighting || options.codeLineNumbers || options.codeStatusBar) {
       if (typeof global.byCODEviewer?.highlight !== "function") {
-        console.warn("easy-md-viewer: Code highlighting and code-block details require easy-code-viewer. https://byuwur.github.io/easy-code-viewer/");
+        // console.warn("easy-md-viewer: Code highlighting and code-block details require easy-code-viewer. https://byuwur.github.io/easy-code-viewer/");
+        console.warn("easy-md-viewer: Code highlighting and code-block details require easy-code-viewer. https://code.byuwur.co/");
         // These options belong to this render; avoid repeating the warning for each fence.
         options.codeHighlighting = options.codeLineNumbers = options.codeStatusBar = false;
       } else {

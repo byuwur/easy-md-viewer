@@ -1083,7 +1083,8 @@ test("optional code highlighting preserves Markdown and follows document themes"
     await t.test("missing libraries stay plain and late loading takes effect on rerender", async () => {
       assert.equal(warnings.length, 1, "Multiple and nested fences warn once per render");
       assert.match(warnings[0], /Code highlighting and code-block details require easy-code-viewer/);
-      assert.ok(warnings[0].includes("https://byuwur.github.io/easy-code-viewer/"));
+      // assert.ok(warnings[0].includes("https://byuwur.github.io/easy-code-viewer/"));
+      assert.ok(warnings[0].includes("https://code.byuwur.co/"));
       await page.evaluate(() => {
         renderMarkdown({ codeHighlighting: false });
         byMDviewer(document.getElementById("viewer"), "Only inline `code`.");
