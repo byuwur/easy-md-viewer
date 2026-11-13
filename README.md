@@ -340,8 +340,8 @@ Install Playwright outside the repository and set `NODE_PATH` to its `node_modul
 
 ```sh
 node --check md.js
-node --test tests/rendering.cjs   # Library
-node --test tests/playground.cjs  # Playground
+node --test __tests__/rendering.cjs   # Library
+node --test __tests__/playground.cjs  # Playground
 ```
 
 Tests default to Playwright Chromium. Set `BROWSER_ENGINE=firefox` or `BROWSER_ENGINE=webkit` for the other engines. Install matching engines with `npx playwright install chromium firefox webkit` from your external Playwright setup. `BROWSER_CHANNEL=chrome` uses installed Chrome; `CHROMIUM_EXECUTABLE_PATH` selects a Chromium executable. These overrides apply only to Chromium.
