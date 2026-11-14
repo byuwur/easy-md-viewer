@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" data-bs-theme="dark">
   <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>easy-md-viewer | Markdown, made to be read.</title>
     <meta name="description" content="Render Markdown with tables, checklists, safe links, code highlighting, and themes. A free, lightweight JavaScript Markdown viewer by BONYUR." />
@@ -1253,7 +1253,7 @@ Write Markdown here…"></textarea>
             "<!doctype html>",
             '<html lang="en">',
             "  <head>",
-            '    <meta charset="utf-8" />',
+            '    <meta charset="UTF-8" />',
             '    <meta name="viewport" content="width=device-width, initial-scale=1" />',
             "    <title>easy-md-viewer</title>",
             `    <link rel="stylesheet" href="${path}md${min}.css" />`,
@@ -1277,7 +1277,7 @@ Write Markdown here…"></textarea>
 
         function downloadHTML() {
           const html = generateIntegration();
-          const url = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
+          const url = URL.createObjectURL(new Blob([html], { type: "text/html;charset=UTF-8" }));
           const link = document.createElement("a");
           link.href = url;
           link.download = "easy-md-viewer.html";
