@@ -33,9 +33,13 @@
     <!-- <meta name="twitter:image" content="https://byuwur.github.io/easy-md-viewer/prev.jpg" /> -->
     <meta name="twitter:image" content="https://md.byuwur.co/prev.jpg" />
     <meta name="twitter:image:alt" content="easy-md-viewer by BONYUR: Markdown playground, options, source editor, and live preview." />
-    <script id="spa-loader" src="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.10/_load.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v1.7/code.min.css" />
+    <script src="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v1.7/code.min.js" defer></script>
+    <script id="spa-loader" src="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.11/_load.min.js"></script>
     <script>
-      const SPA_VERSION = "v20.10";
+      "use strict";
+
+      const SPA_VERSION = "v20.11";
       const HOST = `https://cdn.jsdelivr.net/gh/byuwur/spa.js@${SPA_VERSION}`;
       const SPA_STYLES = [
         { path: "/css/shards.min.css", optional: false },
@@ -47,7 +51,6 @@
         { path: "/css/animate.min.css", optional: false }
       ];
       const SPA_SCRIPTS = [
-        { path: "/_transitions.min.js", optional: true },
         { path: "/js/pickr.min.js", optional: false },
         { path: "/js/popper.min.js", optional: false },
         { path: "/js/bootstrap.min.js", optional: false }
@@ -57,11 +60,9 @@
         await byLoad(SPA_SCRIPTS, { host: HOST, before: document.getElementById("spa-loader") });
       })().catch(console.error);
     </script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v1.7/code.min.css" />
-    <script src="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@v1.7/code.min.js" defer></script>
   </head>
 
-  <body class="byVIEWmotion">
+  <body>
     <a class="visually-hidden-focusable position-absolute top-0 start-0 p-3 z-3 bg-body-tertiary link-body-emphasis" href="#playground">Skip to playground</a>
     <header class="border-bottom">
       <nav class="navbar navbar-expand-md site-width container-fluid" aria-label="Main navigation">
@@ -473,14 +474,7 @@ Write Markdown here..."></textarea>
     <noscript>
       <p class="site-width container-fluid">Enable JavaScript to use the playground. The <a href="https://github.com/byuwur/easy-md-viewer#readme">README</a> includes integration examples.</p>
     </noscript>
-
     <style>
-      .byCODEdocument,
-      .byCODEdocument *,
-      .byMDdocument,
-      .byMDdocument * {
-        transition: none !important;
-      }
       :root {
         --accent: #c4b5fd;
         --accent-text: var(--accent);
@@ -758,53 +752,25 @@ Write Markdown here..."></textarea>
       }
 
       /* --- MOTION --- */
-      body {
-        --by-view-motion-duration: 0s;
+      :root:not(.no-motion) .animate__animated {
+        animation-duration: var(--transition-duration) !important;
       }
-      body.byVIEWmotion {
-        --by-view-motion-duration: 0.3s;
-      }
-      body :is(.btn, .form-control, .form-select, .form-check-input, .accordion-button, summary, a) {
-        transition:
-          color var(--by-view-motion-duration) ease,
-          background-color var(--by-view-motion-duration) ease,
-          border-color var(--by-view-motion-duration) ease,
-          box-shadow var(--by-view-motion-duration) ease,
-          opacity var(--by-view-motion-duration) ease,
-          translate var(--by-view-motion-duration) ease-out !important;
-      }
-      body.byVIEWmotion :is(.btn, summary):active {
-        translate: 0 0.0625em;
-      }
-      body .collapsing {
-        transition: height var(--by-view-motion-duration) ease-out !important;
-      }
-      body .fade {
-        transition: opacity var(--by-view-motion-duration) ease-out !important;
-      }
-      body.byVIEWmotion .animate__animated {
-        animation-duration: var(--by-view-motion-duration) !important;
-      }
-      body.byVIEWmotion details::details-content {
+      :root:not(.no-motion) details::details-content {
         interpolate-size: allow-keywords;
         block-size: 0;
         opacity: 0;
         overflow: clip;
         transition:
-          block-size var(--by-view-motion-duration) ease,
-          opacity var(--by-view-motion-duration) ease,
-          content-visibility var(--by-view-motion-duration) allow-discrete;
+          block-size var(--transition-duration) ease,
+          opacity var(--transition-duration) ease,
+          content-visibility var(--transition-duration) allow-discrete;
       }
-      body.byVIEWmotion details[open]::details-content {
+      :root:not(.no-motion) details[open]::details-content {
         block-size: auto;
         opacity: 1;
       }
-      body:not(.byVIEWmotion),
-      body:not(.byVIEWmotion) *,
-      body:not(.byVIEWmotion) *::before,
-      body:not(.byVIEWmotion) *::after {
+      :root.no-motion .animate__animated {
         animation: none !important;
-        transition: none !important;
       }
 
       @media print {
@@ -817,8 +783,9 @@ Write Markdown here..."></textarea>
         }
       }
     </style>
-
     <script>
+      "use strict";
+
       document.addEventListener("DOMContentLoaded", async () => {
         // DOMContentLoaded does not wait for dynamically loaded SPA styles and scripts.
         await spaReady;
@@ -1258,7 +1225,7 @@ Write Markdown here..."></textarea>
         }
 
         function generateIntegration() {
-          document.body.classList.toggle("byVIEWmotion", state.options.animations);
+          document.documentElement.classList.toggle("no-motion", !state.options.animations);
           for (const control of document.querySelectorAll('#credits, #themeToggle, #fontSizeControls, #copyButton, #controlsCompact, [name="controlsSize"], [name="controlsPosition"]')) control.disabled = !state.options.toolbar;
           document.getElementById("appearAnimation").disabled = !state.options.animations;
           document.getElementById("options-json").value = settingsJSON(state.options);
@@ -1452,8 +1419,7 @@ Write Markdown here..."></textarea>
         selectSource("showcase");
         initializePreview();
       });
-    </script>
-    <script>
+
       (function initColorPickers() {
         document.addEventListener("DOMContentLoaded", async () => {
           // DOMContentLoaded does not wait for dynamically loaded SPA styles and scripts.
@@ -1507,8 +1473,7 @@ Write Markdown here..."></textarea>
           });
         });
       })();
-    </script>
-    <script>
+
       function getPreviewMode(target) {
         return ["light", "dark"].includes(target.dataset.theme) ? target.dataset.theme : target.classList.contains("dark") ? "dark" : "light";
       }
@@ -1672,9 +1637,7 @@ Write Markdown here..."></textarea>
           loadPalette();
         });
       })("md");
-    </script>
 
-    <script>
       // Animate deliberate panel changes; initial content and render batches stay visible.
       document.addEventListener("shown.bs.tab", (event) => {
         const target = event.target.getAttribute("data-bs-target") || event.target.getAttribute("href");
