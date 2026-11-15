@@ -334,7 +334,7 @@
                   title="Ctrl / ⌘ + Enter to render. Tab moves focus."
                   placeholder="# Your document
 
-Write Markdown here…"></textarea>
+Write Markdown here..."></textarea>
               </div>
             </section>
 
@@ -342,7 +342,7 @@ Write Markdown here…"></textarea>
             <section id="preview-panel" class="tab-pane active panel flex-column d-md-flex preview-panel col-12 col-md-6 col-xl-5" aria-labelledby="preview-heading">
               <div class="panel-heading border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 px-3 px-xxl-4 py-3">
                 <h3 id="preview-heading" class="h6 m-0 fw-semibold flex-shrink-0"><span class="small font-monospace text-body-secondary me-2">03</span> Live preview</h3>
-                <span class="font-monospace text-body-secondary small"><span id="render-status" role="status">Loading…</span></span>
+                <span class="font-monospace text-body-secondary small"><span id="render-status" role="status">Loading...</span></span>
               </div>
               <div class="panel-body overflow-hidden flex-grow-1">
                 <iframe id="preview-frame" title="Live Markdown document" allow="clipboard-write" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" class="d-block w-100 h-100 border-0"></iframe>
@@ -352,19 +352,19 @@ Write Markdown here…"></textarea>
           <dl class="metric-strip bg-body-tertiary m-0 border-top row g-0" aria-label="Measurements for the current render">
             <div class="metric p-3 col-6 col-md-3">
               <dt class="small fw-normal font-monospace text-body-secondary mb-2">Source size</dt>
-              <dd class="m-0 font-monospace" id="metric-size">—</dd>
+              <dd class="m-0 font-monospace" id="metric-size">-</dd>
             </div>
             <div class="metric p-3 col-6 col-md-3">
               <dt class="small fw-normal font-monospace text-body-secondary mb-2">Lines</dt>
-              <dd class="m-0 font-monospace" id="metric-lines">—</dd>
+              <dd class="m-0 font-monospace" id="metric-lines">-</dd>
             </div>
             <div class="metric p-3 col-6 col-md-3">
               <dt class="small fw-normal font-monospace text-body-secondary mb-2" title="Synchronous byMDviewer() call; excludes browser paint and resource loading">Renderer call</dt>
-              <dd class="m-0 font-monospace" id="metric-time">—</dd>
+              <dd class="m-0 font-monospace" id="metric-time">-</dd>
             </div>
             <div class="metric p-3 col-6 col-md-3">
               <dt class="small fw-normal font-monospace text-body-secondary mb-2">DOM elements</dt>
-              <dd class="m-0 font-monospace" id="metric-nodes">—</dd>
+              <dd class="m-0 font-monospace" id="metric-nodes">-</dd>
             </div>
           </dl>
         </div>
@@ -1007,7 +1007,7 @@ Write Markdown here…"></textarea>
           document.querySelectorAll(".feature-chip").forEach((button) => button.setAttribute("aria-pressed", "false"));
           showSourceError();
           editor.disabled = true;
-          document.getElementById("render-status").textContent = "Loading…";
+          document.getElementById("render-status").textContent = "Loading...";
           document.getElementById("copy-markdown").disabled = true;
           document.getElementById("restore-source").disabled = true;
           generateIntegration();
@@ -1067,7 +1067,7 @@ Write Markdown here…"></textarea>
         function clearPreview() {
           clearTimeout(state.renderTimer);
           if (state.previewReady) frame.contentDocument.getElementById("document").textContent = "";
-          for (const name of ["size", "lines", "time", "nodes"]) document.getElementById(`metric-${name}`).textContent = "—";
+          for (const name of ["size", "lines", "time", "nodes"]) document.getElementById(`metric-${name}`).textContent = "-";
           document.getElementById("render-source").disabled = true;
         }
 
@@ -1103,7 +1103,7 @@ Write Markdown here…"></textarea>
 
         function scheduleRender() {
           clearTimeout(state.renderTimer);
-          document.getElementById("render-status").textContent = "Updating…";
+          document.getElementById("render-status").textContent = "Updating...";
           state.renderTimer = setTimeout(renderPreview, editor.value.length > 10000 ? 300 : 120);
         }
 
@@ -1122,7 +1122,7 @@ Write Markdown here…"></textarea>
                 if (!anchor.getAttribute("href").startsWith("#")) {
                   if (anchor.target !== "_blank") {
                     state.previewReady = false;
-                    document.getElementById("render-status").textContent = "Opening link…";
+                    document.getElementById("render-status").textContent = "Opening link...";
                   }
                   return;
                 }

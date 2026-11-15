@@ -622,7 +622,7 @@ Arabic: مرحبا بالعالم
 
 Korean: 안녕하세요 세계
 
-Mixed: Hello 世界 🌎 — café — Привет — مرحبا
+Mixed: Hello 世界 🌎 - café - Привет - مرحبا
 
 Combining characters: é á ö
 

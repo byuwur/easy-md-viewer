@@ -87,7 +87,7 @@ Pass options as the third argument, such as `byMDviewer(target, markdown, { brea
 | `credits`           | `true`              | Show attribution in the header.                                                                                                     |
 | `theme`             | Container           | Initial `"light"` or `"dark"` mode class.                                                                                           |
 | `palette`           | Container or GitHub | Initial `data-theme` palette, including custom CSS names.                                                                           |
-| `fontSize`          | Container           | Number in rem or a CSS size such as `"1.25em"` or `"20px"`; bounded to `0.5rem`–`3rem`.                                             |
+| `fontSize`          | Container           | Number in rem or a CSS size such as `"1.25em"` or `"20px"`; bounded to `0.5rem`-`3rem`.                                             |
 | `themeToggle`       | `true`              | Show the theme toggle.                                                                                                              |
 | `fontSizeControls`  | `true`              | Show text-size controls.                                                                                                            |
 | `copyButton`        | `true`              | Show Copy: click for rendered plain text; Shift+click for original Markdown.                                                        |
