@@ -297,7 +297,7 @@
     const toolbar = document.createElement("div");
     toolbar.className = "byVIEWtoolbar";
     toolbar.dataset.size = ["xs", "small", "regular", "large", "xl"].includes(options.controlsSize) ? options.controlsSize : "regular";
-    element.classList.toggle("byVIEWcompact", options.controlsCompact !== false);
+    element.classList.toggle("byVIEWcompact", options.controlsCompact);
     element.classList.toggle("byVIEWbottom", options.controlsPosition === "bottom");
     const controls = document.createElement("div");
     controls.className = "byVIEWcontrols";
@@ -307,12 +307,12 @@
     info.className = "byVIEWinfo";
     info.innerHTML = /* HTML */ `<a href="https://github.com/byuwur/easy-md-viewer" target="_blank" rel="noopener noreferrer">easy-md-viewer</a> · v${byMDviewer.VERSION} ·
       <a href="https://byuwur.co" target="_blank" rel="noopener noreferrer">@byUwUr</a>`;
-    if (options.credits !== false) toolbar.appendChild(info);
+    if (options.credits) toolbar.appendChild(info);
     if (options.themeToggle) appendThemeToggle(element, controls, filename);
     if (options.fontSizeControls) appendFontSizeControls(element, controls);
     if (options.copyButton) appendCopyButton(controls, (event) => (event.shiftKey ? source : getPlainText(element)), "Copy text (Shift+click for Markdown)");
     if (controls.childNodes.length) toolbar.appendChild(controls);
-    if (options.toolbar === false || !toolbar.childNodes.length) {
+    if (!options.toolbar || !toolbar.childNodes.length) {
       element.classList.remove("byVIEWbottom");
       return;
     }
@@ -669,6 +669,7 @@
    * UTF-16 offsets stay relative to the original argument, including recursively parsed children.
    */
   const inlineTokens = (text, options = {}, base = 0, depth = 0) => {
+    const { withImages = true, withLinks = true, withStrikethrough = true } = options;
     // Deep input stays literal instead of exhausting recursion in either rendering or editing.
     if (depth >= 32) return [{ type: "text", from: base, to: base + text.length, text }];
     const tokens = [];
@@ -704,8 +705,8 @@
         i += run;
         continue;
       }
-      const image = options.withImages !== false && text.startsWith("![", i);
-      if (image || (options.withLinks !== false && char === "[")) {
+      const image = withImages && text.startsWith("![", i);
+      if (image || (withLinks && char === "[")) {
         const open = image ? i + 1 : i,
           close = findClosingBracket(text, open);
         if (close !== -1 && text[close + 1] === "(") {
@@ -723,7 +724,7 @@
           }
         }
       }
-      if (options.withLinks !== false && char === "<") {
+      if (withLinks && char === "<") {
         const close = text.indexOf(">", i + 1);
         if (close !== -1) {
           const value = text.slice(i + 1, close);
@@ -735,7 +736,7 @@
           }
         }
       }
-      if (options.withLinks !== false) {
+      if (withLinks) {
         const rest = text.slice(i),
           url = rest.match(/^https?:\/\/[^\s<>"']+/i);
         const previous = i > 0 ? text[i - 1] : "";
@@ -760,7 +761,7 @@
         ["*", "em"],
         ["_", "em"]
       ]) {
-        if (!text.startsWith(delimiter, i) || (type === "del" && options.withStrikethrough === false)) continue;
+        if (!text.startsWith(delimiter, i) || (type === "del" && !withStrikethrough)) continue;
         if (delimiter === "_" && /[\p{L}\p{N}]/u.test(text[i - 1] || "") && /[\p{L}\p{N}]/u.test(text[i + 1] || "")) continue;
         const close = findClosingDelimiter(text, delimiter, i + delimiter.length);
         if (close <= i + delimiter.length) continue;
@@ -1591,28 +1592,48 @@
     if (source instanceof HTMLElement) source = source.textContent;
     else if (source === undefined || source === null) source = element.textContent;
     if (typeof source !== "string") throw new TypeError("byMDviewer: markdown must be a string or HTMLElement.");
+    const {
+      withLinks = true,
+      withImages = true,
+      withTables = true,
+      withTasks = true,
+      withStrikethrough = true,
+      codeHighlighting = true,
+      codeLineNumbers = false,
+      codeStatusBar = false,
+      breaks = false,
+      toolbar = true,
+      credits = true,
+      themeToggle = true,
+      fontSizeControls = true,
+      copyButton = true,
+      controlsCompact = true,
+      animations = true,
+      appearAnimation = false,
+      ...otherOptions
+    } = options ?? {};
     options = {
-      withLinks: true,
-      withImages: true,
-      withTables: true,
-      withTasks: true,
-      withStrikethrough: true,
-      codeHighlighting: true,
-      codeLineNumbers: false,
-      codeStatusBar: false,
-      breaks: false,
       linkTarget: "_blank",
-      toolbar: true,
-      credits: true,
-      themeToggle: true,
-      fontSizeControls: true,
-      copyButton: true,
       controlsSize: "regular",
-      controlsCompact: true,
-      animations: true,
-      appearAnimation: false,
       controlsPosition: "top",
-      ...options,
+      ...otherOptions,
+      withLinks,
+      withImages,
+      withTables,
+      withTasks,
+      withStrikethrough,
+      codeHighlighting,
+      codeLineNumbers,
+      codeStatusBar,
+      breaks,
+      toolbar,
+      credits,
+      themeToggle,
+      fontSizeControls,
+      copyButton,
+      controlsCompact,
+      animations,
+      appearAnimation,
       // Allocate slug ownership per render so duplicate headings never depend on another viewer's content.
       [HEADING_IDS]: Object.create(null)
     };
@@ -1620,8 +1641,8 @@
     // Clear the target safely.
     element.textContent = "";
     element.classList.add("byMDdocument");
-    element.classList.toggle("byVIEWmotion", options.animations !== false);
-    const appear = options.animations !== false && options.appearAnimation === true;
+    element.classList.toggle("byVIEWmotion", options.animations);
+    const appear = options.animations && options.appearAnimation;
     element.classList.toggle("byVIEWappear", appear);
     // Paint opacity 0 before starting each requested fade.
     if (appear) element.classList.remove("byVIEWready");
