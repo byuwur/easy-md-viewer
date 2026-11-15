@@ -1621,11 +1621,15 @@
     element.textContent = "";
     element.classList.add("byMDdocument");
     element.classList.toggle("byVIEWmotion", options.animations !== false);
-    element.classList.toggle("byVIEWappear", options.animations !== false && options.appearAnimation === true);
+    const appear = options.animations !== false && options.appearAnimation === true;
+    element.classList.toggle("byVIEWappear", appear);
+    // Paint opacity 0 before starting each requested fade.
+    if (appear) element.classList.remove("byVIEWready");
     if (!element.classList.contains("byVIEWready")) {
       requestAnimationFrame(() =>
         requestAnimationFrame(() => {
-          if (element.classList.contains("byMDdocument")) element.classList.add("byVIEWready");
+          // A replaced render must not finish the new render's fade.
+          if (content.parentNode === element) element.classList.add("byVIEWready");
         })
       );
     }

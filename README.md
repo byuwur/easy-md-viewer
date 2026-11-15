@@ -82,7 +82,7 @@ Pass options as the third argument, such as `byMDviewer(target, markdown, { brea
 | `breaks`            | `false`             | Convert paragraph line breaks to `<br>`.                                                                                            |
 | `linkTarget`        | `"_blank"`          | Link target; `false` omits it. Same-document anchors stay in this tab.                                                              |
 | `animations`        | `true`              | Brief control/disclosure motion and background fades; overrides the system motion preference.                                       |
-| `appearAnimation`   | `false`             | Fade and gently move the viewer in when `animations` is enabled. Initial rendering remains immediate by default.                    |
+| `appearAnimation`   | `false`             | Fade the viewer in on each render when `animations` is enabled. Initial rendering remains immediate by default.                     |
 | `toolbar`           | `true`              | Show the viewer header; secondary tools are configured separately.                                                                  |
 | `credits`           | `true`              | Show attribution in the header.                                                                                                     |
 | `theme`             | Container           | Initial `"light"` or `"dark"` mode class.                                                                                           |
