@@ -27,14 +27,14 @@ jobs:
     timeout-minutes: 10
     defaults:
       run:
-        working-directory: easy-md-viewer
+        working-directory: md.view
     env:
       RELEASE_TAG: ${{ github.event_name == 'push' && github.ref_type == 'tag' && github.ref_name || 'v0.0.0-ci' }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          path: easy-md-viewer
+          path: md.view
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -53,7 +53,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: tested-release
-          path: easy-md-viewer/dist/assets/
+          path: md.view/dist/assets/
           if-no-files-found: error
           retention-days: 7
 

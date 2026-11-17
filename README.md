@@ -1,6 +1,6 @@
-# byuwur/easy-md-viewer
+# MD.view
 
-![easy-md-viewer preview](prev.jpg)
+![MD.view preview](prev.jpg)
 
 **Markdown, made to be read.**
 
@@ -10,7 +10,7 @@ Use it for READMEs, documentation, notes, and other Markdown content.
 
 One JavaScript file. One scoped stylesheet. No build step. Plain JavaScript, with no runtime dependencies.
 
-<!-- [Open the playground](https://byuwur.github.io/easy-md-viewer/) · [CodePen](https://codepen.io/byuwur/pen/VYPoWMM) -->
+<!-- [Open the playground](https://byuwur.github.io/md.view/) · [CodePen](https://codepen.io/byuwur/pen/VYPoWMM) -->
 
 [Open the playground](https://md.byuwur.co/) · [CodePen](https://codepen.io/byuwur/pen/VYPoWMM)
 
@@ -21,8 +21,8 @@ Open `index.html` for the local playground; its page assets require internet acc
 **Recommended: CDN.** No downloads or package manager.
 
 ```html
-<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@latest/md.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@latest/md.min.js" defer></script>
+<link href="https://cdn.jsdelivr.net/gh/byuwur/md.view@latest/md.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/gh/byuwur/md.view@latest/md.min.js" defer></script>
 ```
 
 The CDN example uses `@latest` and requires internet access. Use a published tag or commit to pin a version.
@@ -76,7 +76,7 @@ Pass options as the third argument, such as `byMDviewer(target, markdown, { brea
 | `withTables`        | `true`              | Render GFM-style tables.                                                                                                            |
 | `withTasks`         | `true`              | Render task checkboxes.                                                                                                             |
 | `withStrikethrough` | `true`              | Render `~~strikethrough~~`.                                                                                                         |
-| `codeHighlighting`  | `true`              | Highlight fenced code when easy-code-viewer is loaded; `false` keeps plain code.                                                    |
+| `codeHighlighting`  | `true`              | Highlight fenced code when CODE.view is loaded; `false` keeps plain code.                                                           |
 | `codeLineNumbers`   | `false`             | Show a framed code block with a line-number gutter.                                                                                 |
 | `codeStatusBar`     | `false`             | Show a framed code block with its language and line count.                                                                          |
 | `breaks`            | `false`             | Convert paragraph line breaks to `<br>`.                                                                                            |
@@ -136,7 +136,7 @@ The playground uses SPA.js's Pickr assets for color and opacity, with text input
 **48 palettes, each with Light and Dark modes.** Monokai, GitHub, Solarized, and High Contrast are included in `md.css`. Load the optional `md.themes.css` after it for the other 44 skins:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/easy-md-viewer@latest/md.themes.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/md.view@latest/md.themes.min.css" />
 ```
 
 For local use, save `md.themes.css` beside `md.css`. The playground loads both stylesheets; default HTML starters use the core stylesheet. Known extra presets without the pack fall back to the current mode and emit a one-time `console.warn` naming the required file. Custom CSS names do not need the pack.
@@ -252,7 +252,7 @@ Legacy integrations can use `#byVIEWtheme` or a detected `md.light.css` / `md.da
 
 ## Supported Markdown
 
-Supports ATX headings, emphasis, strikethrough, code spans/fences, ordered/unordered/nested/task lists, recursive blockquotes, horizontal rules, images, links, aligned GFM tables, escapes, and common HTML entities. Task checkboxes are read-only; use [easy-md-editor](https://github.com/byuwur/easy-md-editor) to edit Markdown. This covers practical documents rather than every CommonMark edge case or extension.
+Supports ATX headings, emphasis, strikethrough, code spans/fences, ordered/unordered/nested/task lists, recursive blockquotes, horizontal rules, images, links, aligned GFM tables, escapes, and common HTML entities. Task checkboxes are read-only; use [MD.edit](https://github.com/byuwur/md.edit) to edit Markdown. This covers practical documents rather than every CommonMark edge case or extension.
 
 Rendering normalizes CR/LF/CRLF and removes a leading BOM; Shift+Copy retains the original Markdown. Full-document rendering is synchronous and has no document-size limit. Bound large documents in the calling application; the inline parser's limit below does not cap the renderer.
 
@@ -270,11 +270,11 @@ The image remains standard Markdown. Other engines supporting HTML comments rend
 
 ### Code blocks
 
-For syntax highlighting, load [easy-code-viewer](https://github.com/byuwur/easy-code-viewer)'s CSS and JavaScript before rendering Markdown:
+For syntax highlighting, load [CODE.view](https://github.com/byuwur/code.view)'s CSS and JavaScript before rendering Markdown:
 
 ```html
-<link href="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@latest/code.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/gh/byuwur/easy-code-viewer@latest/code.min.js" defer></script>
+<link href="https://cdn.jsdelivr.net/gh/byuwur/code.view@latest/code.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/gh/byuwur/code.view@latest/code.min.js" defer></script>
 ```
 
 Keep the Markdown files too. For offline use, save all four files beside your HTML and use local paths.
@@ -292,7 +292,7 @@ byMDviewer(document.getElementById("document"), markdown, {
 });
 ```
 
-If highlighting or code-block details are enabled but the library is missing, the first fence logs a console warning with the easy-code-viewer landing link, once per render.
+If highlighting or code-block details are enabled but the library is missing, the first fence logs a console warning with the CODE.view landing link, once per render.
 
 The playground pins its CODE dependency to a numbered release; documentation examples follow `@latest`. Use explicit release tags in deployed pages. Exported starters keep the standalone Markdown setup. Add the two code-viewer files to enable highlighting in a starter.
 
@@ -330,7 +330,7 @@ const closing = byMDviewer.scanLine("~~~", code.state);
 
 Both line arguments must be strings or `scanLine()` throws `TypeError`. Omit `context` for the first line; otherwise use a preceding scanner result's `state`. Scanning creates no DOM and does not parse the whole document.
 
-[easy-md-editor](https://github.com/byuwur/easy-md-editor) uses these APIs to keep Markdown as its source of truth and this viewer for exact, read-only Preview.
+[MD.edit](https://github.com/byuwur/md.edit) uses these APIs to keep Markdown as its source of truth and this viewer for exact, read-only Preview.
 
 ## Checks
 
@@ -345,21 +345,21 @@ node --test __tests__/rendering.cjs
 
 `BROWSER_CHANNEL=chrome` uses installed Chrome; `CHROMIUM_EXECUTABLE_PATH` selects a Chromium executable.
 
-The library suite is the main automated contract: parsing/rendering, untrusted input, and replacement/cleanup. `node --test __tests__/playground.cjs` runs one smaller smoke check for page startup, preview editing, and a copied starter. It uses the real local SPA.js and CODE companions instead of live CDN requests; check out `spa.js` at `v20.13` and `easy-code-viewer` at `v1.8` beside this repository. The [Actions workflow](.github/workflows/rendering.yml) runs separate jobs in this exact order: library Chromium, Firefox, WebKit; then playground Chromium, Firefox, WebKit. Later jobs still report their result if an earlier job fails; cancellation stops the chain. One reusable browser job keeps setup identical. Each suite has a 30-second execution limit, the test step is capped at two minutes, and each job at three minutes. Browsers are preinstalled in the matching CI image. `BROWSER_ENGINE=firefox` / `webkit` selects a local engine; `BROWSER_CHANNEL=chrome` applies only to Chromium.
+The library suite is the main automated contract: parsing/rendering, untrusted input, and replacement/cleanup. `node --test __tests__/playground.cjs` runs one smaller smoke check for page startup, preview editing, and a copied starter. It uses the real local SPA.js and CODE companions instead of live CDN requests; check out `spa.js` at `v20.13` and `code.view` at `v1.8` beside this repository. The [Actions workflow](.github/workflows/rendering.yml) runs separate jobs in this exact order: library Chromium, Firefox, WebKit; then playground Chromium, Firefox, WebKit. Later jobs still report their result if an earlier job fails; cancellation stops the chain. One reusable browser job keeps setup identical. Each suite has a 30-second execution limit, the test step is capped at two minutes, and each job at three minutes. Browsers are preinstalled in the matching CI image. `BROWSER_ENGINE=firefox` / `webkit` selects a local engine; `BROWSER_CHANNEL=chrome` applies only to Chromium.
 
-## The easy viewers
+## Viewer/Editor family
 
 Need another format, maybe an editor? Explore the family:
 
-<!-- <a href="https://byuwur.github.io/easy-md-viewer/"><img src="https://raw.githubusercontent.com/byuwur/easy-md-viewer/main/assets/favicon.png" height="24" align="top" alt="" /> MD</a> · <a href="https://byuwur.github.io/easy-md-editor/"><img src="https://raw.githubusercontent.com/byuwur/easy-md-editor/main/assets/favicon.png" height="24" align="top" alt="" /> MD.edit</a> · <a href="https://byuwur.github.io/easy-code-viewer/"><img src="https://raw.githubusercontent.com/byuwur/easy-code-viewer/main/assets/favicon.png" height="24" align="top" alt="" /> CODE</a> · <a href="https://byuwur.github.io/easy-json-viewer/"><img src="https://raw.githubusercontent.com/byuwur/easy-json-viewer/main/assets/favicon.png" height="24" align="top" alt="" /> JSON</a> · <a href="https://byuwur.github.io/easy-csv-viewer/"><img src="https://raw.githubusercontent.com/byuwur/easy-csv-viewer/main/assets/favicon.png" height="24" align="top" alt="" /> CSV</a> · <a href="https://byuwur.github.io/easy-diff-viewer/"><img src="https://raw.githubusercontent.com/byuwur/easy-diff-viewer/main/assets/favicon.png" height="24" align="top" alt="" /> DIFF</a> · <a href="https://byuwur.github.io/easy-log-viewer/"><img src="https://raw.githubusercontent.com/byuwur/easy-log-viewer/main/assets/favicon.png" height="24" align="top" alt="" /> LOG</a> · <a href="https://byuwur.github.io/easy-xml-viewer/"><img src="https://raw.githubusercontent.com/byuwur/easy-xml-viewer/main/assets/favicon.png" height="24" align="top" alt="" /> XML</a> · <a href="https://byuwur.github.io/easy-yaml-viewer/"><img src="https://raw.githubusercontent.com/byuwur/easy-yaml-viewer/main/assets/favicon.png" height="24" align="top" alt="" /> YAML</a> -->
+<!-- <a href="https://byuwur.github.io/md.view/"><img src="https://raw.githubusercontent.com/byuwur/md.view/main/assets/favicon.png" height="24" align="top" alt="" /> MD.view</a> · <a href="https://byuwur.github.io/md.edit/"><img src="https://raw.githubusercontent.com/byuwur/md.edit/main/assets/favicon.png" height="24" align="top" alt="" /> MD.edit</a> · <a href="https://byuwur.github.io/code.view/"><img src="https://raw.githubusercontent.com/byuwur/code.view/main/assets/favicon.png" height="24" align="top" alt="" /> CODE.view</a> · <a href="https://byuwur.github.io/json.view/"><img src="https://raw.githubusercontent.com/byuwur/json.view/main/assets/favicon.png" height="24" align="top" alt="" /> JSON.view</a> · <a href="https://byuwur.github.io/csv.view/"><img src="https://raw.githubusercontent.com/byuwur/csv.view/main/assets/favicon.png" height="24" align="top" alt="" /> CSV.view</a> · <a href="https://byuwur.github.io/diff.view/"><img src="https://raw.githubusercontent.com/byuwur/diff.view/main/assets/favicon.png" height="24" align="top" alt="" /> DIFF.view</a> · <a href="https://byuwur.github.io/log.view/"><img src="https://raw.githubusercontent.com/byuwur/log.view/main/assets/favicon.png" height="24" align="top" alt="" /> LOG.view</a> · <a href="https://byuwur.github.io/xml.view/"><img src="https://raw.githubusercontent.com/byuwur/xml.view/main/assets/favicon.png" height="24" align="top" alt="" /> XML.view</a> · <a href="https://byuwur.github.io/yaml.view/"><img src="https://raw.githubusercontent.com/byuwur/yaml.view/main/assets/favicon.png" height="24" align="top" alt="" /> YAML.view</a> -->
 
-<a href="https://md.byuwur.co/"><img src="https://raw.githubusercontent.com/byuwur/easy-md-viewer/main/assets/favicon.png" height="24" align="top" alt="" /> MD</a> · <a href="https://mdedit.byuwur.co/"><img src="https://raw.githubusercontent.com/byuwur/easy-md-editor/main/assets/favicon.png" height="24" align="top" alt="" /> MD.edit</a> · <a href="https://code.byuwur.co/"><img src="https://raw.githubusercontent.com/byuwur/easy-code-viewer/main/assets/favicon.png" height="24" align="top" alt="" /> CODE</a> · <a href="https://json.byuwur.co/"><img src="https://raw.githubusercontent.com/byuwur/easy-json-viewer/main/assets/favicon.png" height="24" align="top" alt="" /> JSON</a> · <a href="https://csv.byuwur.co/"><img src="https://raw.githubusercontent.com/byuwur/easy-csv-viewer/main/assets/favicon.png" height="24" align="top" alt="" /> CSV</a> · <a href="https://diff.byuwur.co/"><img src="https://raw.githubusercontent.com/byuwur/easy-diff-viewer/main/assets/favicon.png" height="24" align="top" alt="" /> DIFF</a> · <a href="https://log.byuwur.co/"><img src="https://raw.githubusercontent.com/byuwur/easy-log-viewer/main/assets/favicon.png" height="24" align="top" alt="" /> LOG</a> · <a href="https://xml.byuwur.co/"><img src="https://raw.githubusercontent.com/byuwur/easy-xml-viewer/main/assets/favicon.png" height="24" align="top" alt="" /> XML</a> · <a href="https://yaml.byuwur.co/"><img src="https://raw.githubusercontent.com/byuwur/easy-yaml-viewer/main/assets/favicon.png" height="24" align="top" alt="" /> YAML</a>
+<a href="https://md.byuwur.co/"><img src="https://raw.githubusercontent.com/byuwur/md.view/main/assets/favicon.png" height="24" align="top" alt="" /> MD.view</a> · <a href="https://mdedit.byuwur.co/"><img src="https://raw.githubusercontent.com/byuwur/md.edit/main/assets/favicon.png" height="24" align="top" alt="" /> MD.edit</a> · <a href="https://code.byuwur.co/"><img src="https://raw.githubusercontent.com/byuwur/code.view/main/assets/favicon.png" height="24" align="top" alt="" /> CODE.view</a> · <a href="https://json.byuwur.co/"><img src="https://raw.githubusercontent.com/byuwur/json.view/main/assets/favicon.png" height="24" align="top" alt="" /> JSON.view</a> · <a href="https://csv.byuwur.co/"><img src="https://raw.githubusercontent.com/byuwur/csv.view/main/assets/favicon.png" height="24" align="top" alt="" /> CSV.view</a> · <a href="https://diff.byuwur.co/"><img src="https://raw.githubusercontent.com/byuwur/diff.view/main/assets/favicon.png" height="24" align="top" alt="" /> DIFF.view</a> · <a href="https://log.byuwur.co/"><img src="https://raw.githubusercontent.com/byuwur/log.view/main/assets/favicon.png" height="24" align="top" alt="" /> LOG.view</a> · <a href="https://xml.byuwur.co/"><img src="https://raw.githubusercontent.com/byuwur/xml.view/main/assets/favicon.png" height="24" align="top" alt="" /> XML.view</a> · <a href="https://yaml.byuwur.co/"><img src="https://raw.githubusercontent.com/byuwur/yaml.view/main/assets/favicon.png" height="24" align="top" alt="" /> YAML.view</a>
 
 ## License
 
 MIT (c) Andres Trujillo [Mateus] byUwUr
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/byuwur/easy-md-viewer)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/byuwur/md.view)
 
 ## Releases
 
@@ -369,7 +369,7 @@ MIT (c) Andres Trujillo [Mateus] byUwUr
 
 Load local library files in your own HTML. The playground is hosted separately; no Node runtime is needed to use either ZIP.
 
-Optional fenced-code colors require easy-code-viewer, distributed separately.
+Optional fenced-code colors require CODE.view, distributed separately.
 
 Minification prefers jsDelivr-generated files pinned to the exact source commit when the working file matches that commit. Unavailable CDN files and local edits use pinned esbuild instead. `--offline` selects local minification explicitly. `manifest.json` records the provider and hashes. Vendored assets are copied unchanged.
 

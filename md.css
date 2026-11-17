@@ -3,7 +3,7 @@
 /* GitHub is the default. Classes select mode; named data-theme values select a palette.
    data-theme="light" / "dark" remain mode aliases and override mode classes. */
 
-/* Syntax variables match easy-code-viewer palettes; code.css owns the token styles. */
+/* Syntax variables match CODE.view palettes; code.css owns the token styles. */
 /* --- VIEWER --- */
 .byMDdocument {
   position: relative;

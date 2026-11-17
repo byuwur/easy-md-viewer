@@ -1,10 +1,10 @@
 "use strict";
 /*
  * File: md.js
- * Desc: Contains the heart of easy MD viewer.
+ * Desc: Contains the heart of MD.view.
  * Deps: none
  * Copyright (c) 2026 Andres Trujillo [Mateus] byUwUr
- * https://github.com/byuwur/easy-md-viewer
+ * https://github.com/byuwur/md.view
  */
 
 (function (global) {
@@ -76,8 +76,8 @@
     const document = element.ownerDocument;
     if (document.defaultView.getComputedStyle(document.documentElement).getPropertyValue("--by-md-themes-loaded").trim() === "1") return;
     warnedPalettes.add(palette);
-    // console.warn(`easy-md-viewer: Palette "${palette}" requires md.themes.css. Import it after md.css. https://byuwur.github.io/easy-md-viewer/`);
-    console.warn(`easy-md-viewer: Palette "${palette}" requires md.themes.css. Import it after md.css. https://md.byuwur.co/`);
+    // console.warn(`MD.view: Palette "${palette}" requires md.themes.css. Import it after md.css. https://byuwur.github.io/md.view/`);
+    console.warn(`MD.view: Palette "${palette}" requires md.themes.css. Import it after md.css. https://md.byuwur.co/`);
   };
 
   // Explicit appearance options override markup; omitted values preserve the container's state.
@@ -305,7 +305,7 @@
     controls.setAttribute("aria-label", "Viewer controls");
     const info = document.createElement("small");
     info.className = "byVIEWinfo";
-    info.innerHTML = /* HTML */ `<a href="https://github.com/byuwur/easy-md-viewer" target="_blank" rel="noopener noreferrer">easy-md-viewer</a> · v${byMDviewer.VERSION} ·
+    info.innerHTML = /* HTML */ `<a href="https://github.com/byuwur/md.view" target="_blank" rel="noopener noreferrer">MD.view</a> · v${byMDviewer.VERSION} ·
       <a href="https://byuwur.co" target="_blank" rel="noopener noreferrer">@byUwUr</a>`;
     if (options.credits) toolbar.appendChild(info);
     if (options.themeToggle) appendThemeToggle(element, controls, filename);
@@ -811,7 +811,7 @@
 
   /**
    * Removes HTML comments and hidden markers while preserving code content and image sizes.
-   * Raw HTML is not rendered by easy-md-viewer, but Markdown comments should remain invisible.
+   * Raw HTML is not rendered by MD.view, but Markdown comments should remain invisible.
    *
    * @param {string[]} lines - Source lines at the current nesting level.
    * @param {Object} options - Renderer options used to detect container boundaries.
@@ -1355,7 +1355,7 @@
   };
 
   /**
-   * Renders a fenced code block, optionally enhanced by easy-code-viewer.
+   * Renders a fenced code block, optionally enhanced by CODE.view.
    *
    * @param {Node} parent
    * @param {string[]} lines
@@ -1388,8 +1388,8 @@
     code.textContent = body.join("\n");
     if (options.codeHighlighting || options.codeLineNumbers || options.codeStatusBar) {
       if (typeof global.byCODEviewer?.highlight !== "function") {
-        // console.warn("easy-md-viewer: Code highlighting and code-block details require easy-code-viewer. https://byuwur.github.io/easy-code-viewer/");
-        console.warn("easy-md-viewer: Code highlighting and code-block details require easy-code-viewer. https://code.byuwur.co/");
+        // console.warn("MD.view: Code highlighting and code-block details require CODE.view. https://byuwur.github.io/code.view/");
+        console.warn("MD.view: Code highlighting and code-block details require CODE.view. https://code.byuwur.co/");
         // These options belong to this render; avoid repeating the warning for each fence.
         options.codeHighlighting = options.codeLineNumbers = options.codeStatusBar = false;
       } else {
@@ -1566,7 +1566,7 @@
    * @param {boolean} [options.withTables=true]
    * @param {boolean} [options.withTasks=true]
    * @param {boolean} [options.withStrikethrough=true]
-   * @param {boolean} [options.codeHighlighting=true] - Highlights fences when easy-code-viewer is loaded.
+   * @param {boolean} [options.codeHighlighting=true] - Highlights fences when CODE.view is loaded.
    * @param {boolean} [options.codeLineNumbers=false] - Adds non-copying line-number gutters to fences.
    * @param {boolean} [options.codeStatusBar=false] - Shows the language and line count above fences.
    * @param {boolean} [options.breaks=false]

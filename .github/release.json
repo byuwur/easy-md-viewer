@@ -1,5 +1,5 @@
 {
-  "repository": "byuwur/easy-md-viewer",
+  "repository": "byuwur/md.view",
   "branch": "main",
   "kind": "easy",
   "runtime": ["md.js", "md.css", "md.themes.css"],

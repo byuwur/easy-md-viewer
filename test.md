@@ -1,6 +1,6 @@
 <!--
 ===============================================================================
-EASY MD VIEWER TEST SOURCE
+MD.view TEST SOURCE
 ===============================================================================
 
 This block should NEVER appear in the rendered output.
@@ -16,9 +16,9 @@ This block should NEVER appear in the rendered output.
 [//]: # (HIDDEN:MARKER)
 [//]: # (OPTIONAL:TEST BEGIN)
 
-# easy MD Viewer BenchMarkDown
+# MD.view BenchMarkDown
 
-A coverage and regression document for **easy-md-viewer**.
+A coverage and regression document for **MD.view**.
 
 This file intentionally mixes normal Markdown, edge cases, Unicode, URLs, nesting,
 escaping, comments, and repeated content.
@@ -242,7 +242,7 @@ Escaped punctuation: \! \# \( \) \[ \] \{ \} \_ \* \~ \>
 
 <style>body { display: none; }</style>
 
-Custom-looking tag: <easy-md-viewer>
+Custom-looking tag: <md-view>
 
 Less than and greater than: 1 < 2 and 3 > 2.
 
@@ -387,11 +387,11 @@ Not an email: test@
 
 ## 12. Images
 
-![Example image](https://raw.githubusercontent.com/byuwur/easy-md-viewer/main/test.png)
+![Example image](https://raw.githubusercontent.com/byuwur/md.view/main/test.png)
 
-![Example image with title](https://raw.githubusercontent.com/byuwur/easy-md-viewer/main/test.png "Example image")
+![Example image with title](https://raw.githubusercontent.com/byuwur/md.view/main/test.png "Example image")
 
-![Alt with **Markdown-looking** text](https://raw.githubusercontent.com/byuwur/easy-md-viewer/main/test.png)
+![Alt with **Markdown-looking** text](https://raw.githubusercontent.com/byuwur/md.view/main/test.png)
 
 ![Relative image](test.png)
 
@@ -636,7 +636,7 @@ Paragraph before several blank lines.
 
 Paragraph after several blank lines.
 
-    Four leading spaces are intentionally not treated as an indented code block by easy-md-viewer.
+    Four leading spaces are intentionally not treated as an indented code block by MD.view.
 
 	A tab starts this line.
 
@@ -988,14 +988,14 @@ The following sequence is intentionally repetitive. Every item from `000` throug
 4. Fourth ordered item.
 
 Final paragraph with Unicode 🦋, an email test@example.com, a URL
-https://example.com/path?q=easy-md-viewer#benchmark, and escaped Markdown
+https://example.com/path?q=md.view#benchmark, and escaped Markdown
 \*literal asterisks\*.
 
 ---
 
 ## 33. End Marker
 
-**END OF EASY MD VIEWER TEST**
+**END OF MD.view TEST**
 
 If this line renders, the complete document reached the end without being swallowed
 by a comment, code fence, list, blockquote, table, or malformed inline construct.
