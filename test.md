@@ -1,31 +1,27 @@
 <!--
-===============================================================================
-MD.view TEST SOURCE
-===============================================================================
+
+# MD.view TEST SOURCE
 
 This block should NEVER appear in the rendered output.
 
 # Hidden heading
+
 **hidden bold**
-- hidden list
-[hidden link](https://example.com)
 
-===============================================================================
--->
+- hidden list [hidden link](https://example.com)
 
-[//]: # (HIDDEN:MARKER)
-[//]: # (OPTIONAL:TEST BEGIN)
+=============================================================================== -->
+
+[//]: # "HIDDEN:MARKER"
+[//]: # "OPTIONAL:TEST BEGIN"
 
 # MD.view BenchMarkDown
 
 A coverage and regression document for **MD.view**.
 
-This file intentionally mixes normal Markdown, edge cases, Unicode, URLs, nesting,
-escaping, comments, and repeated content.
+This file intentionally mixes normal Markdown, edge cases, Unicode, URLs, nesting, escaping, comments, and repeated content.
 
-**Expected behavior:** supported Markdown should render consistently, hidden comments
-should remain hidden, raw HTML should remain text, and unsafe URLs should not become
-clickable links.
+**Expected behavior:** supported Markdown should render consistently, hidden comments should remain hidden, raw HTML should remain text, and unsafe URLs should not become clickable links.
 
 ---
 
@@ -81,9 +77,9 @@ clickable links.
 
 ###### Heading 6
 
-### Heading With Closing Hashes ###
+### Heading With Closing Hashes
 
-### Heading containing **bold**, *italic*, `code`, and ~~strike~~
+### Heading containing **bold**, _italic_, `code`, and ~~strike~~
 
 ---
 
@@ -91,9 +87,7 @@ clickable links.
 
 This is a normal paragraph.
 
-This paragraph contains multiple
-source lines that should remain part
-of the same paragraph when `breaks` is `false`.
+This paragraph contains multiple source lines that should remain part of the same paragraph when `breaks` is `false`.
 
 This line ends with two spaces.  
 This should be a hard line break.
@@ -101,7 +95,7 @@ This should be a hard line break.
 This line ends with a backslash.\
 This should also be a hard line break.
 
-A paragraph with punctuation: ! @ # $ % ^ & * ( ) _ + - = [ ] { } ; : ' " , . / ? \ | ` ~
+A paragraph with punctuation: ! @ # $ % ^ & \* ( ) \_ + - = [ ] { } ; : ' " , . / ? \ | ` ~
 
 ---
 
@@ -109,27 +103,27 @@ A paragraph with punctuation: ! @ # $ % ^ & * ( ) _ + - = [ ] { } ; : ' " , . / 
 
 **bold**
 
-__bold with underscores__
+**bold with underscores**
 
-*italic*
+_italic_
 
 _italic with underscores_
 
-***bold italic***
+**_bold italic_**
 
-___bold italic with underscores___
+**_bold italic with underscores_**
 
 ~~strikethrough~~
 
-**bold with *italic* inside**
+**bold with _italic_ inside**
 
-*italic with **bold** inside*
+_italic with **bold** inside_
 
 ~~strike with **bold** inside~~
 
 **bold with `inline code` inside**
 
-Normal **bold**, *italic*, ~~strike~~, and `code` in the same sentence.
+Normal **bold**, _italic_, ~~strike~~, and `code` in the same sentence.
 
 foo_bar_baz should keep the underscores inside the word.
 
@@ -137,9 +131,9 @@ snake_case_value should remain readable.
 
 _unambiguous emphasis_
 
-**unclosed bold
+\*\*unclosed bold
 
-*unclosed italic
+\*unclosed italic
 
 ~~unclosed strike
 
@@ -155,7 +149,7 @@ _unambiguous emphasis_
 
 ``code containing ` one backtick``
 
-```code containing `` two backticks```
+`code containing `` two backticks`
 
 `https://example.com should not become a link inside code`
 
@@ -182,11 +176,11 @@ console.log(hello, markdown);
 }
 ```
 
-~~~css
+```css
 .byMDdocument {
   display: block;
 }
-~~~
+```
 
 ```text
 <!-- This comment-looking text must stay inside the code block. -->
@@ -210,7 +204,7 @@ console.log("nested-looking fence");
 
 \*not italic\*
 
-\**not bold\**
+\*\*not bold\*\*
 
 \# not a heading
 
@@ -271,16 +265,14 @@ https://example.com/hidden
 
 Visible after the hidden block.
 
-[//]: # (THIS ENTIRE MARKER MUST BE HIDDEN)
+[//]: # "THIS ENTIRE MARKER MUST BE HIDDEN"
+[//]: # "OPTIONAL:EXAMPLE BEGIN"
 
-[//]: # (OPTIONAL:EXAMPLE BEGIN)
+The text between marker lines remains visible because the markers themselves are document-control comments, not section-removal instructions.
 
-The text between marker lines remains visible because the markers themselves are
-document-control comments, not section-removal instructions.
+[//]: # "OPTIONAL:EXAMPLE END"
+[//]: # "OPTIONAL:DISABLED BEGIN"
 
-[//]: # (OPTIONAL:EXAMPLE END)
-
-[//]: # (OPTIONAL:DISABLED BEGIN)
 <!--
 ### Disabled Section
 
@@ -289,7 +281,8 @@ This entire optional section must stay hidden.
 - Hidden list item
 - Another hidden list item
 -->
-[//]: # (OPTIONAL:DISABLED END)
+
+[//]: # "OPTIONAL:DISABLED END"
 
 Visible after the disabled optional section.
 
@@ -323,15 +316,15 @@ Visible after the disabled optional section.
 
 [Link with title](https://example.com "Example website")
 
-[Parentheses in URL](https://example.com/wiki/Test_(example))
+[Parentheses in URL](<https://example.com/wiki/Test_(example)>)
 
 [**Bold link label**](https://example.com)
 
-[*Italic link label*](https://example.com)
+[_Italic link label_](https://example.com)
 
 [`Code link label`](https://example.com)
 
-Unsafe link should not become clickable: [javascript](javascript:alert(1))
+Unsafe link should not become clickable: [javascript](<javascript:alert(1)>)
 
 Unsafe data link should not become clickable: [data](data:text/html,test)
 
@@ -395,7 +388,7 @@ Not an email: test@
 
 ![Relative image](test.png)
 
-Unsafe image should remain text: ![Unsafe image](javascript:alert(1))
+Unsafe image should remain text: ![Unsafe image](<javascript:alert(1)>)
 
 Unsafe data image should remain text: ![Data image](data:image/png;base64,AAAA)
 
@@ -413,15 +406,15 @@ Broken image: ![broken](
 * Asterisk two
 * Asterisk three
 
-+ Plus one
-+ Plus two
-+ Plus three
+- Plus one
+- Plus two
+- Plus three
 
-- **Bold item**
-- *Italic item*
-- `Code item`
-- [Linked item](https://example.com)
-- ~~Struck item~~
+* **Bold item**
+* _Italic item_
+* `Code item`
+* [Linked item](https://example.com)
+* ~~Struck item~~
 
 Paragraph after unordered lists.
 
@@ -433,9 +426,9 @@ Paragraph after unordered lists.
 2. Two
 3. Three
 
-5. Starts at five
-6. Six
-7. Seven
+4. Starts at five
+5. Six
+6. Seven
 
 1) Parenthesis marker one
 2) Parenthesis marker two
@@ -475,12 +468,9 @@ Paragraph after nested lists.
 
 ## 16. Multiline List Items
 
-- This is a list item
-  whose content continues on another line.
+- This is a list item whose content continues on another line.
 
-- This item contains multiple lines
-  that should remain associated
-  with the same list item.
+- This item contains multiple lines that should remain associated with the same list item.
 
 - This item has a nested paragraph-like continuation.
 
@@ -495,7 +485,7 @@ Paragraph after multiline list items.
 ## 17. Task Lists
 
 - [x] Completed task
-- [X] Completed task using uppercase X
+- [x] Completed task using uppercase X
 - [ ] Incomplete task
 - [x] **Completed bold task**
 - [ ] Task with [a link](https://example.com)
@@ -516,7 +506,7 @@ Paragraph after task lists.
 
 > **Bold** inside a blockquote.
 >
-> *Italic* inside a blockquote.
+> _Italic_ inside a blockquote.
 >
 > `Code` inside a blockquote.
 
@@ -529,8 +519,10 @@ Paragraph after task lists.
 > 2. Ordered two
 
 > Level one
->> Level two
->>> Level three
+>
+> > Level two
+> >
+> > > Level three
 
 > A blockquote containing a task list:
 >
@@ -549,51 +541,51 @@ Three dashes:
 
 Three asterisks:
 
-***
+---
 
 Three underscores:
 
-___
+---
 
 Spaced dashes:
 
-- - -
+---
 
 Spaced asterisks:
 
-* * *
+---
 
 Spaced underscores:
 
-_ _ _
+---
 
 ---
 
 ## 20. Tables
 
-| Name | Type | Value |
-|---|---|---|
-| String | text | Hello |
-| Number | numeric | 123 |
-| Boolean | logical | true |
+| Name    | Type    | Value |
+| ------- | ------- | ----- |
+| String  | text    | Hello |
+| Number  | numeric | 123   |
+| Boolean | logical | true  |
 
 | Left | Center | Right |
-|:---|:---:|---:|
-| A | B | C |
-| D | E | F |
+| :--- | :----: | ----: |
+| A    |   B    |     C |
+| D    |   E    |     F |
 
-| Markdown | Result |
-|---|---|
-| **Bold** | strong |
-| *Italic* | emphasis |
-| `Code` | code |
-| ~~Strike~~ | deleted |
-| [Link](https://example.com) | anchor |
+| Markdown                    | Result   |
+| --------------------------- | -------- |
+| **Bold**                    | strong   |
+| _Italic_                    | emphasis |
+| `Code`                      | code     |
+| ~~Strike~~                  | deleted  |
+| [Link](https://example.com) | anchor   |
 
-| Escaping |
-|---|
-| foo \| bar |
-| `foo | bar` |
+| Escaping     |
+| ------------ | ---- |
+| foo \| bar   |
+| `foo         | bar` |
 | backslash \\ |
 
 Paragraph after tables.
@@ -632,17 +624,15 @@ Combining characters: é á ö
 
 Paragraph before several blank lines.
 
-
-
 Paragraph after several blank lines.
 
     Four leading spaces are intentionally not treated as an indented code block by MD.view.
 
-	A tab starts this line.
+    A tab starts this line.
 
-Text with     multiple     internal     spaces.
+Text with multiple internal spaces.
 
-Trailing spaces at the end of this line should not create extra visible content.     
+Trailing spaces at the end of this line should not create extra visible content.
 
 ---
 
@@ -650,11 +640,11 @@ Trailing spaces at the end of this line should not create extra visible content.
 
 Brackets: [ ] ( ) { } < >
 
-Markdown markers: * ** *** _ __ ___ ~~ ` `` ```
+Markdown markers: \* ** \*** \_ ** \_** ~~ ` `` ```
 
-Punctuation: ! @ # $ % ^ & * ( ) _ + - = [ ] { } | ; : ' " , . < > / ? \ ` ~
+Punctuation: ! @ # $ % ^ & \* ( ) \_ + - = [ ] { } | ; : ' " , . < > / ? \ ` ~
 
-Math-looking text: 1 + 2 = 3, 10 * 5 = 50, a_b, x^2.
+Math-looking text: 1 + 2 = 3, 10 \* 5 = 50, a_b, x^2.
 
 Template-looking text: {{ value }} ${value} <% value %>
 
@@ -693,12 +683,15 @@ Another paragraph outside the ordered list.
 ## 25. Regression: Comments Around Blocks
 
 <!-- hidden before heading -->
+
 ### Visible Heading
 
 <!-- hidden before paragraph -->
+
 Visible paragraph.
 
 <!-- hidden before list -->
+
 - Visible item one
 - Visible item two
 <!-- hidden after list -->
@@ -718,11 +711,10 @@ Inline: `**bold** *italic* ~~strike~~ [link](https://example.com)`
 
 ```markdown
 # Heading
+
 ## Heading 2
 
-**bold**
-*italic*
-~~strike~~
+**bold** _italic_ ~~strike~~
 
 - list
 - list
@@ -730,30 +722,31 @@ Inline: `**bold** *italic* ~~strike~~ [link](https://example.com)`
 [link](https://example.com)
 
 <!-- comment -->
-[//]: # (hidden marker looking text)
+
+[//]: # "hidden marker looking text"
 ```
 
 ---
 
 Nested fences must preserve HTML comments and hidden markers as literal code:
 
-> ~~~html
+> ```html
 > <!-- literal comment in a blockquote -->
 > [//]: # "literal marker in code"
-> ~~~
+> ```
 
 - Parent
   - Child
 
-    ~~~html
+    ```html
     <!-- literal comment in a deep list -->
-    ~~~
+    ```
 
-> > ~~~html
+> > ```html
 > > <!--
 > > literal multiline comment
 > > -->
-> > ~~~
+> > ```
 
 Comments outside code must stay hidden:
 
@@ -771,10 +764,10 @@ Escaped pipe: \|
 
 Inline code pipe: `a | b`
 
-| Column A | Column B |
-|---|---|
-| escaped \| pipe | code `a | b` |
-| one | two |
+| Column A        | Column B |
+| --------------- | -------- | --- |
+| escaped \| pipe | code `a  | b`  |
+| one             | two      |
 
 ---
 
@@ -802,17 +795,17 @@ Balanced: https://example.com/foo_(bar)
 
 ## 29. Regression: Nested Formatting
 
-**bold *italic* bold**
+**bold _italic_ bold**
 
-*italic **bold** italic*
+_italic **bold** italic_
 
 ~~strike **bold** strike~~
 
 **bold ~~strike~~ bold**
 
-[**bold *italic* link**](https://example.com)
+[**bold _italic_ link**](https://example.com)
 
-> **Blockquote bold with *nested italic*.**
+> **Blockquote bold with _nested italic_.**
 >
 > - **List item with [link](https://example.com) and `code`.**
 
@@ -822,11 +815,9 @@ Balanced: https://example.com/foo_(bar)
 
 These cases should remain stable and must not throw exceptions.
 
-**
+\*\*
 
-*
-
-***
+- ***
 
 ~~
 
@@ -856,8 +847,7 @@ These cases should remain stable and must not throw exceptions.
 
 ## 31. Ordering / Volume Test
 
-The following sequence is intentionally repetitive. Every item from `000` through
-`099` should appear once, in order, with no missing or duplicated values.
+The following sequence is intentionally repetitive. Every item from `000` through `099` should appear once, in order, with no missing or duplicated values.
 
 - `000`
 - `001`
@@ -966,19 +956,18 @@ The following sequence is intentionally repetitive. Every item from `000` throug
 
 > ### Nested document sample
 >
-> This combines **bold**, *italic*, ~~strike~~, `code`, and a
-> [safe link](https://example.com).
+> This combines **bold**, _italic_, ~~strike~~, `code`, and a [safe link](https://example.com).
 >
 > - [x] Completed
 > - [ ] Pending
 >   - Nested item with **formatting**
 >   - Nested item with https://example.com
 >
-> | Feature | Status |
-> |:---|---:|
-> | **Markdown** | Working |
-> | `DOM` | Safe |
-> | ~~Dependencies~~ | None |
+> | Feature          |  Status |
+> | :--------------- | ------: |
+> | **Markdown**     | Working |
+> | `DOM`            |    Safe |
+> | ~~Dependencies~~ |    None |
 
 1. First ordered item with **bold**.
 2. Second ordered item with `code`.
@@ -987,9 +976,7 @@ The following sequence is intentionally repetitive. Every item from `000` throug
    - Another nested item.
 4. Fourth ordered item.
 
-Final paragraph with Unicode 🦋, an email test@example.com, a URL
-https://example.com/path?q=md.view#benchmark, and escaped Markdown
-\*literal asterisks\*.
+Final paragraph with Unicode 🦋, an email test@example.com, a URL https://example.com/path?q=md.view#benchmark, and escaped Markdown \*literal asterisks\*.
 
 ---
 
@@ -997,7 +984,6 @@ https://example.com/path?q=md.view#benchmark, and escaped Markdown
 
 **END OF MD.view TEST**
 
-If this line renders, the complete document reached the end without being swallowed
-by a comment, code fence, list, blockquote, table, or malformed inline construct.
+If this line renders, the complete document reached the end without being swallowed by a comment, code fence, list, blockquote, table, or malformed inline construct.
 
-[//]: # (OPTIONAL:TEST END)
+[//]: # "OPTIONAL:TEST END"
