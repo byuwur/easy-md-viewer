@@ -5,6 +5,13 @@
 
 /* Syntax variables match CODE.view palettes; code.css owns the token styles. */
 /* --- VIEWER --- */
+/* Keep host layout transitions out; component rules below opt in to motion. */
+.byMDdocument,
+.byMDdocument *,
+.byMDdocument *::before,
+.byMDdocument *::after {
+  transition: none !important;
+}
 .byMDdocument {
   position: relative;
   display: flex;
@@ -376,7 +383,7 @@
   pointer-events: none;
   border-radius: 50%;
   background: currentColor;
-  transition: transform var(--by-view-motion-duration, 0s) ease-out;
+  transition: transform var(--by-view-motion-duration, 0s) ease-out !important;
 }
 
 /* --- INTERACTION --- */
@@ -385,7 +392,7 @@
   touch-action: manipulation;
   transition:
     background-color var(--by-view-motion-duration, 0s) ease,
-    box-shadow var(--by-view-motion-duration, 0s) ease-out;
+    box-shadow var(--by-view-motion-duration, 0s) ease-out !important;
 }
 .byMDdocument button:not(:disabled):hover {
   background: color-mix(in srgb, currentColor 7%, var(--by-view-container-bg, var(--by-md-bg)));
@@ -425,10 +432,10 @@
 .byMDdocument.byVIEWready {
   transition:
     background-color var(--by-view-motion-duration, 0s) ease,
-    opacity var(--by-view-motion-duration, 0s) ease;
+    opacity var(--by-view-motion-duration, 0s) ease !important;
 }
 .byMDdocument :is(.byVIEWpanel, .byVIEWstatus) {
-  transition: background-color var(--by-view-motion-duration, 0s) ease;
+  transition: background-color var(--by-view-motion-duration, 0s) ease !important;
 }
 .byMDdocument.byVIEWmotion.byVIEWappear:not(.byVIEWready) {
   opacity: 0;
@@ -440,7 +447,7 @@
     border-color var(--by-view-motion-duration) ease,
     box-shadow var(--by-view-motion-duration) ease,
     opacity var(--by-view-motion-duration) ease,
-    translate var(--by-view-motion-duration) ease-out;
+    translate var(--by-view-motion-duration) ease-out !important;
 }
 .byMDdocument.byVIEWmotion :is(button, summary):not(:disabled):active {
   translate: 0 0.0625em;
@@ -453,7 +460,7 @@
   transition:
     block-size var(--by-view-motion-duration) ease,
     opacity var(--by-view-motion-duration) ease,
-    content-visibility var(--by-view-motion-duration) allow-discrete;
+    content-visibility var(--by-view-motion-duration) allow-discrete !important;
 }
 .byMDdocument.byVIEWmotion details[open]::details-content {
   block-size: auto;
@@ -471,18 +478,18 @@
 /* High Contrast switches colors immediately so intermediate colors cannot lose contrast. */
 .byMDdocument[data-theme="high-contrast"],
 .byMDdocument[data-theme="high-contrast"] :is(.byVIEWpanel, .byVIEWstatus) {
-  transition: none;
+  transition: none !important;
 }
 .byMDdocument[data-theme="high-contrast"] :is(button, input, select, textarea, summary, a) {
-  transition-property: opacity, translate;
+  transition-property: opacity, translate !important;
 }
 @media (forced-colors: active) {
   .byMDdocument,
   .byMDdocument :is(.byVIEWpanel, .byVIEWstatus) {
-    transition: none;
+    transition: none !important;
   }
   .byMDdocument :is(button, input, select, textarea, summary, a) {
-    transition-property: opacity, translate;
+    transition-property: opacity, translate !important;
   }
 }
 
@@ -500,7 +507,7 @@
 }
 
 .byMDdocument .byVIEWinfo {
-  transition: opacity var(--by-view-motion-duration) ease-out;
+  transition: opacity var(--by-view-motion-duration) ease-out !important;
 }
 
 /* --- THEMES --- */
