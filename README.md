@@ -2,8 +2,6 @@
 
 ![MD.view preview](prev.jpg)
 
-Development version: **v3** (unreleased). The [latest release](https://github.com/byuwur/md.view/releases/latest) supplies the published files.
-
 **Markdown, made to be read.**
 
 Render Markdown into headings, lists, tables, tasks, links, and code blocks.
