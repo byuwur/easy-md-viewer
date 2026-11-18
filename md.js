@@ -1506,7 +1506,7 @@
         element.className = "byMDheading";
         const content = heading[2].replace(/\s+#+\s*$/, "");
         appendInline(element, content, options);
-        element.id = headingId(element.textContent, options);
+        element.id = options.headingIdPrefix + headingId(element.textContent, options);
         parent.appendChild(element);
         index += 1;
         continue;
@@ -1570,6 +1570,7 @@
    * @param {boolean} [options.codeLineNumbers=false] - Adds non-copying line-number gutters to fences.
    * @param {boolean} [options.codeStatusBar=false] - Shows the language and line count above fences.
    * @param {boolean} [options.breaks=false]
+   * @param {string} [options.headingIdPrefix=""] Prefix for this viewer’s headings and matching fragment links.
    * @param {string|false} [options.linkTarget="_blank"]
    * @param {boolean} [options.toolbar=true] - Show the viewer header.
    * @param {boolean} [options.credits=true] - Show attribution in the header.
@@ -1613,6 +1614,7 @@
       ...otherOptions
     } = options ?? {};
     options = {
+      headingIdPrefix: "",
       linkTarget: "_blank",
       controlsSize: "regular",
       controlsPosition: "top",
@@ -1637,6 +1639,7 @@
       // Allocate slug ownership per render so duplicate headings never depend on another viewer's content.
       [HEADING_IDS]: Object.create(null)
     };
+    if (typeof options.headingIdPrefix !== "string") throw new TypeError("headingIdPrefix must be a string.");
     applyAppearance(element, options);
     // Clear the target safely.
     element.textContent = "";
@@ -1660,6 +1663,18 @@
     content.className = "byMDcontent";
     element.appendChild(content);
     renderBlocks(content, normalized.split("\n"), options);
+    // Resolve forward links after every heading has its final slug. Host-page anchors stay intact.
+    if (options.headingIdPrefix) {
+      for (const anchor of content.querySelectorAll('a[href^="#"]')) {
+        let id = anchor.hash.slice(1);
+        try {
+          id = decodeURIComponent(id);
+        } catch {
+          continue;
+        }
+        if (Object.hasOwn(options[HEADING_IDS], id)) anchor.setAttribute("href", "#" + encodeURIComponent(options.headingIdPrefix + id));
+      }
+    }
     // Copy uses the caller's original source, preserving line endings that were normalized only for display.
     appendViewerControls(element, options, "md", source);
   }

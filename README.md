@@ -80,6 +80,7 @@ Pass options as the third argument, such as `byMDviewer(target, markdown, { brea
 | `codeLineNumbers`   | `false`             | Show a framed code block with a line-number gutter.                                                                                 |
 | `codeStatusBar`     | `false`             | Show a framed code block with its language and line count.                                                                          |
 | `breaks`            | `false`             | Convert paragraph line breaks to `<br>`.                                                                                            |
+| `headingIdPrefix`   | `""`                | Prefix for heading IDs and matching local Markdown links. Use a different prefix for each document sharing a page.                  |
 | `linkTarget`        | `"_blank"`          | Link target; `false` omits it. Same-document anchors stay in this tab.                                                              |
 | `animations`        | `true`              | Brief control/disclosure motion and background fades; overrides the system motion preference.                                       |
 | `appearAnimation`   | `false`             | Fade the viewer in on each render when `animations` is enabled. Initial rendering remains immediate by default.                     |
@@ -298,7 +299,7 @@ The playground pins its CODE dependency to a numbered release; documentation exa
 
 ### Heading anchors
 
-`## Installation` gets `installation`; repeated headings get suffixes such as `example-1`. Nested headings also receive IDs. Link with `[Installation](#installation)`.
+`## Installation` gets `installation`; repeated headings get suffixes such as `example-1`. Nested headings also receive IDs. Link with `[Installation](#installation)`. With `{ headingIdPrefix: "guide-" }`, both the heading and its local link use `guide-installation`. Links to other page anchors keep their original targets.
 
 ### Links and raw HTML
 

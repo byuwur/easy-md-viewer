@@ -37,6 +37,21 @@ test("MD library", { timeout: 30000 }, async (t) => {
     assert.match(await page.locator(".byMDcontent pre").textContent(), /const n = 1;/);
   });
 
+  await t.test("prefixed documents keep their own heading links and preserve host links", async () => {
+    const anchors = await page.evaluate(() => {
+      const markdown = "[First](#install) [Again](#install-1) [Host](#contact)\n\n## Install\n\n## Install";
+      const other = document.body.appendChild(document.createElement("section"));
+      byMDviewer(other, markdown);
+      byMDviewer(root, markdown, { headingIdPrefix: "guide-" });
+      const ids = [...root.querySelectorAll("h2")].map((heading) => heading.id);
+      const links = [...root.querySelectorAll(".byMDlink")].map((link) => link.getAttribute("href"));
+      const original = other.querySelector("h2").id;
+      other.remove();
+      return { ids, links, original };
+    });
+    assert.deepEqual(anchors, { ids: ["guide-install", "guide-install-1"], links: ["#guide-install", "#guide-install-1", "#contact"], original: "install" });
+  });
+
   await t.test("keeps HTML and unsafe links inert", async () => {
     await page.evaluate(() => byMDviewer(root, '<img src=x onerror="window.injected=1">\n\n[bad](javascript:alert(1))'));
     assert.equal(await page.locator("#viewer img, #viewer script, #viewer a[href^='javascript:']").count(), 0);

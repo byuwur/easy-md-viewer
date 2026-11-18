@@ -854,7 +854,7 @@ Write Markdown here..."></textarea>
           { name: "codeStatusBar", label: "Code status info", default: false, example: "code" },
           { name: "breaks", label: "Soft line breaks", description: "Keep paragraph line breaks", default: false, example: "breaks" }
         ];
-        const defaults = { ...Object.fromEntries(optionDefinitions.map((option) => [option.name, option.default])), controlsSize: "regular", controlsPosition: "top", linkTarget: "_blank" };
+        const defaults = { ...Object.fromEntries(optionDefinitions.map((option) => [option.name, option.default])), controlsSize: "regular", controlsPosition: "top", linkTarget: "_blank", headingIdPrefix: "" };
         const editor = document.getElementById("markdown-source");
         const frame = document.getElementById("preview-frame");
         const sourceSelect = document.getElementById("document-source");
@@ -946,6 +946,8 @@ Write Markdown here..."></textarea>
             "beforeend",
             dedent(/* HTML */ `
               <div class="mt-3">
+                <label for="headingIdPrefix" class="form-label">Heading ID prefix</label>
+                <input id="headingIdPrefix" name="headingIdPrefix" class="form-control mb-3" type="text" placeholder="guide-" />
                 <fieldset id="linkTarget" class="mb-3">
                   <legend class="small mb-2 form-label">Open links in</legend>
                   <div class="btn-group w-100" role="group" aria-label="Open links in">
@@ -1346,7 +1348,7 @@ Write Markdown here..."></textarea>
           const field = event.target;
           if (field.name === "previewTheme") return setPreviewTheme(field.value);
           if (!(field.name in defaults)) return generateIntegration();
-          state.options[field.name] = field.type === "checkbox" ? field.checked : field.value === "false" ? false : field.value;
+          state.options[field.name] = field.type === "checkbox" ? field.checked : field.name === "linkTarget" && field.value === "false" ? false : field.value;
           renderPreview();
         });
         document.getElementById("reset-options").addEventListener("click", () => {
