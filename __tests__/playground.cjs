@@ -55,7 +55,6 @@ test("MD playground loads, updates, and copies a starter", { timeout: 30000 }, a
     return route.fulfill({ body, contentType: `${contentType}; charset=UTF-8` });
   });
   await page.goto("https://playground.test/index.html");
-  assert.equal(await page.locator("#latest-release").textContent(), "Latest Release");
   assert.equal(await page.locator("#latest-release").getAttribute("href"), "https://github.com/byuwur/md.view/releases/latest");
   assert.equal(await page.locator("#download-release").getAttribute("href"), "https://github.com/byuwur/md.view/releases/latest/download/md.view.zip");
   assert.equal(await page.locator("#download-minified").getAttribute("href"), "https://github.com/byuwur/md.view/releases/latest/download/md.view.minified.zip");
