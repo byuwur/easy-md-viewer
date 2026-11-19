@@ -57,7 +57,11 @@
         { path: "/js/bootstrap.min.js", optional: false }
       ];
       const spaReady = (async () => {
-        await byLoad(SPA_STYLES, { host: HOST, before: document.getElementById("spa-loader"), defer: false });
+        await byLoad(SPA_STYLES, {
+          host: HOST,
+          before: document.getElementById("spa-loader"),
+          defer: false
+        });
         await byLoad(SPA_SCRIPTS, { host: HOST, before: document.getElementById("spa-loader") });
       })().catch(console.error);
     </script>
@@ -65,10 +69,12 @@
 
   <body>
     <template id="site-analytics-frame">
-      <meta name="referrer" content="no-referrer">
+      <meta name="referrer" content="no-referrer" />
       <script>
         window.dataLayer = [];
-        function gtag() { window.dataLayer.push(arguments); }
+        function gtag() {
+          window.dataLayer.push(arguments);
+        }
       </script>
     </template>
     <a class="visually-hidden-focusable position-absolute top-0 start-0 p-3 z-3 bg-body-tertiary link-body-emphasis" href="#playground">Skip to playground</a>
@@ -493,6 +499,9 @@ Write Markdown here..."></textarea>
       <p class="site-width container-fluid">Enable JavaScript to use the playground. The <a href="https://github.com/byuwur/md.view#readme">README</a> includes integration examples.</p>
     </noscript>
     <style>
+      /* ===========================
+       * THEME COLORS AND TYPOGRAPHY
+       * =========================== */
       :root {
         --accent: #c4b5fd;
         --accent-text: var(--accent);
@@ -521,6 +530,9 @@ Write Markdown here..."></textarea>
         outline: 0.125rem solid var(--accent-text);
         outline-offset: 0.1875rem;
       }
+      /* ==========================
+       * PAGE LAYOUT AND NAVIGATION
+       * ========================== */
       .site-width {
         max-width: 92.5rem;
         padding-inline: clamp(1rem, 3vw, 3rem);
@@ -554,6 +566,9 @@ Write Markdown here..."></textarea>
       .intro h1 span {
         color: var(--accent-text);
       }
+      /* =========================
+       * BUTTONS AND FORM CONTROLS
+       * ========================= */
       .btn {
         display: inline-flex;
         align-items: center;
@@ -617,6 +632,9 @@ Write Markdown here..."></textarea>
         border-color: var(--accent-text);
         box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--accent-text) 20%, #0000);
       }
+      /* =================
+       * PLAYGROUND PANELS
+       * ================= */
       .mobile-tabs.nav.nav-pills {
         --bs-nav-link-color: var(--bs-secondary-color);
         --bs-nav-link-hover-color: var(--accent-text);
@@ -661,6 +679,9 @@ Write Markdown here..."></textarea>
       .panel-body {
         min-height: 0;
       }
+      /* =====================================
+       * SOURCE EDITOR AND INTEGRATION PREVIEW
+       * ===================================== */
       .source-editor,
       .integration-code {
         resize: none;
@@ -688,6 +709,9 @@ Write Markdown here..."></textarea>
       .integration-code .byCODElineNumber {
         background: #0000;
       }
+      /* =======================
+       * CONFIGURATION ACCORDION
+       * ======================= */
       .accordion {
         --bs-accordion-bg: var(--bs-tertiary-bg);
         --bs-accordion-active-bg: var(--bs-tertiary-bg);
@@ -759,7 +783,9 @@ Write Markdown here..."></textarea>
         }
       }
 
-      /* --- COLOR PICKERS --- */
+      /* =============
+       * COLOR PICKERS
+       * ============= */
       .pcr-app {
         background: var(--bs-body-bg);
         border: 0.0625rem solid var(--bs-border-color);
@@ -769,7 +795,9 @@ Write Markdown here..."></textarea>
         color: var(--bs-body-color);
       }
 
-      /* --- MOTION --- */
+      /* ==========
+       * MOTION
+       * ========== */
       :root:not(.no-motion) .animate__animated {
         animation-duration: var(--transition-duration) !important;
       }
@@ -815,7 +843,9 @@ Write Markdown here..."></textarea>
           return text.replace(new RegExp(`^${indentation}`, "gm"), "").trim();
         }
 
-        // --- STATE & SAMPLES ---
+        // =====================
+        // STATE & CONFIGURATION
+        // =====================
         const optionDefinitions = [
           { name: "toolbar", label: "Viewer header", default: true, group: "viewer", example: "controls" },
           { name: "credits", label: "Credits", default: true, group: "viewer", example: "controls" },
@@ -863,7 +893,13 @@ Write Markdown here..."></textarea>
           { name: "codeStatusBar", label: "Code status info", default: false, example: "code" },
           { name: "breaks", label: "Soft line breaks", description: "Keep paragraph line breaks", default: false, example: "breaks" }
         ];
-        const defaults = { ...Object.fromEntries(optionDefinitions.map((option) => [option.name, option.default])), controlsSize: "regular", controlsPosition: "top", linkTarget: "_blank", headingIdPrefix: "" };
+        const defaults = {
+          ...Object.fromEntries(optionDefinitions.map((option) => [option.name, option.default])),
+          controlsSize: "regular",
+          controlsPosition: "top",
+          linkTarget: "_blank",
+          headingIdPrefix: ""
+        };
         const editor = document.getElementById("markdown-source");
         const frame = document.getElementById("preview-frame");
         const sourceSelect = document.getElementById("document-source");
@@ -902,7 +938,9 @@ Write Markdown here..."></textarea>
         state.originals = { showcase, features: samples.features.source, custom: samples.custom.source };
         state.drafts = { ...state.originals };
 
-        // --- CONFIGURATION ---
+        // =============
+        // CONFIGURATION
+        // =============
         function buildConfigurator() {
           for (const option of optionDefinitions) {
             const row = document.createElement("div");
@@ -973,7 +1011,9 @@ Write Markdown here..."></textarea>
           );
         }
 
-        // --- SOURCE LOADING ---
+        // ==============
+        // SOURCE LOADING
+        // ==============
         // Source/document management: drafts are authoritative; async loads cannot replace a newer selection.
         function showSourceError(message = "", retry = false) {
           document.getElementById("source-error").hidden = !message;
@@ -1051,7 +1091,9 @@ Write Markdown here..."></textarea>
           }
         }
 
-        // --- PREVIEW ---
+        // ==========
+        // PREVIEW
+        // ==========
         function clearPreview() {
           clearTimeout(state.renderTimer);
           if (state.previewReady) frame.contentDocument.getElementById("document").textContent = "";
@@ -1104,7 +1146,10 @@ Write Markdown here..."></textarea>
               state.previewReady = typeof frame.contentWindow.byMDviewer === "function";
               if (!state.previewReady) throw new Error("Renderer missing");
               const viewer = frame.contentDocument.getElementById("document");
-              new MutationObserver(syncPreviewTheme).observe(viewer, { attributes: true, attributeFilter: ["data-theme", "class"] });
+              new MutationObserver(syncPreviewTheme).observe(viewer, {
+                attributes: true,
+                attributeFilter: ["data-theme", "class"]
+              });
               frame.contentDocument.addEventListener("click", (event) => {
                 const anchor = event.target.closest("a[href]");
                 if (!anchor) return;
@@ -1161,7 +1206,9 @@ Write Markdown here..."></textarea>
           `);
         }
 
-        // --- VIEWER THEME ---
+        // ============
+        // VIEWER THEME
+        // ============
         // The container owns its theme; the configurator observes that attribute.
         function syncPreviewTheme() {
           const viewer = frame.contentDocument.getElementById("document");
@@ -1182,21 +1229,24 @@ Write Markdown here..."></textarea>
           renderPreview();
         }
 
-        // --- FEATURE EXAMPLES ---
-        // Feature demonstrations preserve the other document drafts and the selected options.
-        function showExample(name) {
-          const example = samples[name];
-          if (!example) return;
-          state.originals.example = example.source;
-          state.drafts.example = example.source;
-          selectSource("example", window.bySiteAnalytics?.begin("resource_selected"));
-          sourceSelect.querySelector('[value="example"]').textContent = `${example.name} sample`;
-          document.querySelectorAll(".feature-chip").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.example === name)));
-          setMobilePanel("preview");
-          document.getElementById("feedback").textContent = `${example.name}. Your other document drafts are kept.`;
-        }
+        // ==========
+        // SITE THEME
+        // ==========
+        document.getElementById("site-theme").addEventListener("click", (event) => {
+          const button = event.currentTarget;
+          const theme = document.documentElement.dataset.bsTheme === "dark" ? "light" : "dark";
+          const next = theme === "dark" ? "light" : "dark";
+          document.documentElement.dataset.bsTheme = theme;
+          button.querySelector("span").textContent = next === "light" ? "Light" : "Dark";
+          button.querySelector("i").className = `fa-solid fa-${next === "light" ? "sun" : "moon"} me-1`;
+          button.setAttribute("aria-label", `Switch website to ${next} theme`);
+          document.querySelector('meta[name="theme-color"]').content = getComputedStyle(document.documentElement).getPropertyValue("--bs-body-bg").trim();
+          document.getElementById("integration-code").dataset.theme = document.documentElement.dataset.bsTheme;
+        });
 
-        // --- INTEGRATION ---
+        // ===========
+        // INTEGRATION
+        // ===========
         function settingsJSON(options) {
           const field = (id) => (id === "preview-controls-font" ? document.querySelector('[name="preview-controls-font"]:checked')?.value : document.getElementById(id)?.value) || null;
           const { forceMonospace, toolbar, credits, themeToggle, fontSizeControls, copyButton, controlsCompact, animations, appearAnimation, controlsSize, controlsPosition, ...rendering } = options;
@@ -1296,7 +1346,9 @@ Write Markdown here..."></textarea>
           document.getElementById("integration-feedback").textContent = "Downloaded. The starter uses default viewer settings.";
         }
 
-        // --- CLIPBOARD ---
+        // ==========
+        // CLIPBOARD
+        // ==========
         async function copyText(text, selectable, button) {
           const caption = button.querySelector("span");
           try {
@@ -1331,12 +1383,18 @@ Write Markdown here..."></textarea>
           bootstrap.Tab.getOrCreateInstance(document.getElementById(`${panel}-tab`)).show();
         }
 
-        // --- EVENTS ---
+        // ===================
+        // PLAYGROUND CONTROLS
+        // ===================
         buildConfigurator();
         const controlTooltips = [];
         if (window.bootstrap?.Tooltip && typeof window.Popper?.createPopper === "function") {
           document.querySelectorAll('#viewer-options label[data-bs-toggle="tooltip"]').forEach((label) => {
-            const tooltip = bootstrap.Tooltip.getOrCreateInstance(label, { container: "body", trigger: "hover", animation: false });
+            const tooltip = bootstrap.Tooltip.getOrCreateInstance(label, {
+              container: "body",
+              trigger: "hover",
+              animation: false
+            });
             const input = document.getElementById(label.htmlFor);
             input.addEventListener("focus", () => tooltip.show());
             input.addEventListener("blur", () => tooltip.hide());
@@ -1428,18 +1486,25 @@ Write Markdown here..."></textarea>
           copyText(integrationHTML, code, event.currentTarget);
         });
         document.getElementById("download-html").addEventListener("click", downloadHTML);
-        document.getElementById("site-theme").addEventListener("click", (event) => {
-          const button = event.currentTarget;
-          const theme = document.documentElement.dataset.bsTheme === "dark" ? "light" : "dark";
-          const next = theme === "dark" ? "light" : "dark";
-          document.documentElement.dataset.bsTheme = theme;
-          button.querySelector("span").textContent = next === "light" ? "Light" : "Dark";
-          button.querySelector("i").className = `fa-solid fa-${next === "light" ? "sun" : "moon"} me-1`;
-          button.setAttribute("aria-label", `Switch website to ${next} theme`);
-          document.querySelector('meta[name="theme-color"]').content = getComputedStyle(document.documentElement).getPropertyValue("--bs-body-bg").trim();
-          document.getElementById("integration-code").dataset.theme = document.documentElement.dataset.bsTheme;
-        });
-        // --- INITIALIZATION ---
+        // ==========
+        // EXAMPLES
+        // ==========
+        // Feature demonstrations preserve the other document drafts and the selected options.
+        function showExample(name) {
+          const example = samples[name];
+          if (!example) return;
+          state.originals.example = example.source;
+          state.drafts.example = example.source;
+          selectSource("example", window.bySiteAnalytics?.begin("resource_selected"));
+          sourceSelect.querySelector('[value="example"]').textContent = `${example.name} sample`;
+          document.querySelectorAll(".feature-chip").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.example === name)));
+          setMobilePanel("preview");
+          document.getElementById("feedback").textContent = `${example.name}. Your other document drafts are kept.`;
+        }
+
+        // ==============
+        // INITIALIZATION
+        // ==============
         document.getElementById("year-txt").textContent = new Date().getFullYear();
         selectSource("showcase");
         initializePreview();
@@ -1469,7 +1534,9 @@ Write Markdown here..."></textarea>
               components: { preview: true, opacity: true, hue: true, interaction: { hex: true, rgba: false, hsla: false, hsva: false, cmyk: false, input: true, save: true, clear: true } },
               i18n: { "btn:clear": "Theme default", "aria:btn:clear": "Use the theme background" }
             });
-            let syncing = false, openingColor, colorChanged;
+            let syncing = false,
+              openingColor,
+              colorChanged;
             const change = (value) => {
               field.value = value;
               validate();
