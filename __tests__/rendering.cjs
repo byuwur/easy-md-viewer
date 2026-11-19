@@ -21,6 +21,9 @@ test("MD library", { timeout: 30000 }, async (t) => {
   page.on("pageerror", (error) => errors.push(error.message));
   // Load authored files directly; CDN availability is not part of this contract.
   await page.route("**/*", (route) => route.abort());
+  // ===============
+  // BROWSER FIXTURE
+  // ===============
   await page.setContent('<!doctype html><meta charset="UTF-8"><div id="viewer"></div>');
   await page.addStyleTag({ path: path.join(__dirname, "../md.css") });
   await page.addScriptTag({ path: path.join(__dirname, "../md.js") });
@@ -28,6 +31,9 @@ test("MD library", { timeout: 30000 }, async (t) => {
     window.root = document.getElementById("viewer");
   });
 
+  // ==================
+  // RENDERING BEHAVIOR
+  // ==================
   await t.test("renders headings, lists, emphasis, and fenced source", async () => {
     const source = "# Core\n\n**strong**\n\n- first\n- second\n\n```js\nconst n = 1;\n```";
     await page.evaluate((source) => byMDviewer(root, source, { animations: false }), source);
@@ -49,7 +55,11 @@ test("MD library", { timeout: 30000 }, async (t) => {
       other.remove();
       return { ids, links, original };
     });
-    assert.deepEqual(anchors, { ids: ["guide-install", "guide-install-1"], links: ["#guide-install", "#guide-install-1", "#contact"], original: "install" });
+    assert.deepEqual(anchors, {
+      ids: ["guide-install", "guide-install-1"],
+      links: ["#guide-install", "#guide-install-1", "#contact"],
+      original: "install"
+    });
   });
 
   await t.test("keeps HTML and unsafe links inert", async () => {

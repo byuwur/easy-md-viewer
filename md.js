@@ -8,13 +8,19 @@
  */
 
 (function (global) {
-  // --- INITIALIZATION ---
+  // ==============
+  // INITIALIZATION
+  // ==============
   if (global.byMDviewer?.initialized) return;
 
-  // --- METADATA ---
+  // ==========
+  // METADATA
+  // ==========
   byMDviewer.VERSION = "3.1"; // 2026-11-18
 
-  // --- CONSTANTS ---
+  // ==========
+  // CONSTANTS
+  // ==========
   const ESCAPABLE = /[\\`*{}\[\]()#+\-.!_>~|]/;
 
   const SAFE_LINK_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:", "ftp:", "ftps:"]);
@@ -23,7 +29,9 @@
 
   const HEADING_IDS = Symbol("headingIds");
 
-  // --- APPEARANCE ---
+  // ==========
+  // APPEARANCE
+  // ==========
   const extraPalettes = new Set([
     "dracula",
     "darcula",
@@ -102,7 +110,9 @@
     }
   };
 
-  // --- CONTROLS ---
+  // ==========
+  // CONTROLS
+  // ==========
   // Mirrored across the family so each viewer can run without a shared runtime.
   // Mirrored across the family so each viewer can run without a shared runtime.
   /**
@@ -320,7 +330,9 @@
     else element.prepend(toolbar);
   };
 
-  // --- PARSING ---
+  // ==========
+  // PARSING
+  // ==========
   /**
    * Returns the amount of leading indentation, treating tabs as four spaces.
    * @param {string} line - Source line.
@@ -675,12 +687,25 @@
     const tokens = [];
     let start = 0;
     const literal = (end) => {
-      if (end > start) tokens.push({ type: "text", from: base + start, to: base + end, text: text.slice(start, end) });
+      if (end > start)
+        tokens.push({
+          type: "text",
+          from: base + start,
+          to: base + end,
+          text: text.slice(start, end)
+        });
     };
     const formatted = (type, from, to, bodyFrom, bodyTo, extra = {}) => {
       literal(from);
       // Carry absolute UTF-16 ranges through nested tokens so the editor can map visible text back to source.
-      const token = { type, from: base + from, to: base + to, bodyFrom: base + bodyFrom, bodyTo: base + bodyTo, ...extra };
+      const token = {
+        type,
+        from: base + from,
+        to: base + to,
+        bodyFrom: base + bodyFrom,
+        bodyTo: base + bodyTo,
+        ...extra
+      };
       // These token bodies are literal or already decoded; recursively parsing them would change their meaning.
       if (!["code", "image", "entity", "escape"].includes(type) && !extra.auto) token.children = inlineTokens(text.slice(bodyFrom, bodyTo), options, base + bodyFrom, depth + 1);
       tokens.push(token);
@@ -731,7 +756,10 @@
           const url = /^(?:https?|ftp|ftps):\/\/[^\s<>]+$/i.test(value) && isSafeUrl(value);
           const email = /^[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+$/.test(value);
           if (url || email) {
-            i = formatted("link", i, close + 1, i + 1, close, { url: email ? `mailto:${value}` : value, auto: true });
+            i = formatted("link", i, close + 1, i + 1, close, {
+              url: email ? `mailto:${value}` : value,
+              auto: true
+            });
             continue;
           }
         }
@@ -745,7 +773,16 @@
         if (value && (email || isSafeUrl(value))) {
           // Autolink labels are literal, rather than recursively parsed Markdown.
           literal(i);
-          tokens.push({ type: "link", from: base + i, to: base + i + value.length, bodyFrom: base + i, bodyTo: base + i + value.length, url: email ? `mailto:${value}` : value, auto: true, text: value });
+          tokens.push({
+            type: "link",
+            from: base + i,
+            to: base + i + value.length,
+            bodyFrom: base + i,
+            bodyTo: base + i + value.length,
+            url: email ? `mailto:${value}` : value,
+            auto: true,
+            text: value
+          });
           i += value.length;
           start = i;
           continue;
@@ -1135,7 +1172,12 @@
    * Look ahead only for table headers. This is an editing classifier, not the full block renderer.
    */
   const scanLine = (text, context = {}, next = "") => {
-    const result = { type: "paragraph", bodyFrom: 0, bodyTo: text.length, state: { fence: null, table: 0 } };
+    const result = {
+      type: "paragraph",
+      bodyFrom: 0,
+      bodyTo: text.length,
+      state: { fence: null, table: 0 }
+    };
     if (context.fence) {
       const fence = context.fence;
       const closing = new RegExp(`^ {0,3}${fence.marker}{${fence.length},}\\s*$`).test(text);
@@ -1215,7 +1257,9 @@
     return result;
   };
 
-  // --- RENDERING ---
+  // ==========
+  // RENDERING
+  // ==========
   /**
    * Appends a text node to an element.
    * @param {Node} parent - Parent DOM node.
@@ -1547,7 +1591,9 @@
     }
   }
 
-  // --- PUBLIC API ---
+  // ==========
+  // PUBLIC API
+  // ==========
   /**
    * Main API.
    * Renders Markdown into an HTMLElement.
@@ -1702,7 +1748,9 @@
     if (typeof source !== "string" || typeof next !== "string") throw new TypeError("byMDviewer.scanLine: lines must be strings.");
     return scanLine(source, context, next);
   };
-  // --- EXPORT ---
+  // ==========
+  // EXPORT
+  // ==========
   global.byMDviewer = byMDviewer;
   byMDviewer.initialized = true;
 })(typeof window !== "undefined" ? window : this);

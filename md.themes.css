@@ -5,8 +5,12 @@
   --by-md-themes-loaded: 1;
 }
 
-/* --- THEMES --- */
-/* --- DRACULA --- */
+/* ==========
+ * THEMES
+ * ========== */
+/* ==========
+ * DRACULA
+ * ========== */
 
 .byMDdocument[data-theme="dracula"]:not(.dark) {
   --by-view-muted: #635f70;
@@ -44,7 +48,9 @@
   --by-code-tag: #ff79c6;
 }
 
-/* --- DARCULA --- */
+/* ==========
+ * DARCULA
+ * ========== */
 
 .byMDdocument[data-theme="darcula"]:not(.dark) {
   --by-view-muted: #65615e;
@@ -82,7 +88,9 @@
   --by-code-tag: #d99a65;
 }
 
-/* --- NORD --- */
+/* ==========
+ * NORD
+ * ========== */
 
 .byMDdocument[data-theme="nord"]:not(.dark) {
   --by-view-muted: #536174;
@@ -120,7 +128,9 @@
   --by-code-tag: #99b3cd;
 }
 
-/* --- CATPPUCCIN --- */
+/* ==========
+ * CATPPUCCIN
+ * ========== */
 
 .byMDdocument[data-theme="catppuccin"]:not(.dark) {
   --by-view-muted: #616478;
@@ -158,7 +168,9 @@
   --by-code-tag: #cba6f7;
 }
 
-/* --- CATPPUCCIN FRAPPÉ --- */
+/* =================
+ * CATPPUCCIN FRAPPÉ
+ * ================= */
 
 .byMDdocument[data-theme="catppuccin-frappe"]:not(.dark) {
   --by-view-muted: #616478;
@@ -196,7 +208,9 @@
   --by-code-tag: #cda4e8;
 }
 
-/* --- CATPPUCCIN MACCHIATO --- */
+/* ====================
+ * CATPPUCCIN MACCHIATO
+ * ==================== */
 
 .byMDdocument[data-theme="catppuccin-macchiato"]:not(.dark) {
   --by-view-muted: #616478;
@@ -234,7 +248,9 @@
   --by-code-tag: #c6a0f6;
 }
 
-/* --- ROSÉ PINE --- */
+/* ==========
+ * ROSÉ PINE
+ * ========== */
 
 .byMDdocument[data-theme="rose-pine"]:not(.dark) {
   --by-view-muted: #68657e;
@@ -272,7 +288,9 @@
   --by-code-tag: #eb6f92;
 }
 
-/* --- ROSÉ PINE MOON --- */
+/* ==============
+ * ROSÉ PINE MOON
+ * ============== */
 
 .byMDdocument[data-theme="rose-pine-moon"]:not(.dark) {
   --by-view-muted: #68657e;
@@ -310,7 +328,9 @@
   --by-code-tag: #c4a7e7;
 }
 
-/* --- GRUVBOX --- */
+/* ==========
+ * GRUVBOX
+ * ========== */
 
 .byMDdocument[data-theme="gruvbox"]:not(.dark) {
   --by-view-muted: #6b5f56;
@@ -348,7 +368,9 @@
   --by-code-tag: #fc8071;
 }
 
-/* --- GRUVBOX MATERIAL --- */
+/* ================
+ * GRUVBOX MATERIAL
+ * ================ */
 
 .byMDdocument[data-theme="gruvbox-material"]:not(.dark) {
   --by-view-muted: #665b52;
@@ -386,7 +408,9 @@
   --by-code-tag: #e88e53;
 }
 
-/* --- TOKYO NIGHT --- */
+/* ===========
+ * TOKYO NIGHT
+ * =========== */
 
 .byMDdocument[data-theme="tokyo-night"]:not(.dark) {
   --by-view-muted: #545c75;
@@ -424,7 +448,9 @@
   --by-code-tag: #bb9af7;
 }
 
-/* --- TOKYO STORM --- */
+/* ===========
+ * TOKYO STORM
+ * =========== */
 
 .byMDdocument[data-theme="tokyo-storm"]:not(.dark) {
   --by-view-muted: #57607a;
@@ -462,7 +488,9 @@
   --by-code-tag: #bb9af7;
 }
 
-/* --- TOKYO MOON --- */
+/* ==========
+ * TOKYO MOON
+ * ========== */
 
 .byMDdocument[data-theme="tokyo-moon"]:not(.dark) {
   --by-view-muted: #605d7b;
@@ -500,7 +528,9 @@
   --by-code-tag: #c099ff;
 }
 
-/* --- ONE --- */
+/* ==========
+ * ONE
+ * ========== */
 
 .byMDdocument[data-theme="one"]:not(.dark) {
   --by-view-muted: #676a75;
@@ -538,7 +568,9 @@
   --by-code-tag: #d090e3;
 }
 
-/* --- MATERIAL --- */
+/* ==========
+ * MATERIAL
+ * ========== */
 
 .byMDdocument[data-theme="material"]:not(.dark) {
   --by-view-muted: #546e7a;
@@ -576,7 +608,9 @@
   --by-code-tag: #cb9aeb;
 }
 
-/* --- MATERIAL OCEAN --- */
+/* ==============
+ * MATERIAL OCEAN
+ * ============== */
 
 .byMDdocument[data-theme="material-ocean"]:not(.dark) {
   --by-view-muted: #5a687d;
@@ -614,7 +648,9 @@
   --by-code-tag: #c792ea;
 }
 
-/* --- NIGHT OWL --- */
+/* ==========
+ * NIGHT OWL
+ * ========== */
 
 .byMDdocument[data-theme="night-owl"]:not(.dark) {
   --by-view-muted: #656575;
@@ -652,7 +688,9 @@
   --by-code-tag: #c792ea;
 }
 
-/* --- SYNTHWAVE --- */
+/* ==========
+ * SYNTHWAVE
+ * ========== */
 
 .byMDdocument[data-theme="synthwave"]:not(.dark) {
   --by-view-muted: #7f4d80;
@@ -690,7 +728,9 @@
   --by-code-tag: #f97e72;
 }
 
-/* --- AYU --- */
+/* ==========
+ * AYU
+ * ========== */
 
 .byMDdocument[data-theme="ayu"]:not(.dark) {
   --by-view-muted: #686b6f;
@@ -728,7 +768,9 @@
   --by-code-tag: #ff8f40;
 }
 
-/* --- EVERFOREST --- */
+/* ==========
+ * EVERFOREST
+ * ========== */
 
 .byMDdocument[data-theme="everforest"]:not(.dark) {
   --by-view-muted: #5d6a72;
@@ -766,7 +808,9 @@
   --by-code-tag: #e8a080;
 }
 
-/* --- KANAGAWA --- */
+/* ==========
+ * KANAGAWA
+ * ========== */
 
 .byMDdocument[data-theme="kanagawa"]:not(.dark) {
   --by-view-muted: #5f5f5c;
@@ -804,7 +848,9 @@
   --by-code-tag: #a693c3;
 }
 
-/* --- SELENIZED --- */
+/* ==========
+ * SELENIZED
+ * ========== */
 
 .byMDdocument[data-theme="selenized"]:not(.dark) {
   --by-view-muted: #56696f;
@@ -842,7 +888,9 @@
   --by-code-tag: #c4a7f0;
 }
 
-/* --- VS CODE --- */
+/* ==========
+ * VS CODE
+ * ========== */
 
 .byMDdocument[data-theme="vscode"]:not(.dark) {
   --by-view-muted: #686868;
@@ -880,7 +928,9 @@
   --by-code-tag: #c586c0;
 }
 
-/* --- MONOKAI DIMMED --- */
+/* ==============
+ * MONOKAI DIMMED
+ * ============== */
 
 .byMDdocument[data-theme="monokai-dimmed"]:not(.dark) {
   --by-view-muted: #68685f;
@@ -918,7 +968,9 @@
   --by-code-tag: #ce8ea5;
 }
 
-/* --- DISCORD --- */
+/* ==========
+ * DISCORD
+ * ========== */
 
 .byMDdocument[data-theme="discord"]:not(.dark) {
   --by-view-muted: #606773;
@@ -956,7 +1008,9 @@
   --by-code-tag: #f5a3da;
 }
 
-/* --- SLACK --- */
+/* ==========
+ * SLACK
+ * ========== */
 
 .byMDdocument[data-theme="slack"]:not(.dark) {
   --by-view-muted: #765677;
@@ -994,7 +1048,9 @@
   --by-code-tag: #eba8e4;
 }
 
-/* --- BONYUR --- */
+/* ==========
+ * BONYUR
+ * ========== */
 
 .byMDdocument[data-theme="bonyur"]:not(.dark) {
   --by-view-muted: #606b68;
@@ -1032,7 +1088,9 @@
   --by-code-tag: #f59cc8;
 }
 
-/* --- SAKURA --- */
+/* ==========
+ * SAKURA
+ * ========== */
 
 .byMDdocument[data-theme="sakura"]:not(.dark) {
   --by-view-muted: #88586e;
@@ -1070,7 +1128,9 @@
   --by-code-tag: #ff9fbc;
 }
 
-/* --- BUBBLEGUM --- */
+/* ==========
+ * BUBBLEGUM
+ * ========== */
 
 .byMDdocument[data-theme="bubblegum"]:not(.dark) {
   --by-view-muted: #824c6e;
@@ -1108,7 +1168,9 @@
   --by-code-tag: #ff9ade;
 }
 
-/* --- CANDY --- */
+/* ==========
+ * CANDY
+ * ========== */
 
 .byMDdocument[data-theme="candy"]:not(.dark) {
   --by-view-muted: #7a5a80;
@@ -1146,7 +1208,9 @@
   --by-code-tag: #f6a1ee;
 }
 
-/* --- ROSE GOLD --- */
+/* ==========
+ * ROSE GOLD
+ * ========== */
 
 .byMDdocument[data-theme="rose-gold"]:not(.dark) {
   --by-view-muted: #7c5e55;
@@ -1184,7 +1248,9 @@
   --by-code-tag: #f2a3bd;
 }
 
-/* --- LAVENDER --- */
+/* ==========
+ * LAVENDER
+ * ========== */
 
 .byMDdocument[data-theme="lavender"]:not(.dark) {
   --by-view-muted: #6e5d84;
@@ -1222,7 +1288,9 @@
   --by-code-tag: #cca8ff;
 }
 
-/* --- CYBERPUNK --- */
+/* ==========
+ * CYBERPUNK
+ * ========== */
 
 .byMDdocument[data-theme="cyberpunk"]:not(.dark) {
   --by-view-muted: #6f6844;
@@ -1260,7 +1328,9 @@
   --by-code-tag: #ff7cce;
 }
 
-/* --- SUNSET --- */
+/* ==========
+ * SUNSET
+ * ========== */
 
 .byMDdocument[data-theme="sunset"]:not(.dark) {
   --by-view-muted: #825c46;
@@ -1298,7 +1368,9 @@
   --by-code-tag: #ff9eaf;
 }
 
-/* --- VOLCANO --- */
+/* ==========
+ * VOLCANO
+ * ========== */
 
 .byMDdocument[data-theme="volcano"]:not(.dark) {
   --by-view-muted: #7e5b54;
@@ -1336,7 +1408,9 @@
   --by-code-tag: #ffab84;
 }
 
-/* --- AMBER --- */
+/* ==========
+ * AMBER
+ * ========== */
 
 .byMDdocument[data-theme="amber"]:not(.dark) {
   --by-view-muted: #74633f;
@@ -1374,7 +1448,9 @@
   --by-code-tag: #ffc766;
 }
 
-/* --- TERMINAL --- */
+/* ==========
+ * TERMINAL
+ * ========== */
 
 .byMDdocument[data-theme="terminal"]:not(.dark) {
   --by-view-muted: #497055;
@@ -1412,7 +1488,9 @@
   --by-code-tag: #7df58b;
 }
 
-/* --- PAPER --- */
+/* ==========
+ * PAPER
+ * ========== */
 
 .byMDdocument[data-theme="paper"]:not(.dark) {
   --by-view-muted: #766657;
@@ -1450,7 +1528,9 @@
   --by-code-tag: #e0a4a3;
 }
 
-/* --- INK --- */
+/* ==========
+ * INK
+ * ========== */
 
 .byMDdocument[data-theme="ink"]:not(.dark) {
   --by-view-muted: #686868;
@@ -1488,7 +1568,9 @@
   --by-code-tag: #b7c4d8;
 }
 
-/* --- OCEAN --- */
+/* ==========
+ * OCEAN
+ * ========== */
 
 .byMDdocument[data-theme="ocean"]:not(.dark) {
   --by-view-muted: #506c7b;
@@ -1526,7 +1608,9 @@
   --by-code-tag: #91b8ff;
 }
 
-/* --- FOREST --- */
+/* ==========
+ * FOREST
+ * ========== */
 
 .byMDdocument[data-theme="forest"]:not(.dark) {
   --by-view-muted: #5b6a58;
@@ -1564,7 +1648,9 @@
   --by-code-tag: #a0d9c4;
 }
 
-/* --- MINT --- */
+/* ==========
+ * MINT
+ * ========== */
 
 .byMDdocument[data-theme="mint"]:not(.dark) {
   --by-view-muted: #516e64;
@@ -1602,7 +1688,9 @@
   --by-code-tag: #97dfd5;
 }
 
-/* --- ICE --- */
+/* ==========
+ * ICE
+ * ========== */
 
 .byMDdocument[data-theme="ice"]:not(.dark) {
   --by-view-muted: #546c78;
@@ -1640,7 +1728,9 @@
   --by-code-tag: #a6bdff;
 }
 
-/* --- SEPIA --- */
+/* ==========
+ * SEPIA
+ * ========== */
 
 .byMDdocument[data-theme="sepia"]:not(.dark) {
   --by-view-muted: #6d5b44;
