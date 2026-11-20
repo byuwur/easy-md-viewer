@@ -5,6 +5,22 @@
 
 /* Syntax variables match CODE.view palettes; code.css owns the token styles. */
 /* ===== VIEWER ===== */
+@property --_view-paper {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+@property --_view-surface {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+@property --by-md-table-alt {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #eff;
+}
+
 /* Keep host layout transitions out; component rules below opt in to motion. */
 .byMDdocument,
 .byMDdocument *,
@@ -13,12 +29,14 @@
   transition: none !important;
 }
 .byMDdocument {
+  --_view-paper: var(--by-view-document-bg, var(--by-md-bg));
+  --_view-surface: var(--by-view-container-bg, var(--by-md-bg));
   position: relative;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
   color: var(--by-md-text);
-  background: var(--by-view-document-bg, var(--by-md-bg));
+  background: var(--_view-paper);
   border: 0.0625rem solid var(--by-md-border);
   border-radius: var(--by-view-radius, 0.75rem);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
@@ -46,12 +64,12 @@
   margin-bottom: 0 !important;
 }
 .byMDcontent {
-  background: var(--by-view-container-bg, var(--by-md-bg));
+  background: var(--_view-surface);
   flex: 1 0 auto;
   min-width: 0;
 }
 .byMDheading {
-  margin: 1.5rem 0 0.625rem;
+  margin: 1.5em 0 0.625em;
   font-weight: 600;
   line-height: 1.25;
 }
@@ -80,7 +98,7 @@
   color: var(--by-md-muted);
 }
 .byMDparagraph {
-  margin: 0 0 1rem;
+  margin: 0 0 1em;
 }
 .byMDlink {
   color: var(--by-md-link);
@@ -102,7 +120,7 @@
 }
 .byMDcodeBlock {
   color: var(--by-md-text);
-  margin: 0 0 1rem;
+  margin: 0 0 1em;
   padding: 1rem;
   overflow: auto;
   border-radius: 0.375rem;
@@ -124,7 +142,7 @@
   background: #0000;
 }
 .byMDblockquote {
-  margin: 0 0 1rem;
+  margin: 0 0 1em;
   padding: 0 1rem;
   border-left: 0.25rem solid var(--by-md-border);
   color: var(--by-md-quote);
@@ -133,11 +151,11 @@
   margin-bottom: 0;
 }
 .byMDlist {
-  margin: 0 0 1rem;
+  margin: 0 0 1em;
   padding-left: 2rem;
 }
 .byMDlist .byMDlist {
-  margin-top: 0.25rem;
+  margin-top: 0.25em;
   margin-bottom: 0;
 }
 .byMDlistItem > .byMDparagraph:last-child {
@@ -147,10 +165,13 @@
   list-style: none;
   display: flex;
   align-items: flex-start;
-  gap: 0.5rem;
+  gap: 0.5em;
 }
 .byMDtaskCheckbox {
-  margin: 0.375rem 0 0;
+  font: inherit;
+  width: 0.875em;
+  height: 0.875em;
+  margin: 0.375em 0 0;
   flex: 0 0 auto;
 }
 .byMDtaskContent {
@@ -164,7 +185,7 @@
   display: block;
   width: max-content;
   max-width: 100%;
-  margin: 0 0 1rem;
+  margin: 0 0 1em;
   overflow: auto;
   border-spacing: 0;
   border-collapse: collapse;
@@ -193,7 +214,7 @@
   max-width: 100%;
   height: auto;
   box-sizing: content-box;
-  background: var(--by-view-container-bg, var(--by-md-bg));
+  background: var(--_view-surface);
 }
 .byMDimage[data-size="original"] {
   width: auto;
@@ -215,7 +236,7 @@
 }
 .byMDdocument hr {
   height: 0.25rem;
-  margin: 1.5rem 0;
+  margin: 1.5em 0;
   padding: 0;
   border: 0;
   background: var(--by-md-border);
@@ -235,7 +256,7 @@
   gap: 0.125em;
   margin: 0.25em 0;
   padding: 0.5em 0;
-  background: #0000;
+
   font: 0.875rem/1.25 var(--by-view-controls-font, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace);
   white-space: normal;
 }
@@ -312,7 +333,7 @@
   padding: 0.25em 0.5em;
   border: 0.0625em solid var(--by-md-border);
   border-radius: var(--by-view-radius, 0.625em);
-  background: var(--by-view-container-bg, var(--by-md-bg));
+  background: var(--_view-surface);
   color: inherit;
   font: inherit;
   line-height: 1;
@@ -320,7 +341,9 @@
   cursor: pointer;
 }
 .byMDdocument > .byVIEWtoolbar button:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
+  outline: 0.0625rem dashed currentColor;
+  outline-offset: -0.25em;
   cursor: not-allowed;
 }
 .byMDdocument > .byVIEWtoolbar button:focus-visible {
@@ -390,15 +413,12 @@
 .byMDdocument button {
   -webkit-tap-highlight-color: #0000;
   touch-action: manipulation;
-  transition:
-    background-color var(--by-view-motion-duration, 0s) ease,
-    box-shadow var(--by-view-motion-duration, 0s) ease-out !important;
 }
 .byMDdocument button:not(:disabled):hover {
-  background: color-mix(in srgb, currentColor 7%, var(--by-view-container-bg, var(--by-md-bg)));
+  background: color-mix(in srgb, currentColor 7%, var(--_view-surface));
 }
 .byMDdocument button:not(:disabled):active {
-  background: color-mix(in srgb, currentColor 13%, var(--by-view-container-bg, var(--by-md-bg)));
+  background: color-mix(in srgb, currentColor 13%, var(--_view-surface));
 }
 .byMDdocument button:focus-visible {
   outline: 0.125rem solid var(--by-md-link);
@@ -428,23 +448,23 @@
 .byMDdocument:not(.byVIEWready) {
   transition: none !important;
 }
-/* Background fades stay on shared surfaces, never individual rows or syntax tokens. */
+/* Interpolate the shared surfaces once, including inside scrolling content. */
 .byMDdocument.byVIEWready {
   transition:
-    background-color var(--by-view-motion-duration, 0s) ease,
-    opacity var(--by-view-motion-duration, 0s) ease !important;
+    --_view-paper var(--by-view-motion-duration) linear,
+    --_view-surface var(--by-view-motion-duration) linear,
+    --by-md-table-alt var(--by-view-motion-duration) linear,
+    color var(--by-view-motion-duration) steps(2, jump-none),
+    opacity var(--by-view-motion-duration) ease !important;
 }
-.byMDdocument :is(.byVIEWpanel, .byVIEWstatus) {
-  transition: background-color var(--by-view-motion-duration, 0s) ease !important;
+.byMDdocument.byVIEWready :is(.byMDinlineCode, .byMDcodeBlock) {
+  transition: background-color var(--by-view-motion-duration) linear !important;
 }
 .byMDdocument.byVIEWmotion.byVIEWappear:not(.byVIEWready) {
   opacity: 0;
 }
 .byMDdocument :is(button, input, select, textarea, summary, a) {
   transition:
-    background-color var(--by-view-motion-duration) ease,
-    color var(--by-view-motion-duration) ease,
-    border-color var(--by-view-motion-duration) ease,
     box-shadow var(--by-view-motion-duration) ease,
     opacity var(--by-view-motion-duration) ease,
     translate var(--by-view-motion-duration) ease-out !important;
@@ -477,15 +497,15 @@
 
 /* High Contrast switches colors immediately so intermediate colors cannot lose contrast. */
 .byMDdocument[data-theme="high-contrast"],
-.byMDdocument[data-theme="high-contrast"] :is(.byVIEWpanel, .byVIEWstatus) {
+.byMDdocument[data-theme="high-contrast"] :is(.byVIEWpanel, .byVIEWstatus, .byMDinlineCode, .byMDcodeBlock) {
   transition: none !important;
 }
 .byMDdocument[data-theme="high-contrast"] :is(button, input, select, textarea, summary, a) {
   transition-property: opacity, translate !important;
 }
 @media (forced-colors: active) {
-  .byMDdocument,
-  .byMDdocument :is(.byVIEWpanel, .byVIEWstatus) {
+  .byMDdocument.byVIEWready,
+  .byMDdocument.byVIEWready :is(.byVIEWpanel, .byVIEWstatus, .byMDinlineCode, .byMDcodeBlock) {
     transition: none !important;
   }
   .byMDdocument :is(button, input, select, textarea, summary, a) {

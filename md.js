@@ -13,6 +13,11 @@
 
   // ===== METADATA =====
   byMDviewer.VERSION = "3.2"; // 2026-11-20
+  // Mirrored helpers are checked by code.view/.github/scripts/check-family.mjs.
+  const componentName = "MD.view";
+  const themeFile = "md";
+  const documentClass = "byMDdocument";
+  const contentSelector = ":scope > .byMDcontent";
 
   // ===== CONSTANTS =====
   const ESCAPABLE = /[\\`*{}\[\]()#+\-.!_>~|]/;
@@ -22,6 +27,13 @@
   const SAFE_IMAGE_PROTOCOLS = new Set(["http:", "https:"]);
 
   const HEADING_IDS = Symbol("headingIds");
+
+  const node = (tag, className = "", text) => {
+    const element = document.createElement(tag);
+    element.className = className;
+    if (text !== undefined) element.textContent = String(text);
+    return element;
+  };
 
   // ===== APPEARANCE =====
   const extraPalettes = new Set([
@@ -74,10 +86,23 @@
   const warnMissingThemes = (element, palette = element.dataset.theme) => {
     if (!extraPalettes.has(palette) || warnedPalettes.has(palette)) return;
     const document = element.ownerDocument;
-    if (document.defaultView.getComputedStyle(document.documentElement).getPropertyValue("--by-md-themes-loaded").trim() === "1") return;
+    if (document.defaultView.getComputedStyle(document.documentElement).getPropertyValue(`--by-${themeFile}-themes-loaded`).trim() === "1") return;
     warnedPalettes.add(palette);
-    // console.warn(`MD.view: Palette "${palette}" requires md.themes.css. Import it after md.css. https://byuwur.github.io/md.view/`);
-    console.warn(`MD.view: Palette "${palette}" requires md.themes.css. Import it after md.css. https://md.byuwur.co/`);
+    console.warn(`${componentName}: Palette "${palette}" requires ${themeFile}.themes.css. Import it after ${themeFile}.css. https://${themeFile}.byuwur.co/`);
+  };
+
+  const getLocalTheme = (target) => {
+    if (["light", "dark"].includes(target.dataset.theme)) return target.dataset.theme;
+    if (target.classList.contains("dark")) return "dark";
+    if (target.classList.contains("light")) return "light";
+    return target.dataset.theme ? "light" : null;
+  };
+
+  const setLocalTheme = (element, mode, palette) => {
+    element.classList.toggle("light", mode === "light");
+    element.classList.toggle("dark", mode === "dark");
+    if (palette != null) element.dataset.theme = palette;
+    else if (["light", "dark"].includes(element.dataset.theme)) element.dataset.theme = mode;
   };
 
   // Explicit appearance options override markup; omitted values preserve the container's state.
@@ -89,92 +114,87 @@
     const size = typeof fontSize === "number" ? `${Math.max(0.5, Math.min(3, fontSize))}rem` : typeof fontSize === "string" ? `clamp(0.5rem, ${fontSize}, 3rem)` : "";
     if (fontSize != null && (typeof fontSize === "number" ? !Number.isFinite(fontSize) : typeof fontSize !== "string" || !CSS.supports("font-size", size))) throw new RangeError("Font size must be a finite multiplier or a CSS size.");
     // Keep palette identity in data-theme while light/dark classes select its mode.
-    if (theme != null || palette != null) {
-      const mode = theme ?? (["light", "dark"].includes(element.dataset.theme) ? element.dataset.theme : element.classList.contains("dark") ? "dark" : "light");
-      element.classList.toggle("light", mode === "light");
-      element.classList.toggle("dark", mode === "dark");
-      if (palette != null) element.dataset.theme = palette;
-      else if (["light", "dark"].includes(element.dataset.theme)) element.dataset.theme = mode;
-    }
-    if (fontSize != null) {
-      element.style.fontSize = size;
-      element.dataset.byViewDefaultFontSize = element.style.fontSize;
-    }
+    if (theme != null || palette != null) setLocalTheme(element, theme ?? getLocalTheme(element) ?? "light", palette);
+    return size;
+  };
+
+  const applyContentAppearance = (element, options, content) => {
+    const size = applyAppearance(element, options);
+    const previous = element.querySelector(contentSelector);
+    content.style.fontSize = size || previous?.style.fontSize || "";
+    content.dataset.byViewDefaultFontSize = size || previous?.dataset.byViewDefaultFontSize || "";
+  };
+
+  const syncMotion = (element, options) => {
+    const enabled = options.animations !== false;
+    const appear = enabled && Boolean(options.appearAnimation);
+    element.classList.toggle("byVIEWmotion", enabled);
+    element.classList.toggle("byVIEWappear", appear);
+    return appear;
   };
 
   // ===== CONTROLS =====
   // Mirrored across the family so each viewer can run without a shared runtime.
-  // Mirrored across the family so each viewer can run without a shared runtime.
+  const createThemeButton = () => {
+    const button = node("button", "byVIEWthemeToggle");
+    button.type = "button";
+    button.innerHTML =
+      '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 0 1 11.2 3 9 9 0 1 0 21 12.8Z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4m0-14.2-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>';
+    return button;
+  };
+
   /**
    * Adds container light/dark controls, retaining legacy stylesheet links as a fallback.
    * @param {HTMLElement} element Viewer container and theme owner.
    * @param {HTMLElement} controls Toolbar control group.
-   * @param {string} filename Legacy theme stylesheet basename.
-   * @returns {HTMLButtonElement} Theme toggle button.
+   * @returns {{button: HTMLButtonElement, sync: Function}} Mounted theme control.
    */
-  const appendThemeToggle = (element, controls, filename) => {
-    const escapedFilename = filename.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const themePattern = new RegExp(`^([^?#]*/)?${escapedFilename}\\.(light|dark)\\.css([?#].*)?$`, "i");
+  const appendThemeToggle = (element, controls) => {
+    const themePattern = new RegExp(`^([^?#]*/)?${themeFile}\\.(light|dark)\\.css([?#].*)?$`, "i");
     const stylesheet = [document.getElementById("byVIEWtheme"), ...document.querySelectorAll('link[rel~="stylesheet"]')].find((link) => link && themePattern.test(link.getAttribute("href") || ""));
-    // Explicit container state takes precedence over a shared legacy stylesheet.
-    const localTheme = (target) => {
-      if (["light", "dark"].includes(target.dataset.theme)) return target.dataset.theme;
-      if (target.classList.contains("dark")) return "dark";
-      if (target.classList.contains("light")) return "light";
-      return target.dataset.theme ? "light" : null;
-    };
     const legacyTheme = () => (stylesheet?.isConnected ? (stylesheet.getAttribute("href") || "").match(themePattern) : null);
-    const getTheme = () => localTheme(element) || legacyTheme()?.[2].toLowerCase() || "light";
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "byVIEWthemeToggle";
-    button.innerHTML =
-      '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 0 1 11.2 3 9 9 0 1 0 21 12.8Z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4m0-14.2-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>';
+    const getTheme = () => getLocalTheme(element) || legacyTheme()?.[2].toLowerCase() || "light";
+    const button = createThemeButton();
     const sync = () => {
       const next = getTheme() === "dark" ? "light" : "dark";
-      const toggles = !localTheme(element) && legacyTheme() ? [button, ...document.querySelectorAll(".byMDdocument > .byVIEWtoolbar > .byVIEWcontrols > .byVIEWthemeToggle")] : [button];
+      const toggles = !getLocalTheme(element) && legacyTheme() ? [button, ...document.querySelectorAll(`.${documentClass} > .byVIEWtoolbar > .byVIEWcontrols > .byVIEWthemeToggle`)] : [button];
       for (const toggle of toggles) {
         // A legacy link must not change the controls of independently themed viewers.
-        if (toggle !== button && localTheme(toggle.closest(".byMDdocument"))) continue;
+        if (toggle !== button && getLocalTheme(toggle.closest(`.${documentClass}`))) continue;
         toggle.title = `Switch to ${next} theme`;
         toggle.setAttribute("aria-label", toggle.title);
       }
     };
     button.addEventListener("click", () => {
       const next = getTheme() === "dark" ? "light" : "dark";
-      if (!localTheme(element) && legacyTheme()) {
+      if (!getLocalTheme(element) && legacyTheme()) {
         const href = stylesheet.getAttribute("href");
         stylesheet.setAttribute(
           "href",
-          href.replace(themePattern, (_, path = "", theme, suffix = "") => `${path}${filename}.${next}.css${suffix}`)
+          href.replace(themePattern, (_, path = "", theme, suffix = "") => `${path}${themeFile}.${next}.css${suffix}`)
         );
-      } else if (element.dataset.theme && !["light", "dark"].includes(element.dataset.theme)) {
-        // Named palettes stay selected while only the mode changes.
-        element.classList.toggle("light", next === "light");
-        element.classList.toggle("dark", next === "dark");
-      } else if (element.hasAttribute("data-theme") || (!element.classList.contains("light") && !element.classList.contains("dark"))) {
-        element.dataset.theme = next;
       } else {
-        element.classList.toggle("light", next === "light");
-        element.classList.toggle("dark", next === "dark");
+        // Preserve attribute-only themes and keep existing mode classes in sync.
+        const palette = element.dataset.theme;
+        if (!element.matches(".light, .dark") && (!palette || ["light", "dark"].includes(palette))) element.dataset.theme = next;
+        else setLocalTheme(element, next, palette === "" ? next : undefined);
       }
       sync();
     });
     button.addEventListener("focus", sync);
     button.addEventListener("pointerenter", sync);
     sync();
-    return controls.appendChild(button);
+    controls.appendChild(button);
+    return { button, sync };
   };
 
   /**
    * Adds text size controls for a renderer.
    * @param {HTMLElement} element - Renderer whose font size is changed.
    * @param {HTMLElement} controls - Toolbar that receives the controls.
-   * @return {HTMLElement} The text size button group.
+   * @return {{group: HTMLElement, sync: Function}} Mounted text size controls.
    */
   const appendFontSizeControls = (element, controls) => {
-    // Remember the caller's initial size so Reset also works after this toolbar is recreated.
-    element.dataset.byViewDefaultFontSize ??= element.style.fontSize;
     const sizes = document.createElement("div");
     sizes.className = "byVIEWfontSizes";
     controls.appendChild(sizes);
@@ -216,7 +236,7 @@
       sync();
     });
     sync();
-    return sizes;
+    return { group: sizes, sync };
   };
 
   /**
@@ -262,6 +282,58 @@
         button.setAttribute("aria-label", button.title);
       }
     });
+    return button;
+  };
+
+  // Keep the toolbar mounted while the current renderer applies option changes.
+  const mountControls = (element, content, initialOptions, getText, version, copyLabel = "Copy source") => {
+    const toolbar = node("div", "byVIEWtoolbar");
+    const controls = node("div", "byVIEWcontrols");
+    controls.setAttribute("role", "group");
+    controls.setAttribute("aria-label", "Viewer controls");
+    const info = node("small", "byVIEWinfo");
+    for (const [text, href] of [
+      [componentName, `https://github.com/byuwur/${themeFile}.view`],
+      ["@byUwUr", "https://byuwur.co"]
+    ]) {
+      const link = node("a", "", text);
+      link.href = href;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      if (info.childNodes.length) info.append(` · v${version} · `);
+      info.appendChild(link);
+    }
+    const theme = appendThemeToggle(element, controls);
+    const sizes = appendFontSizeControls(content, controls);
+    const copy = appendCopyButton(controls, getText, copyLabel);
+    const update = (options, changes = {}) => {
+      if ("fontSize" in changes || "theme" in changes || "palette" in changes) {
+        applyContentAppearance(element, changes, content);
+        theme.sync();
+        sizes.sync();
+      }
+      Object.assign(options, changes);
+      if ("animations" in changes || "appearAnimation" in changes) syncMotion(element, options);
+      element.classList.toggle("byVIEWcompact", options.controlsCompact !== false);
+      const bottom = options.controlsPosition === "bottom";
+      toolbar.dataset.size = ["xs", "small", "regular", "large", "xl"].includes(options.controlsSize) ? options.controlsSize : "regular";
+      if (!toolbar.childElementCount || ["credits", "themeToggle", "fontSizeControls", "copyButton"].some((key) => key in changes)) {
+        controls.replaceChildren();
+        if (options.themeToggle !== false) controls.appendChild(theme.button);
+        if (options.fontSizeControls !== false) controls.appendChild(sizes.group);
+        if (options.copyButton !== false) controls.appendChild(copy);
+        toolbar.replaceChildren();
+        if (options.credits !== false) toolbar.appendChild(info);
+        if (controls.childElementCount) toolbar.appendChild(controls);
+      }
+      const visible = options.toolbar !== false && toolbar.childElementCount > 0;
+      element.classList.toggle("byVIEWbottom", visible && bottom);
+      if (!visible) toolbar.remove();
+      else if (bottom && toolbar !== element.lastElementChild) element.appendChild(toolbar);
+      else if (!bottom && toolbar !== element.firstElementChild) element.prepend(toolbar);
+    };
+    update(initialOptions);
+    return update;
   };
 
   /**
@@ -283,41 +355,6 @@
     } finally {
       copy.remove();
     }
-  };
-
-  /**
-   * Attach the enabled theme, size, and copy controls to this renderer instance.
-   * @param {HTMLElement} element DOM element owned by this operation.
-   * @param {Object} options Options that configure this operation.
-   * @param {string} filename File name or relative asset path.
-   * @param {unknown} source Source data consumed without taking ownership of its storage.
-   * @returns {void}
-   */
-  const appendViewerControls = (element, options, filename, source) => {
-    const toolbar = document.createElement("div");
-    toolbar.className = "byVIEWtoolbar";
-    toolbar.dataset.size = ["xs", "small", "regular", "large", "xl"].includes(options.controlsSize) ? options.controlsSize : "regular";
-    element.classList.toggle("byVIEWcompact", options.controlsCompact);
-    element.classList.toggle("byVIEWbottom", options.controlsPosition === "bottom");
-    const controls = document.createElement("div");
-    controls.className = "byVIEWcontrols";
-    controls.setAttribute("role", "group");
-    controls.setAttribute("aria-label", "Viewer controls");
-    const info = document.createElement("small");
-    info.className = "byVIEWinfo";
-    info.innerHTML = /* HTML */ `<a href="https://github.com/byuwur/md.view" target="_blank" rel="noopener noreferrer">MD.view</a> · v${byMDviewer.VERSION} ·
-      <a href="https://byuwur.co" target="_blank" rel="noopener noreferrer">@byUwUr</a>`;
-    if (options.credits) toolbar.appendChild(info);
-    if (options.themeToggle) appendThemeToggle(element, controls, filename);
-    if (options.fontSizeControls) appendFontSizeControls(element, controls);
-    if (options.copyButton) appendCopyButton(controls, (event) => (event.shiftKey ? source : getPlainText(element)), "Copy text (Shift+click for Markdown)");
-    if (controls.childNodes.length) toolbar.appendChild(controls);
-    if (!options.toolbar || !toolbar.childNodes.length) {
-      element.classList.remove("byVIEWbottom");
-      return;
-    }
-    if (options.controlsPosition === "bottom") element.appendChild(toolbar);
-    else element.prepend(toolbar);
   };
 
   // ===== PARSING =====
@@ -1613,7 +1650,7 @@
    * @param {"xs"|"small"|"regular"|"large"|"xl"} [options.controlsSize="regular"] - Sets the control size; invalid values use regular.
    * @param {boolean} [options.controlsCompact=true] - Places attribution beside the controls, wrapping as needed.
    * @param {"top"|"bottom"} [options.controlsPosition="top"] - Keeps the toolbar at the scroll area's top or bottom while the viewer is visible; invalid values use top.
-   * @returns {void}
+   * @returns {{setOptions: Function}} Mounted viewer.
    * @throws {TypeError|RangeError}
    */
   function byMDviewer(element, markdown, options = {}) {
@@ -1670,13 +1707,13 @@
       [HEADING_IDS]: Object.create(null)
     };
     if (typeof options.headingIdPrefix !== "string") throw new TypeError("headingIdPrefix must be a string.");
-    applyAppearance(element, options);
+    const content = document.createElement("div");
+    content.className = "byMDcontent";
+    applyContentAppearance(element, options, content);
     // Clear the target safely.
     element.textContent = "";
-    element.classList.add("byMDdocument");
-    element.classList.toggle("byVIEWmotion", options.animations);
-    const appear = options.animations && options.appearAnimation;
-    element.classList.toggle("byVIEWappear", appear);
+    element.classList.add(documentClass);
+    const appear = syncMotion(element, options);
     // Paint opacity 0 before starting each requested fade.
     if (appear) element.classList.remove("byVIEWready");
     if (!element.classList.contains("byVIEWready")) {
@@ -1689,24 +1726,38 @@
     }
     // Normalize line endings and remove the BOM.
     const normalized = source.replace(/\r\n?/g, "\n").replace(/^\uFEFF/, "");
-    const content = document.createElement("div");
-    content.className = "byMDcontent";
     element.appendChild(content);
-    renderBlocks(content, normalized.split("\n"), options);
-    // Resolve forward links after every heading has its final slug. Host-page anchors stay intact.
-    if (options.headingIdPrefix) {
-      for (const anchor of content.querySelectorAll('a[href^="#"]')) {
-        let id = anchor.hash.slice(1);
-        try {
-          id = decodeURIComponent(id);
-        } catch {
-          continue;
+    const renderContent = () => {
+      content.replaceChildren();
+      options[HEADING_IDS] = Object.create(null);
+      renderBlocks(content, normalized.split("\n"), options);
+      // Resolve forward links after every heading has its final slug. Host-page anchors stay intact.
+      if (options.headingIdPrefix) {
+        for (const anchor of content.querySelectorAll('a[href^="#"]')) {
+          let id = anchor.hash.slice(1);
+          try {
+            id = decodeURIComponent(id);
+          } catch {
+            continue;
+          }
+          if (Object.hasOwn(options[HEADING_IDS], id)) anchor.setAttribute("href", "#" + encodeURIComponent(options.headingIdPrefix + id));
         }
-        if (Object.hasOwn(options[HEADING_IDS], id)) anchor.setAttribute("href", "#" + encodeURIComponent(options.headingIdPrefix + id));
       }
-    }
+    };
+    renderContent();
     // Copy uses the caller's original source, preserving line endings that were normalized only for display.
-    appendViewerControls(element, options, "md", source);
+    const updateControls = mountControls(element, content, options, (event) => (event.shiftKey ? source : getPlainText(element)), byMDviewer.VERSION, "Copy text (Shift+click for Markdown)");
+    return {
+      setOptions(changes) {
+        if (content.parentNode !== element) return;
+        if ("headingIdPrefix" in changes && typeof changes.headingIdPrefix !== "string") throw new TypeError("headingIdPrefix must be a string.");
+        const redraw = ["withLinks", "withImages", "withTables", "withTasks", "withStrikethrough", "codeHighlighting", "codeLineNumbers", "codeStatusBar", "breaks", "headingIdPrefix", "linkTarget"].some(
+          (key) => key in changes && changes[key] !== options[key]
+        );
+        updateControls(options, changes);
+        if (redraw) renderContent();
+      }
+    };
   }
   /**
    * Return inline tokens with UTF-16 source ranges without creating DOM.

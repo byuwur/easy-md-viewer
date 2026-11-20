@@ -61,7 +61,7 @@ byMDviewer(target, document.getElementById("markdownSource"));
 
 Use `byMDviewer(target)` instead when the target itself contains Markdown.
 
-`byMDviewer(target, markdown?, options?)` replaces the target's contents synchronously and returns `undefined`. Invalid targets or source types throw `TypeError`. It has no `ready` promise or controller; call it again to replace the document. Pass the Markdown again on subsequent calls, because the target now contains rendered content.
+`byMDviewer(target, markdown?, options?)` renders synchronously and returns a controller with `setOptions(changes)`. Invalid targets or source types throw `TypeError`. To replace the document, call the viewer again with the new Markdown source.
 
 ### Options
 
@@ -80,7 +80,7 @@ Pass options as the third argument, such as `byMDviewer(target, markdown, { brea
 | `breaks`            | `false`             | Convert paragraph line breaks to `<br>`.                                                                                            |
 | `headingIdPrefix`   | `""`                | Prefix for heading IDs and matching local Markdown links. Use a different prefix for each document sharing a page.                  |
 | `linkTarget`        | `"_blank"`          | Link target; `false` omits it. Same-document anchors stay in this tab.                                                              |
-| `animations`        | `true`              | Brief control/disclosure motion and background fades; overrides the system motion preference.                                       |
+| `animations`        | `true`              | Animate controls, disclosures and theme backgrounds. Overrides the system motion preference.                                        |
 | `appearAnimation`   | `false`             | Fade the viewer in on each render when `animations` is enabled. Initial rendering remains immediate by default.                     |
 | `toolbar`           | `true`              | Show the viewer header; secondary tools are configured separately.                                                                  |
 | `credits`           | `true`              | Show attribution in the header.                                                                                                     |
@@ -192,7 +192,7 @@ Both line arguments must be strings or `scanLine()` throws `TypeError`. Omit `co
 
 Use `theme` for light or dark mode and `palette` for the color scheme. Monokai, GitHub, Solarized and High Contrast are built in. Load [md.themes.css](md.themes.css) after the base stylesheet for the other palettes.
 
-Options override container settings. Omit an option or pass `null` to keep its current value. Numeric `fontSize` uses rem. CSS sizes such as `20px` also work within the `0.5rem` to `3rem` range. Invalid appearance values throw `RangeError` before replacing the document.
+Options override container settings. Omit an option or pass `null` to keep its current value. Call `setOptions(changes)` on the returned viewer to apply settings immediately. Presentation changes preserve the displayed document. The text controls resize content in `0.125rem` steps. Content padding stays fixed. The document frame and toolbar keep their size. Reset restores the configured or inherited size. Numeric `fontSize` uses rem. CSS sizes such as `20px` also work within the `0.5rem` to `3rem` range. Invalid appearance values throw `RangeError` before replacing the document.
 
 ```html
 <div id="viewer" class="dark" data-theme="github"></div>
