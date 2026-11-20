@@ -42,6 +42,8 @@ Allow the script and style origins in your CSP. Authorize inline initialization 
 
 [Playground](https://md.byuwur.co/) · [CodePen](https://codepen.io/byuwur/pen/VYPoWMM)
 
+The library contains no tracking. The [privacy policy](https://byuwur.co/privacy/dotview) and [cookie policy](https://byuwur.co/cookies/dotview) apply only to the hosted landing page and playground.
+
 Open [index.html](index.html) locally. Its host assets use the network. Exported starters use the default settings.
 
 ## Downloads
