@@ -4,9 +4,7 @@
    data-theme="light" / "dark" remain mode aliases and override mode classes. */
 
 /* Syntax variables match CODE.view palettes; code.css owns the token styles. */
-/* ==========
- * VIEWER
- * ========== */
+/* ===== VIEWER ===== */
 /* Keep host layout transitions out; component rules below opt in to motion. */
 .byMDdocument,
 .byMDdocument *,
@@ -30,9 +28,7 @@
   min-height: 4rem;
 }
 
-/* ==========
- * CONTENT
- * ========== */
+/* ===== CONTENT ===== */
 .byMDdocument > .byMDcontent {
   padding: 1rem 0.5rem 0;
 }
@@ -227,9 +223,7 @@
 .byMDdocument del {
   text-decoration-thickness: 0.0625rem;
 }
-/* ==========
- * CONTROLS
- * ========== */
+/* ===== CONTROLS ===== */
 .byMDdocument > .byVIEWtoolbar {
   position: sticky;
   flex-shrink: 0;
@@ -392,9 +386,7 @@
   transition: transform var(--by-view-motion-duration, 0s) ease-out !important;
 }
 
-/* ===========
- * INTERACTION
- * =========== */
+/* ===== INTERACTION ===== */
 .byMDdocument button {
   -webkit-tap-highlight-color: #0000;
   touch-action: manipulation;
@@ -424,9 +416,7 @@
   display: none;
 }
 
-/* ==========
- * MOTION
- * ========== */
+/* ===== MOTION ===== */
 /* Initial content is immediate unless the entrance animation is explicitly enabled. */
 .byMDdocument {
   --by-view-motion-duration: 0s;
@@ -520,12 +510,8 @@
   transition: opacity var(--by-view-motion-duration) ease-out !important;
 }
 
-/* ==========
- * THEMES
- * ========== */
-/* ==========
- * LIGHT
- * ========== */
+/* ===== THEMES ===== */
+/* ===== LIGHT ===== */
 .byMDdocument,
 .byMDdocument.light:not([data-theme="dark"]),
 .byMDdocument[data-theme="light"] {
@@ -548,9 +534,7 @@
   --by-code-tag: #116329;
 }
 
-/* ==========
- * DARK
- * ========== */
+/* ===== DARK ===== */
 .byMDdocument.dark:not([data-theme="light"]),
 .byMDdocument[data-theme="dark"] {
   color-scheme: dark;
@@ -572,9 +556,7 @@
   --by-code-tag: #7ee787;
 }
 
-/* ==========
- * MONOKAI
- * ========== */
+/* ===== MONOKAI ===== */
 /* Light */
 .byMDdocument[data-theme="monokai"]:not(.dark) {
   --by-view-muted: #8a8875;
@@ -612,9 +594,7 @@
   --by-code-tag: #f92672;
 }
 
-/* ==========
- * SOLARIZED
- * ========== */
+/* ===== SOLARIZED ===== */
 /* Light */
 .byMDdocument[data-theme="solarized"]:not(.dark) {
   --by-view-muted: #657b83;
@@ -652,9 +632,7 @@
   --by-code-tag: #268bd2;
 }
 
-/* =============
- * HIGH CONTRAST
- * ============= */
+/* ===== HIGH CONTRAST ===== */
 /* Light */
 .byMDdocument[data-theme="high-contrast"]:not(.dark) {
   --by-view-muted: #333333;

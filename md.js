@@ -8,19 +8,13 @@
  */
 
 (function (global) {
-  // ==============
-  // INITIALIZATION
-  // ==============
+  // ===== INITIALIZATION =====
   if (global.byMDviewer?.initialized) return;
 
-  // ==========
-  // METADATA
-  // ==========
+  // ===== METADATA =====
   byMDviewer.VERSION = "3.1"; // 2026-11-18
 
-  // ==========
-  // CONSTANTS
-  // ==========
+  // ===== CONSTANTS =====
   const ESCAPABLE = /[\\`*{}\[\]()#+\-.!_>~|]/;
 
   const SAFE_LINK_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:", "ftp:", "ftps:"]);
@@ -29,9 +23,7 @@
 
   const HEADING_IDS = Symbol("headingIds");
 
-  // ==========
-  // APPEARANCE
-  // ==========
+  // ===== APPEARANCE =====
   const extraPalettes = new Set([
     "dracula",
     "darcula",
@@ -110,9 +102,7 @@
     }
   };
 
-  // ==========
-  // CONTROLS
-  // ==========
+  // ===== CONTROLS =====
   // Mirrored across the family so each viewer can run without a shared runtime.
   // Mirrored across the family so each viewer can run without a shared runtime.
   /**
@@ -330,9 +320,7 @@
     else element.prepend(toolbar);
   };
 
-  // ==========
-  // PARSING
-  // ==========
+  // ===== PARSING =====
   /**
    * Returns the amount of leading indentation, treating tabs as four spaces.
    * @param {string} line - Source line.
@@ -1257,9 +1245,7 @@
     return result;
   };
 
-  // ==========
-  // RENDERING
-  // ==========
+  // ===== RENDERING =====
   /**
    * Appends a text node to an element.
    * @param {Node} parent - Parent DOM node.
@@ -1591,9 +1577,7 @@
     }
   }
 
-  // ==========
-  // PUBLIC API
-  // ==========
+  // ===== PUBLIC API =====
   /**
    * Main API.
    * Renders Markdown into an HTMLElement.
@@ -1748,9 +1732,7 @@
     if (typeof source !== "string" || typeof next !== "string") throw new TypeError("byMDviewer.scanLine: lines must be strings.");
     return scanLine(source, context, next);
   };
-  // ==========
-  // EXPORT
-  // ==========
+  // ===== EXPORT =====
   global.byMDviewer = byMDviewer;
   byMDviewer.initialized = true;
 })(typeof window !== "undefined" ? window : this);

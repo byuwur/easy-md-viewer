@@ -36,9 +36,7 @@ test("MD playground loads, updates, and copies a starter", { timeout: 30000 }, a
       }
     });
   });
-  // ==============
-  // PROJECT ASSETS
-  // ==============
+  // ===== PROJECT ASSETS =====
   // Use real local companions behind the page's declared URLs, without contacting the CDN.
   const projects = {
     "spa.js": process.env.SPA_ASSETS_ROOT || path.join(root, "../spa.js"),
@@ -72,9 +70,7 @@ test("MD playground loads, updates, and copies a starter", { timeout: 30000 }, a
       }[path.extname(file)] || "application/octet-stream";
     return route.fulfill({ body, contentType: `${contentType}; charset=UTF-8` });
   });
-  // ====================
-  // BROWSER INTERACTIONS
-  // ====================
+  // ===== BROWSER INTERACTIONS =====
   await page.goto("https://playground.test/index.html");
   assert.equal(await page.locator("#latest-release").getAttribute("href"), "https://github.com/byuwur/md.view/releases/latest");
   assert.equal(await page.locator("#download-release").getAttribute("href"), "https://github.com/byuwur/md.view/releases/latest/download/md.view.zip");
