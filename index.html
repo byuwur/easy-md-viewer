@@ -882,14 +882,15 @@ Write Markdown here..."></textarea>
           linkTarget: "_blank",
           headingIdPrefix: ""
         };
+        const form = document.getElementById("config-form");
         const editor = document.getElementById("markdown-source");
         const frame = document.getElementById("preview-frame");
+        let viewer;
         const sourceSelect = document.getElementById("document-source");
         const state = {
           source: "showcase",
           options: { ...defaults },
           theme: "light",
-          integrationMode: "cdn",
           drafts: {},
           originals: {},
           sourceRequest: 0,
@@ -1015,7 +1016,6 @@ Write Markdown here..."></textarea>
           document.getElementById("render-status").textContent = "Loading...";
           document.getElementById("copy-markdown").disabled = true;
           document.getElementById("restore-source").disabled = true;
-          generateIntegration();
           if (source === "benchmark" && state.drafts.benchmark === undefined) {
             try {
               if (location.protocol === "file:") throw new Error("file-protocol");
@@ -1072,14 +1072,14 @@ Write Markdown here..."></textarea>
         // ===== PREVIEW =====
         function clearPreview() {
           clearTimeout(state.renderTimer);
+          viewer = null;
           if (state.previewReady) frame.contentDocument.getElementById("document").textContent = "";
           for (const name of ["size", "lines", "time", "nodes"]) document.getElementById(`metric-${name}`).textContent = "-";
           document.getElementById("render-source").disabled = true;
         }
 
-        function renderPreview(resetScroll = false, completed) {
+        function renderPreview(resetScroll = false, completed, appearance) {
           clearTimeout(state.renderTimer);
-          generateIntegration();
           if (!state.previewReady || state.drafts[state.source] === undefined) return;
           const markdown = state.drafts[state.source];
           try {
@@ -1087,10 +1087,9 @@ Write Markdown here..."></textarea>
             const target = previewWindow.document.getElementById("document");
             const scrollTop = resetScroll ? 0 : previewWindow.scrollY;
             const start = performance.now();
-            previewWindow.byMDviewer(target, markdown, state.options);
+            viewer = previewWindow.byMDviewer(target, markdown, { ...state.options, ...(viewer ? appearance : previewAppearance()) });
             const duration = performance.now() - start;
             const hasContent = !!markdown.trim();
-            target.style.minHeight = hasContent ? "" : "0";
             previewWindow.scrollTo(0, scrollTop);
             const bytes = new TextEncoder().encode(markdown).length;
             document.getElementById("metric-size").textContent = bytes < 1024 ? `${bytes} B` : `${(bytes / 1024).toFixed(1)} KiB`;
@@ -1129,25 +1128,12 @@ Write Markdown here..."></textarea>
               frame.contentDocument.addEventListener("click", (event) => {
                 const anchor = event.target.closest("a[href]");
                 if (!anchor) return;
-                if (!anchor.getAttribute("href").startsWith("#")) {
-                  if (anchor.target !== "_blank") {
-                    state.previewReady = false;
-                    document.getElementById("render-status").textContent = "Opening link...";
-                  }
-                  return;
+                if (!anchor.getAttribute("href").startsWith("#") && anchor.target !== "_blank") {
+                  state.previewReady = false;
+                  document.getElementById("render-status").textContent = "Opening link...";
                 }
-                event.preventDefault();
-                const id = anchor.getAttribute("href").slice(1);
-                let decoded = id;
-                try {
-                  decoded = decodeURIComponent(id);
-                } catch {
-                  // Malformed percent escapes can be literal heading IDs.
-                }
-                const heading = frame.contentDocument.getElementById(decoded);
-                heading?.scrollIntoView();
               });
-              setPreviewTheme(state.theme);
+              renderPreview(false, null, previewAppearance());
             } catch {
               state.previewReady = false;
               document.getElementById("render-status").textContent = "Preview unavailable";
@@ -1188,19 +1174,14 @@ Write Markdown here..."></textarea>
           const viewer = frame.contentDocument.getElementById("document");
           state.theme = getPreviewMode(viewer);
           document.getElementById(`preview-${state.theme}`).checked = true;
-          setPreviewMode(viewer, state.theme);
-          generateIntegration();
+          syncOptions(state.options);
         }
 
         function setPreviewTheme(theme) {
           state.theme = theme;
           document.getElementById(`preview-${theme}`).checked = true;
-          if (!state.previewReady) {
-            generateIntegration();
-            return;
-          }
-          setPreviewMode(frame.contentDocument.getElementById("document"), theme);
-          renderPreview();
+          viewer?.setOptions({ theme });
+          syncOptions(state.options);
         }
 
         // ===== SITE THEME =====
@@ -1217,15 +1198,20 @@ Write Markdown here..."></textarea>
         });
 
         // ===== INTEGRATION =====
+        function optionValue(control) {
+          if (control.type === "checkbox") return control.checked;
+          if (control.type === "number") return Number(control.value);
+          if ((control.type === "radio" || control.tagName === "SELECT") && control.value === "false") return false;
+          return control.value;
+        }
+
         function settingsJSON(options) {
           const field = (id) => (id === "preview-controls-font" ? document.querySelector('[name="preview-controls-font"]:checked')?.value : document.getElementById(id)?.value) || null;
           const { forceMonospace, toolbar, credits, themeToggle, fontSizeControls, copyButton, controlsCompact, animations, appearAnimation, controlsSize, controlsPosition, ...rendering } = options;
           return JSON.stringify(
             {
-              theme: document.querySelector('[name="previewTheme"]:checked').value,
-              palette: field("preview-palette") || "github",
+              ...previewAppearance(),
               fontFamily: field("preview-font"),
-              fontSize: field("preview-size") === null ? null : Number(field("preview-size")),
               lineHeight: field("preview-leading") === null ? null : Number(field("preview-leading")),
               controlsFont: field("preview-controls-font") || "ui-monospace, monospace",
               backgroundColor: field("preview-bg"),
@@ -1250,87 +1236,98 @@ Write Markdown here..."></textarea>
           );
         }
 
+        function syncOptions(options) {
+          document.documentElement.classList.toggle("no-motion", !options.animations);
+          for (const control of document.querySelectorAll('#credits, #themeToggle, #fontSizeControls, #copyButton, #controlsCompact, [name="controlsSize"], [name="controlsPosition"]')) control.disabled = !options.toolbar;
+          const statusBar = document.getElementById("statusBar");
+          if (statusBar) statusBar.disabled = !options.displayContainer;
+          document.getElementById("appearAnimation").disabled = !options.animations;
+          document.getElementById("options-json").value = settingsJSON(options);
+        }
+
+        const integrationCode = document.getElementById("integration-code");
         let integrationHTML = "";
-        function renderIntegration(html) {
+        function downloadText(text, filename, type) {
+          const url = URL.createObjectURL(new Blob([text], { type }));
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = filename;
+          document.body.append(link);
+          link.click();
+          window.bySiteAnalytics?.begin("resource_exported")?.();
+          link.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        function renderIntegration(title, assets, body) {
+          const html = [
+            "<!doctype html>",
+            '<html lang="en">',
+            "  <head>",
+            '    <meta charset="UTF-8">',
+            '    <meta name="viewport" content="width=device-width, initial-scale=1">',
+            `    <title>${title}</title>`,
+            ...assets,
+            "  </head>",
+            "  <body>",
+            ...body,
+            "  </body>",
+            "</html>"
+          ].join("\n");
           if (html === integrationHTML) return;
           integrationHTML = html;
-          const code = document.getElementById("integration-code");
           if (typeof window.byCODEviewer === "function") {
-            byCODEviewer(code, html, {
+            byCODEviewer(integrationCode, html, {
               language: "html",
               theme: document.documentElement.dataset.bsTheme,
               fontSize: 1,
               toolbar: false,
               displayContainer: false
             });
-          } else code.textContent = html;
+          } else integrationCode.textContent = html;
         }
 
-        function generateIntegration() {
-          document.documentElement.classList.toggle("no-motion", !state.options.animations);
-          for (const control of document.querySelectorAll('#credits, #themeToggle, #fontSizeControls, #copyButton, #controlsCompact, [name="controlsSize"], [name="controlsPosition"]')) control.disabled = !state.options.toolbar;
-          document.getElementById("appearAnimation").disabled = !state.options.animations;
-          document.getElementById("options-json").value = settingsJSON(state.options);
-          const cdn = state.integrationMode === "cdn";
+        function updateIntegration(mode = "cdn") {
+          const cdn = mode === "cdn";
           const min = cdn ? ".min" : "";
           const path = cdn ? "https://cdn.jsdelivr.net/gh/byuwur/md.view@latest/" : "";
           const endScript = "</" + "script>";
-          // Explicit lines preserve export indentation when the page is formatted.
-          const html = [
-            "<!doctype html>",
-            '<html lang="en">',
-            "  <head>",
-            '    <meta charset="UTF-8" />',
-            '    <meta name="viewport" content="width=device-width, initial-scale=1" />',
-            "    <title>MD.view</title>",
-            `    <link rel="stylesheet" href="${path}md${min}.css" />`,
-            `    <script src="${path}md${min}.js" defer>${endScript}`,
-            "  </head>",
-            "  <body>",
-            '    <div id="document" class="light" data-theme="github"></div>',
-            "    <script>",
-            '      document.addEventListener("DOMContentLoaded", () => {',
-            `        const markdown = ${JSON.stringify("# A little Markdown. A real document.\n\nWrite something useful. Let **MD.view** handle the rendering.")};`,
-            '        byMDviewer(document.getElementById("document"), markdown);',
-            "      });",
-            `    ${endScript}`,
-            "  </body>",
-            "</html>"
-          ].join("\n");
-          renderIntegration(html);
+          renderIntegration(
+            "MD.view",
+            [`    <link rel="stylesheet" href="${path}md${min}.css" />`, `    <script src="${path}md${min}.js" defer>${endScript}`],
+            [
+              '    <div id="document" class="light" data-theme="github"></div>',
+              "    <script>",
+              '      document.addEventListener("DOMContentLoaded", () => {',
+              `        const markdown = ${JSON.stringify("# A little Markdown. A real document.\n\nWrite something useful. Let **MD.view** handle the rendering.")};`,
+              '        byMDviewer(document.getElementById("document"), markdown);',
+              "      });",
+              `    ${endScript}`
+            ]
+          );
           document.getElementById("integration-note").textContent = cdn ? "CDN follows the latest release; updates may take time to reach caches." : "Place the HTML beside md.js and md.css.";
-          return html;
-        }
-
-        function downloadHTML() {
-          const html = generateIntegration();
-          const url = URL.createObjectURL(new Blob([html], { type: "text/html;charset=UTF-8" }));
-          const link = document.createElement("a");
-          link.href = url;
-          link.download = "md.view.html";
-          document.body.append(link);
-          link.click();
-          window.bySiteAnalytics?.begin("resource_exported")?.();
-          link.remove();
-          setTimeout(() => URL.revokeObjectURL(url), 1000);
-          document.getElementById("integration-feedback").textContent = "Downloaded. The starter uses default viewer settings.";
+          document.getElementById("integration-feedback").textContent = "";
         }
 
         // ===== CLIPBOARD =====
         async function copyText(text, selectable, button) {
           const caption = button.querySelector("span");
+          const starter = selectable.id === "integration-code";
+          if (starter) button.disabled = true;
           try {
-            const copied = window.bySiteAnalytics?.begin("resource_copied");
-            await navigator.clipboard.writeText(text);
-            copied?.();
+            await writeClipboard(text);
+            if (starter && text !== integrationHTML) return;
             caption.textContent = "Copied!";
             button.removeAttribute("title");
           } catch {
+            if (starter && text !== integrationHTML) return;
             selectable.focus();
             if (typeof selectable.select === "function") selectable.select();
             else document.getSelection()?.selectAllChildren(selectable);
             caption.textContent = "Failed";
             button.title = "Clipboard unavailable. Press Ctrl+C or ⌘C to copy the selected text.";
+          } finally {
+            if (starter) button.disabled = false;
           }
         }
 
@@ -1368,32 +1365,37 @@ Write Markdown here..."></textarea>
           });
         }
         window.addEventListener("pagehide", () => controlTooltips.forEach((tooltip) => tooltip.hide()));
-        document.querySelectorAll("[data-options-view]").forEach((button) =>
+        const optionsTabs = document.querySelectorAll("[data-options-view]");
+        optionsTabs.forEach((button) =>
           button.addEventListener("click", () => {
-            const jsonView = button.dataset.optionsView === "json";
-            document.getElementById("config-form").hidden = jsonView;
-            document.getElementById("options-json-panel").hidden = !jsonView;
-            document.getElementById("copy-options").hidden = !jsonView;
-            document.querySelectorAll("[data-options-view]").forEach((choice) => choice.setAttribute("aria-pressed", String(choice === button)));
+            const json = button.dataset.optionsView === "json";
+            form.hidden = json;
+            document.getElementById("options-json-panel").hidden = !json;
+            document.getElementById("copy-options").hidden = !json;
+            optionsTabs.forEach((choice) => choice.setAttribute("aria-pressed", String(choice === button)));
           })
         );
         document.getElementById("copy-options").addEventListener("click", (event) => {
           const options = document.getElementById("options-json");
           copyText(options.value, options, event.currentTarget);
         });
-        document.getElementById("config-form").addEventListener("submit", (event) => event.preventDefault());
-        document.getElementById("config-form").addEventListener("change", (event) => {
+        form.addEventListener("submit", (event) => event.preventDefault());
+        form.addEventListener("change", (event) => {
           const field = event.target;
           if (field.name === "previewTheme") return setPreviewTheme(field.value);
-          if (!(field.name in defaults)) return generateIntegration();
-          state.options[field.name] = field.type === "checkbox" ? field.checked : field.name === "linkTarget" && field.value === "false" ? false : field.value;
-          renderPreview();
+          if (field.id === "preview-palette") viewer?.setOptions({ palette: field.value });
+          if (field.id === "preview-size" && field.checkValidity()) viewer?.setOptions({ fontSize: previewAppearance("1em").fontSize });
+          if (!(field.name in defaults)) return syncOptions(state.options);
+          state.options[field.name] = optionValue(field);
+          viewer?.setOptions({ [field.name]: state.options[field.name] });
+          syncOptions(state.options);
         });
         document.getElementById("reset-options").addEventListener("click", () => {
           state.options = { ...defaults };
-          document.getElementById("config-form").reset();
-          if (state.previewReady) frame.contentDocument.getElementById("document").style.fontSize = "";
-          setPreviewTheme("light");
+          form.reset();
+          state.theme = "light";
+          viewer?.setOptions({ ...state.options, ...previewAppearance("1em") });
+          syncOptions(state.options);
           document.getElementById("feedback").textContent = "Default options, light preview, and default text size restored.";
         });
         sourceSelect.addEventListener("change", () => selectSource(sourceSelect.value, window.bySiteAnalytics?.begin("resource_selected")));
@@ -1436,22 +1438,16 @@ Write Markdown here..."></textarea>
             frame.srcdoc = frame.srcdoc;
           } else renderPreview(false, window.bySiteAnalytics?.begin("content_processed"));
         });
-        document.querySelectorAll('[name="integrationMode"]').forEach((input) =>
-          input.addEventListener("change", () => {
-            state.integrationMode = input.value;
-            generateIntegration();
-          })
-        );
+        document.querySelectorAll('[name="integrationMode"]').forEach((input) => input.addEventListener("change", () => updateIntegration(input.value)));
         document.getElementById("copy-markdown").addEventListener("click", (event) => {
           setMobilePanel("source");
           copyText(editor.value, editor, event.currentTarget);
         });
-        document.getElementById("copy-integration").addEventListener("click", (event) => {
-          generateIntegration();
-          const code = document.getElementById("integration-code");
-          copyText(integrationHTML, code, event.currentTarget);
+        document.getElementById("copy-integration").addEventListener("click", (event) => copyText(integrationHTML, integrationCode, event.currentTarget));
+        document.getElementById("download-html").addEventListener("click", () => {
+          downloadText(integrationHTML, "md.view.html", "text/html;charset=UTF-8");
+          document.getElementById("integration-feedback").textContent = "Downloaded. The starter uses default viewer settings.";
         });
-        document.getElementById("download-html").addEventListener("click", downloadHTML);
         // ===== EXAMPLES =====
         // Feature demonstrations preserve the other document drafts and the selected options.
         function showExample(name) {
@@ -1468,9 +1464,17 @@ Write Markdown here..."></textarea>
 
         // ===== INITIALIZATION =====
         document.getElementById("year-txt").textContent = new Date().getFullYear();
+        syncOptions(state.options);
+        updateIntegration(document.querySelector('[name="integrationMode"]:checked').value);
         selectSource("showcase");
         initializePreview();
       });
+
+      async function writeClipboard(text) {
+        const copied = window.bySiteAnalytics?.begin("resource_copied");
+        await navigator.clipboard.writeText(text);
+        copied?.();
+      }
 
       (function initColorPickers() {
         document.addEventListener("DOMContentLoaded", async () => {
@@ -1538,25 +1542,23 @@ Write Markdown here..."></textarea>
         return ["light", "dark"].includes(target.dataset.theme) ? target.dataset.theme : target.classList.contains("dark") ? "dark" : "light";
       }
 
-      function setPreviewMode(target, mode) {
-        const palette = document.getElementById("preview-palette").value;
-        // Only write changes: the preview observer watches these same attributes.
-        for (const value of ["light", "dark"]) {
-          if (target.classList.contains(value) !== (value === mode)) target.classList.toggle(value, value === mode);
-        }
-        const theme = palette === "github" ? mode : palette;
-        if (target.dataset.theme !== theme) target.dataset.theme = theme;
-        target.ownerDocument.documentElement.style.colorScheme = mode;
-        target.ownerDocument.body.style.background = target.ownerDocument.defaultView.getComputedStyle(target).backgroundColor;
+      function previewAppearance(defaultSize = null) {
+        const size = document.getElementById("preview-size");
+        return {
+          theme: document.querySelector('[name="previewTheme"]:checked').value,
+          palette: document.getElementById("preview-palette").value,
+          fontSize: size.value && size.checkValidity() ? size.valueAsNumber : defaultSize
+        };
       }
 
-      (function appearance(name) {
+      (function appearance(name, targetId = "viewer", contentSelector = "> .byVIEWcontent") {
         document.addEventListener("DOMContentLoaded", async () => {
           // DOMContentLoaded does not wait for dynamically loaded SPA styles and scripts.
           await spaReady;
           const frame = document.getElementById("preview-frame");
           const fields = [...document.querySelectorAll(".preview-appearance input:not([type=radio]), .preview-appearance select, #preview-controls-font")];
           const palette = document.getElementById("preview-palette");
+          const defaultPalette = [...palette.options].find((option) => option.defaultSelected)?.value || palette.options[0].value;
           const editor = document.getElementById("custom-theme-css");
           const themeStatus = document.getElementById("theme-status");
           const selector = `.by${name.toUpperCase()}document`;
@@ -1566,16 +1568,15 @@ Write Markdown here..."></textarea>
           const declarations = () => {
             const rules = fields.map((field, index) => {
               const value = field.id === "preview-controls-font" ? field.querySelector("input:checked").value : field.value;
-              return [properties[index], field.checkValidity() ? value + (field.id === "preview-size" && value ? "rem" : "") : ""];
+              return [properties[index], field.checkValidity() ? value : ""];
             });
             if (!["md", "json"].includes(name)) rules.push(["--by-view-content-font", rules[0][1]], ["--by-view-line-height", rules[2][1]]);
-            return rules;
+            return rules.filter(([property, value]) => property !== "font-size" && value);
           };
-          const initialStyles = new Map();
           let customDraft = null;
           let themesWarned = false;
           let themeTimer;
-          const target = () => frame.contentDocument?.querySelector(selector);
+          const target = () => frame.contentDocument?.getElementById(targetId);
           // Read both modes on temporary containers so exporting CSS never changes the live viewer.
           const themeCSS = (selected) => {
             const document = frame.contentDocument;
@@ -1606,19 +1607,11 @@ Write Markdown here..."></textarea>
               style.id = "custom-theme-style";
               frame.contentDocument.head.appendChild(style);
             }
-            const css = palette.value === "custom" ? editor.value : "";
+            const rules = declarations()
+              .map(([property, value]) => `${property}: ${value};`)
+              .join("\n");
+            const css = `${palette.value === "custom" ? editor.value : ""}\n#${viewer.id} {\n${rules}\n}`;
             if (style.textContent !== css) style.textContent = css;
-            for (const [property, value] of declarations()) {
-              if (value) {
-                if (!initialStyles.has(property)) initialStyles.set(property, viewer.style.getPropertyValue(property));
-                viewer.style.setProperty(property, value);
-              } else if (initialStyles.has(property)) {
-                viewer.style.setProperty(property, initialStyles.get(property));
-                initialStyles.delete(property);
-              }
-            }
-            viewer.dataset.byViewDefaultFontSize = viewer.style.fontSize;
-            setPreviewMode(viewer, getPreviewMode(viewer));
             const invalid = fields.some((field) => !field.checkValidity());
             document.getElementById("appearance-status").textContent = invalid ? "Use valid number ranges and CSS background colors; text color uses six-digit hex." : "";
           };
@@ -1628,12 +1621,12 @@ Write Markdown here..."></textarea>
             if (
               !["monokai", "github", "solarized", "high-contrast", "custom"].includes(palette.value) &&
               !themesWarned &&
-              frame.contentWindow.getComputedStyle(frame.contentDocument.documentElement).getPropertyValue("--by-md-themes-loaded").trim() !== "1"
+              frame.contentWindow.getComputedStyle(frame.contentDocument.documentElement).getPropertyValue(`--by-${name}-themes-loaded`).trim() !== "1"
             ) {
               themesWarned = true;
-              console.warn(`MD.view: Import md.themes.css after md.css to use "${palette.value}".`);
+              console.warn(`${name.toUpperCase()}.view: Import ${name}.themes.css after ${name}.css to use "${palette.value}".`);
             }
-            const css = palette.value === "custom" ? (customDraft ?? themeCSS("github")) : themeCSS(palette.value);
+            const css = palette.value === "custom" ? (customDraft ?? themeCSS(defaultPalette)) : themeCSS(palette.value);
             if (editor.value !== css) editor.value = css;
             apply();
             themeStatus.textContent = "";
@@ -1653,10 +1646,7 @@ Write Markdown here..."></textarea>
             themeTimer = setTimeout(editTheme, 180);
           });
           editor.addEventListener("change", editTheme);
-          frame.addEventListener("load", () => {
-            initialStyles.clear();
-            loadPalette();
-          });
+          frame.addEventListener("load", loadPalette);
           document.querySelectorAll("#reset-settings, #reset-options, #reset").forEach((button) =>
             button.addEventListener("click", () => {
               clearTimeout(themeTimer);
@@ -1668,15 +1658,13 @@ Write Markdown here..."></textarea>
                   field.setCustomValidity("");
                 }
               });
-              palette.value = "github";
-              palette.dispatchEvent(new Event("change", { bubbles: true }));
+              palette.value = defaultPalette;
+              loadPalette();
             })
           );
           document.getElementById("copy-theme").addEventListener("click", async () => {
             try {
-              const copied = window.bySiteAnalytics?.begin("resource_copied");
-              await navigator.clipboard.writeText(editor.value);
-              copied?.();
+              await writeClipboard(editor.value);
               themeStatus.textContent = 'Theme CSS copied. Use data-theme="custom" with a light/dark class.';
             } catch {
               themeStatus.textContent = "Copy failed. Check clipboard access.";
@@ -1685,13 +1673,12 @@ Write Markdown here..."></textarea>
           document.getElementById("copy-appearance").addEventListener("click", async () => {
             if (fields.some((field) => !field.checkValidity())) return apply();
             const rules = declarations()
-              .filter(([, value]) => value)
               .map(([property, value]) => `  ${property}: ${value};`)
               .join("\n");
             try {
-              const copied = window.bySiteAnalytics?.begin("resource_copied");
-              await navigator.clipboard.writeText(`${selector} {\n${rules}\n}`);
-              copied?.();
+              const size = document.getElementById("preview-size");
+              const contentRule = size.value ? `\n${selector} ${contentSelector} { font-size: ${size.valueAsNumber}rem; }` : "";
+              await writeClipboard(`${selector} {\n${rules}\n}${contentRule}`);
               document.getElementById("appearance-status").textContent = "CSS copied. Place it after the viewer stylesheet.";
             } catch {
               document.getElementById("appearance-status").textContent = "Copy failed. Check clipboard access.";
@@ -1700,7 +1687,7 @@ Write Markdown here..."></textarea>
           window.addEventListener("pagehide", () => clearTimeout(themeTimer));
           loadPalette();
         });
-      })("md");
+      })("md", "document", "> .byMDcontent");
 
       // Animate deliberate panel changes; initial content and render batches stay visible.
       document.addEventListener("shown.bs.tab", (event) => {
