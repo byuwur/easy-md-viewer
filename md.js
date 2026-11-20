@@ -1362,7 +1362,7 @@
     if (/ {2,}$/.test(source)) {
       hardBreak = true;
       source = source.replace(/ {2,}$/, "");
-    } else if (/\\$/.test(source) && !/\\\\$/.test(source)) {
+    } else if (source.endsWith("\\") && !source.endsWith("\\\\")) {
       // Treat a trailing backslash as a hard break.
       hardBreak = true;
       source = source.slice(0, -1);

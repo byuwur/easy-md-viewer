@@ -1115,7 +1115,7 @@ Write Markdown here..."></textarea>
 
         function initializePreview() {
           // A persistent srcdoc loads the actual library once; subsequent edits call its public API.
-          const base = new URL("./", location.href).href.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+          const base = new URL("./", location.href).href.replaceAll("&", "&amp;").replaceAll('"', "&quot;");
           frame.addEventListener("load", () => {
             try {
               state.previewReady = typeof frame.contentWindow.byMDviewer === "function";
@@ -1954,7 +1954,7 @@ Write Markdown here..."></textarea>
                 ? {
                     field_id: field
                       .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
-                      .replace(/-/g, "_")
+                      .replaceAll("-", "_")
                       .toLowerCase()
                   }
                 : {})
